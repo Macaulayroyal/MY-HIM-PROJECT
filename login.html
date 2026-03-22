@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - HIM.clothiers</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Lexend', sans-serif;
+        scrollbar-width: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    *::-webkit-scrollbar {
+        display: none;
+    }
+
+    html {
+        height: 100%;
+        width: 100%;
+    }
+
+    body {
+        background: white;
+        min-height: 100vh;
+        min-height: 100dvh; /* Dynamic viewport height for mobile */
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0; /* Remove padding on mobile */
+        overflow-x: hidden;
+    }
+
+    .container {
+        display: flex;
+        background: white;
+        overflow: hidden;
+        max-width: 1200px;
+        width: 100%;
+        min-height: 600px;
+        height: 100vh;
+        height: 100dvh;
+    }
+
+    .image-container {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+        min-height: 400px;
+    }
+
+    .image-container img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+    }
+
+    .image-container img.active {
+        opacity: 1;
+    }
+
+    .content-container {
+        flex: 1;
+        padding: 60px 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: left;
+        width: 100%;
+    }
+
+    .login-form {
+        width: 100%;
+        max-width: 400px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .header-section {
+        width: 100%;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #000;
+        margin-bottom: 20px;
+        letter-spacing: -1px;
+        text-align: center;
+    }
+
+    .profile-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .profile-upload {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid #6F4D38;
+        position: relative;
+        background: #f5f5f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .profile-upload img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: none;
+    }
+
+    .profile-upload img.show {
+        display: block;
+    }
+
+    .profile-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-size: 2.5rem;
+    }
+
+    .welcome-text {
+        font-size: 1.1rem;
+        font-weight: 300;
+        color: #000;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .love-icon {
+        width: 18px;
+        height: 18px;
+        fill: #000;
+    }
+
+    .input-group {
+        width: 100%;
+        position: relative;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 16px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 200px;
+        font-size: 1rem;
+        font-weight: 300;
+        color: #333;
+        transition: all 0.3s ease;
+        font-family: 'Lexend', sans-serif;
+        background: white;
+    }
+
+    .input-field:focus {
+        outline: none;
+        border-color: #6F4D38;
+        box-shadow: 0 0 0 3px rgba(111, 77, 56, 0.1);
+    }
+
+    .input-field::placeholder {
+        color: #999;
+    }
+
+    .options-row {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 5px 0;
+        padding: 0 5px;
+    }
+
+    .remember-me-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+    }
+
+    .toggle-switch {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        background-color: #e0e0e0;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .toggle-switch.active {
+        background-color: #6F4D38;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        background-color: white;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .toggle-switch.active .toggle-slider {
+        transform: translateX(20px);
+    }
+
+    .remember-text {
+        font-size: 0.9rem;
+        font-weight: 400;
+        color: #555;
+        user-select: none;
+    }
+
+    .forgot-password {
+        font-size: 0.9rem;
+        font-weight: 400;
+        color: #6F4D38;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .forgot-password:hover {
+        color: #5a3f2d;
+        text-decoration: underline;
+    }
+
+    .error-message {
+        color: #e74c3c;
+        font-size: 0.9rem;
+        margin-top: 5px;
+        display: none;
+        padding: 12px 16px;
+        background: #fee;
+        border-radius: 12px;
+        width: 100%;
+        text-align: center;
+        font-weight: 400;
+    }
+
+    .error-message.show {
+        display: block;
+    }
+
+    .success-message {
+        color: #27ae60;
+        font-size: 0.9rem;
+        margin-top: 5px;
+        display: none;
+        padding: 12px 16px;
+        background: #efe;
+        border-radius: 12px;
+        width: 100%;
+        text-align: center;
+        font-weight: 400;
+    }
+
+    .success-message.show {
+        display: block;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 16px 20px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        border-radius: 200px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Lexend', sans-serif;
+        border: none;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .btn-login {
+        background-color: #6F4D38;
+        color: white;
+        box-shadow: 0 4px 15px rgba(111, 77, 56, 0.3);
+        margin-top: 10px;
+    }
+
+    .btn-login:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(111, 77, 56, 0.4);
+        background-color: #5a3f2d;
+    }
+
+    .btn-login:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .btn-cancel {
+        background-color: white;
+        color: #000;
+        border: 2px solid #e0e0e0;
+    }
+
+    .btn-cancel:hover {
+        background-color: #f5f5f5;
+        border-color: #ccc;
+        transform: translateY(-2px);
+    }
+
+    .btn-signup {
+        background-color: transparent;
+        color: #6F4D38;
+        border: 2px solid #6F4D38;
+        margin-top: 10px;
+    }
+
+    .btn-signup:hover {
+        background-color: #f9f5f2;
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border: 2px solid #ffffff;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-left: 10px;
+        vertical-align: middle;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* ============================================
+       DESKTOP STYLES (min-width: 769px)
+       ============================================ */
+    @media (min-width: 769px) {
+        body {
+            padding: 20px;
+        }
+
+        .input-field, .btn {
+            width: 100% !important;
+            max-width: 400px !important;
+        }
+    }
+
+    /* ============================================
+       MOBILE STYLES (max-width: 768px)
+       ============================================ */
+    @media (max-width: 768px) {
+        body {
+            padding: 0;
+            align-items: flex-start; /* Align to top on mobile */
+        }
+
+        .container {
+            flex-direction: column;
+            border-radius: 0;
+            min-height: 100vh;
+            min-height: 100dvh;
+            height: auto;
+        }
+
+        .image-container {
+            display: none;
+        }
+
+        .content-container {
+            padding: 40px 24px; /* Comfortable side padding */
+            min-height: 100vh;
+            min-height: 100dvh;
+            width: 100%;
+            justify-content: flex-start; /* Start from top */
+            padding-top: 60px; /* Space from top */
+        }
+
+        .login-form {
+            max-width: 100%;
+            width: 100%;
+            gap: 20px;
+        }
+
+        .header-section {
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 1.875rem; /* 30px - comfortable mobile size */
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+        }
+
+        .profile-container {
+            margin-bottom: 24px;
+        }
+
+        .profile-upload {
+            width: 90px;
+            height: 90px;
+            border-width: 3px;
+        }
+
+        .profile-placeholder {
+            font-size: 2rem;
+        }
+
+        .welcome-text {
+            font-size: 1rem;
+            gap: 4px;
+        }
+
+        .love-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .input-field {
+            padding: 16px 20px;
+            font-size: 16px; /* Prevent zoom on iOS */
+            border-radius: 25px;
+            width: 100%;
+        }
+
+        .options-row {
+            margin: 8px 0;
+            padding: 0;
+            gap: 10px;
+        }
+
+        .remember-me-container {
+            gap: 8px;
+        }
+
+        .remember-text {
+            font-size: 0.875rem;
+        }
+
+        .forgot-password {
+            font-size: 0.875rem;
+        }
+
+        .btn {
+            padding: 16px 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            width: 100%;
+            border-radius: 25px;
+        }
+
+        .btn-login {
+            margin-top: 10px;
+        }
+
+        .btn-signup {
+            margin-top: 8px;
+        }
+
+        .error-message,
+        .success-message {
+            font-size: 0.875rem;
+            padding: 12px;
+            border-radius: 12px;
+        }
+    }
+
+    /* ============================================
+       SMALL MOBILE STYLES (max-width: 380px)
+       ============================================ */
+    @media (max-width: 380px) {
+        .content-container {
+            padding: 32px 20px;
+            padding-top: 40px;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+        }
+
+        .profile-upload {
+            width: 80px;
+            height: 80px;
+        }
+
+        .login-form {
+            gap: 16px;
+        }
+
+        .input-field {
+            padding: 14px 18px;
+        }
+
+        .btn {
+            padding: 14px 18px;
+        }
+
+        .options-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+    }
+
+    /* ============================================
+       VERY SMALL DEVICES (max-width: 320px)
+       ============================================ */
+    @media (max-width: 320px) {
+        .content-container {
+            padding: 24px 16px;
+            padding-top: 32px;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+        }
+
+        .input-field {
+            font-size: 14px;
+        }
+    }
+
+    /* ============================================
+       LANDSCAPE MOBILE OPTIMIZATION
+       ============================================ */
+    @media (max-width: 768px) and (orientation: landscape) {
+        .content-container {
+            padding-top: 20px;
+            justify-content: center;
+        }
+
+        .header-section {
+            margin-bottom: 20px;
+        }
+
+        .profile-upload {
+            width: 70px;
+            height: 70px;
+        }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .content-container > * {
+        animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    .content-container > *:nth-child(1) { animation-delay: 0.1s; }
+    .login-form { animation-delay: 0.2s; }
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="image-container">
+            <img src="img/bg1.jpg" alt="Modern workspace" class="active">
+            <img src="img/bg2.jpg" alt="Team collaboration">
+            <img src="img/bg1.jpg" alt="Creative meeting">
+            <img src="img/bg2.jpg" alt="Team collaboration">
+        </div>
+
+        <div class="content-container">
+            <form class="login-form" id="loginForm">
+                <div class="header-section">
+                    <h1 class="page-title">Welcome Back</h1>
+                    
+                    <div class="profile-container">
+                        <div class="profile-upload" id="profileUpload">
+                            <img src="" alt="Profile" id="profileImg">
+                            <div class="profile-placeholder" id="profilePlaceholder">👤</div>
+                        </div>
+                    </div>
+                    
+                    <p class="welcome-text">
+                        Good to see you again
+                        <svg class="love-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </p>
+                </div>
+                
+                <div class="input-group">
+                    <input type="email" class="input-field" id="emailInput" placeholder="Email Address" required autocomplete="email">
+                </div>
+
+                <div class="input-group">
+                    <input type="password" class="input-field" id="passwordInput" placeholder="Password" required minlength="6" autocomplete="current-password">
+                </div>
+
+                <div class="options-row">
+                    <div class="remember-me-container" onclick="toggleRememberMe()">
+                        <div class="toggle-switch" id="rememberToggle">
+                            <div class="toggle-slider"></div>
+                        </div>
+                        <span class="remember-text">Remember me</span>
+                    </div>
+                    <a href="forgotpassword.html" class="forgot-password">Forgot password?</a>
+                </div>
+
+                <div class="error-message" id="errorMessage"></div>
+                <div class="success-message" id="successMessage"></div>
+
+                <button type="submit" class="btn btn-login" id="loginBtn">Login</button>
+                <button type="button" class="btn btn-signup" onclick="window.location.href='signup.html'">Create Account</button>
+                <button style="border: none; color: black; font-weight: 100;" type="button" class="btn btn-cancel" onclick="window.location.href='index.html'">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const SUPABASE_URL = 'https://ddrhpjiaotwtblnlqytw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkcmhwamlhb3R3dGJsbmxxeXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NTI0MjMsImV4cCI6MjA4ODMyODQyM30.GNb6OTErsgNbb0PlEysXD7BtUhkjk0ldQCPbO_5EsKU';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let rememberMe = false;
+
+    // Image rotation
+    const images = document.querySelectorAll('.image-container img');
+    let currentImage = 0;
+    setInterval(() => {
+        images[currentImage].classList.remove('active');
+        currentImage = (currentImage + 1) % images.length;
+        images[currentImage].classList.add('active');
+    }, 3000);
+
+    // Toggle Remember Me
+    function toggleRememberMe() {
+        rememberMe = !rememberMe;
+        const toggle = document.getElementById('rememberToggle');
+        if (rememberMe) {
+            toggle.classList.add('active');
+            localStorage.setItem('rememberMe', 'true');
+        } else {
+            toggle.classList.remove('active');
+            localStorage.removeItem('rememberMe');
+            localStorage.removeItem('keepSession');
+        }
+    }
+
+    // Load saved remember me preference
+    function loadRememberMe() {
+        const saved = localStorage.getItem('rememberMe');
+        if (saved === 'true') {
+            rememberMe = true;
+            document.getElementById('rememberToggle').classList.add('active');
+        }
+    }
+
+    // Load profile image from various sources
+    async function loadProfileImage() {
+        const profileImg = document.getElementById('profileImg');
+        const placeholder = document.getElementById('profilePlaceholder');
+
+        // Try to get from localStorage first (from signup flow)
+        let avatarUrl = localStorage.getItem('pendingAvatarUrl') ||
+                        localStorage.getItem('userAvatarUrl');
+
+        // If we have a session, try to get fresh data from Supabase
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session?.user) {
+            const avatar = session.user.user_metadata?.avatar_url;
+            if (avatar) {
+                avatarUrl = avatar;
+                localStorage.setItem('userAvatarUrl', avatar);
+            }
+        }
+
+        if (avatarUrl && avatarUrl !== 'null' && avatarUrl !== '') {
+            profileImg.src = avatarUrl;
+            profileImg.classList.add('show');
+            placeholder.style.display = 'none';
+        } else {
+            profileImg.classList.remove('show');
+            placeholder.style.display = 'flex';
+        }
+    }
+
+    // Check for existing session (auto-login)
+    async function checkExistingSession() {
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+
+        if (error) {
+            console.error('Session check error:', error);
+            return;
+        }
+
+        if (session?.user) {
+            if (!session.user.email_confirmed_at) {
+                localStorage.setItem('pendingEmail', session.user.email);
+                window.location.href = 'confirmotp.html';
+                return;
+            }
+            window.location.href = 'HIM-coursepage.html';
+        }
+    }
+
+    // Show error message
+    function showError(message) {
+        const errorEl = document.getElementById('errorMessage');
+        const successEl = document.getElementById('successMessage');
+        errorEl.textContent = message;
+        errorEl.classList.add('show');
+        successEl.classList.remove('show');
+    }
+
+    // Show success message
+    function showSuccess(message) {
+        const errorEl = document.getElementById('errorMessage');
+        const successEl = document.getElementById('successMessage');
+        successEl.textContent = message;
+        successEl.classList.add('show');
+        errorEl.classList.remove('show');
+    }
+
+    // Reset login button
+    function resetButton() {
+        const btn = document.getElementById('loginBtn');
+        btn.disabled = false;
+        btn.innerHTML = 'Login';
+    }
+
+    // ✅ UPDATED handleLogin FUNCTION
+    async function handleLogin(e) {
+        e.preventDefault();
+        
+        const loginBtn = document.getElementById('loginBtn');
+        const email = document.getElementById('emailInput').value.trim().toLowerCase();
+        const password = document.getElementById('passwordInput').value;
+
+        if (!email || !password) {
+            showError('Please enter both email and password');
+            return;
+        }
+
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = 'Logging in... <span class="spinner"></span>';
+
+        try {
+            // 🔥 USE YOUR EXACT PASSWORD FROM SIGNUP
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password  // Plain text - must match signup password
+            });
+
+            if (error) {
+                console.error('Login error:', error.message);
+
+                if (error.message.includes('Invalid login credentials')) {
+                    showError('❌ Invalid email or password');
+                } else if (error.message.includes('Email not confirmed')) {
+                    showError('Please verify your email first');
+                } else {
+                    showError('Login failed. Try again.');
+                }
+                return;
+            }
+
+            // SUCCESS - store data like signup
+            const user = data.user;
+            localStorage.setItem('userEmail', user.email);
+            localStorage.setItem('userId', user.id);
+            localStorage.setItem('userAvatarUrl', user.user_metadata?.avatar_url || '');
+
+            showSuccess('Login successful! Redirecting...');
+            
+            setTimeout(() => {
+                window.location.href = 'HIM-coursepage.html';
+            }, 1500);
+
+        } catch (error) {
+            showError('Login failed. Try again.');
+            console.error('Login error:', error);
+        } finally {
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = 'Login';
+        }
+    }
+
+    // Initialize page
+    window.addEventListener('load', async () => {
+        loadRememberMe();
+        await loadProfileImage();
+
+        const keepSession = localStorage.getItem('keepSession');
+        if (keepSession === 'true') {
+            await checkExistingSession();
+        }
+    });
+
+    // Attach event listener
+    document.getElementById('loginForm').addEventListener('submit', handleLogin);
+</script>
+
+</body>
+</html>

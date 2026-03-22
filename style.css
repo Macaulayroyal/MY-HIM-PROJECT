@@ -1,0 +1,56 @@
+/* ============================================
+   ADMIN ICON - FIXED POSITION
+   ============================================ */
+
+.admin-icon {
+    position: fixed;
+    bottom: 100px; /* Above bottom nav */
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background: #6F4D38; /* Primary color */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 999; /* Below modals but above content */
+    box-shadow: 0 4px 15px rgba(111, 77, 56, 0.4);
+    transition: all 0.3s ease;
+    border: 2px solid white;
+    text-decoration: none;
+}
+
+.admin-icon:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 6px 20px rgba(111, 77, 56, 0.5);
+    background: #5a3f2e; /* Darker primary */
+}
+
+.admin-icon i {
+    color: white;
+    font-size: 1.3rem;
+    -webkit-text-stroke: 0;
+}
+
+/* Desktop positioning - adjust for sidebar */
+@media (min-width: 1024px) {
+    .admin-icon {
+        bottom: 30px;
+        right: 30px;
+        width: 56px;
+        height: 56px;
+    }
+    
+    .admin-icon i {
+        font-size: 1.5rem;
+    }
+}
+
+/* Hide when modal is open to avoid overlap */
+.product-modal.active ~ .admin-icon,
+.cart-modal.active ~ .admin-icon,
+.favorites-modal.active ~ .admin-icon {
+    opacity: 0;
+    pointer-events: none;
+}

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - HIM.clothiers</title>
+    
+    <!-- Import Raleway and Lexend fonts from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com ">
+    <link rel="preconnect" href="https://fonts.gstatic.com " crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Raleway:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Raleway', sans-serif;
+        }
+
+        /* Full page background with reduced opacity */
+        body {
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background image with white overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('img/bg1.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        /* White overlay for extra brightness */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.4);
+            z-index: -1;
+        }
+
+        /* Center container - subtle but noticeable shadow */
+        .welcome-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: white;
+            padding: 0;
+            border-radius: 20px;
+            box-shadow: 
+                0 4px 6px rgba(0, 0, 0, 0.05),
+                0 10px 20px rgba(0, 0, 0, 0.08),
+                0 25px 50px rgba(0, 0, 0, 0.12);
+            max-width: 480px;
+            width: 90%;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        /* Image wrapper - 100% width with fixed height */
+        .image-wrapper {
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+        }
+
+        /* Inner background image - fills width, covers height */
+        .container-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Content area with padding */
+        .content-area {
+            padding: 45px 50px 55px;
+        }
+
+        /* Welcome text - Raleway font */
+        .welcome-text {
+            font-size: 2rem;
+            color: #000;
+            margin-bottom: 35px;
+            letter-spacing: 0.5px;
+            line-height: 1.3;
+            font-family: 'Raleway', sans-serif;
+        }
+
+        /* Clothiers in primary color */
+        .brand-highlight {
+            color: #6F4D38;
+        }
+
+        /* Let's Start button - Lexend font, wider on large screens */
+        .btn-start {
+            width: 100%;
+            max-width: 320px;
+            padding: 18px 40px;
+            background-color: #6F4D38;
+            color: white;
+            border: none;
+            border-radius: 200px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Lexend', sans-serif;
+            box-shadow: 0 4px 15px rgba(111, 77, 56, 0.35);
+            text-decoration: none;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(111, 77, 56, 0.45);
+            background-color: #5a3f2d;
+        }
+
+        .btn-start:active {
+            transform: translateY(-1px);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -40%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        /* Mobile responsive - taller container */
+        @media (max-width: 768px) {
+            .welcome-container {
+                width: 92%;
+                max-width: none;
+                min-height: 85vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .image-wrapper {
+                height: 35vh;
+                min-height: 200px;
+            }
+
+            .content-area {
+                padding: 40px 35px 50px;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .welcome-text {
+                font-size: 1.8rem;
+                margin-bottom: 40px;
+            }
+
+            .btn-start {
+                padding: 18px 32px;
+                font-size: 1.05rem;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <!-- Image wrapper - 100% width, fixed height -->
+        <div class="image-wrapper">
+            <img src="img/welcomepage.jpg" alt="Welcome" class="container-image">
+        </div>
+        
+        <!-- Content area with text and button -->
+        <div class="content-area">
+            <h1 class="welcome-text">Welcome to<br>HIM.<span class="brand-highlight">clothiers</span></h1>
+            <button class="btn-start" onclick="startApp()">Let's Start</button>
+        </div>
+    </div>
+
+    <script>
+        function startApp() {
+            // Always redirect to the course page when the button is clicked
+            window.location.href = 'HIM-coursepage.html';
+        }
+    </script>
+</body>
+</html>

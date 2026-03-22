@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to HIM.clothiers</title>
+    
+    <!-- Import Lexend font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500&display=swap" rel="stylesheet">
+    
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Lexend', sans-serif;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    *::-webkit-scrollbar {
+        display: none;
+    }
+
+    html {
+        height: 100%;
+        width: 100%;
+    }
+
+    body {
+        background: white;
+        min-height: 100vh;
+        min-height: 100dvh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        overflow-x: hidden;
+    }
+
+    /* Loader Overlay - covers entire page */
+    .loader-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .loader-overlay.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    /* Glass white transparent container - 30x30px */
+    .loader-container {
+        width: 30px;
+        height: 30px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+        border-radius: 6px;
+    }
+
+    /* Larger square ball - 12px with smaller movement area */
+    .loader-ball {
+        width: 12px;
+        height: 12px;
+        background-color: #6F4D38;
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        animation: squareMove 1.5s infinite linear;
+        border-radius: 2px;
+    }
+
+    /* Tight square path - ball doesn't touch corners */
+    @keyframes squareMove {
+        0% {
+            top: 4px;
+            left: 4px;
+        }
+        25% {
+            top: 4px;
+            left: 14px;
+        }
+        50% {
+            top: 14px;
+            left: 14px;
+        }
+        75% {
+            top: 14px;
+            left: 4px;
+        }
+        100% {
+            top: 4px;
+            left: 4px;
+        }
+    }
+
+    .container {
+        display: flex;
+        background: white;
+        overflow: hidden;
+        max-width: 1200px;
+        width: 100%;
+        min-height: 600px;
+        height: 100vh;
+        height: 100dvh;
+        filter: blur(0px);
+        transition: filter 0.5s ease;
+    }
+
+    .container.loading {
+        filter: blur(8px);
+    }
+
+    .image-container {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+        min-height: 400px;
+    }
+
+    .image-container img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+    }
+
+    .image-container img.active {
+        opacity: 1;
+    }
+
+    .content-container {
+        flex: 1;
+        padding: 60px 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+    }
+
+    .site-name {
+        font-size: 3rem;
+        font-weight: 400;
+        color: #6F4D38;
+        margin-bottom: 90px;
+        letter-spacing: -1px;
+    }
+
+    .site-name span {
+        color: black;
+        font-family: 'Lexend', sans-serif;
+        font-weight: 400;
+    }
+
+    .description {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: #000;
+        margin-bottom: 120px;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        font-weight: 300;
+    }
+
+    .cta-button {
+        background-color: #6F4D38;
+        color: white;
+        border: none;
+        padding: 16px 40px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        border-radius: 200px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 15px rgba(111, 77, 56, 0.3);
+        font-family: 'Lexend', sans-serif;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .cta-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(111, 77, 56, 0.4);
+        background-color: #5a3f2d;
+    }
+
+    .login-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        color: #6F4D38;
+        text-decoration: none;
+        font-weight: 400;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        padding: 8px 0;
+        font-family: 'Lexend', sans-serif;
+        flex-shrink: 0;
+    }
+
+    .login-link:hover {
+        gap: 12px;
+        color: #5a3f2d;
+    }
+
+    .arrow-icon {
+        width: 30px;
+        height: 30px;
+        fill: currentColor;
+        background-color: #6F4D38;
+        color: white;
+        padding: 5px;
+        border-radius: 200px;
+        flex-shrink: 0;
+    }
+
+    /* ============================================
+       COOKIE CONSENT BANNER - HIM.clothiers Style
+       ============================================ */
+    .cookie-banner {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(150%);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(111, 77, 56, 0.15);
+        border-radius: 20px;
+        padding: 20px 24px;
+        box-shadow: 0 8px 32px rgba(111, 77, 56, 0.15), 
+                    0 2px 8px rgba(0, 0, 0, 0.08);
+        z-index: 10000;
+        max-width: 90%;
+        width: 400px;
+        opacity: 0;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .cookie-banner.show {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+
+    .cookie-banner.hide {
+        transform: translateX(-50%) translateY(150%);
+        opacity: 0;
+    }
+
+    .cookie-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .cookie-text {
+        font-size: 0.9rem;
+        line-height: 1.6;
+        color: #333;
+        font-weight: 300;
+        text-align: center;
+    }
+
+    .cookie-text strong {
+        color: #6F4D38;
+        font-weight: 500;
+    }
+
+    .cookie-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .cookie-btn {
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        font-family: 'Lexend', sans-serif;
+        flex: 1;
+        max-width: 140px;
+    }
+
+    .cookie-btn-accept {
+        background: #6F4D38;
+        color: white;
+        box-shadow: 0 4px 12px rgba(111, 77, 56, 0.3);
+    }
+
+    .cookie-btn-accept:hover {
+        background: #5a3f2d;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(111, 77, 56, 0.4);
+    }
+
+    .cookie-btn-decline {
+        background: transparent;
+        color: #6F4D38;
+        border: 2px solid rgba(111, 77, 56, 0.3);
+    }
+
+    .cookie-btn-decline:hover {
+        background: rgba(111, 77, 56, 0.05);
+        border-color: #6F4D38;
+        transform: translateY(-2px);
+    }
+
+    .cookie-icon {
+        text-align: center;
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+    }
+
+    /* ============================================
+       DESKTOP STYLES (min-width: 769px)
+       ============================================ */
+    @media (min-width: 769px) {
+        body {
+            padding: 20px;
+        }
+
+        .cta-button {
+            width: 60% !important;
+            max-width: 400px !important;
+        }
+
+        .cookie-banner {
+            bottom: 30px;
+            width: 450px;
+            padding: 24px 28px;
+        }
+
+        .cookie-text {
+            font-size: 0.95rem;
+        }
+
+        .cookie-btn {
+            padding: 14px 28px;
+            font-size: 0.95rem;
+        }
+    }
+
+    /* ============================================
+       MOBILE STYLES (max-width: 768px)
+       ============================================ */
+    @media (max-width: 768px) {
+        body {
+            padding: 0;
+        }
+
+        .container {
+            flex-direction: column;
+            border-radius: 0;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        .image-container {
+            display: none;
+        }
+
+        .content-container {
+            padding: 60px 24px;
+            min-height: 100vh;
+            min-height: 100dvh;
+            width: 100%;
+            justify-content: space-between;
+            padding-top: 80px;
+            padding-bottom: 60px;
+        }
+
+        .site-name {
+            font-size: 2.2rem;
+            margin-bottom: 0;
+            margin-top: 20px;
+            letter-spacing: -0.5px;
+        }
+
+        .description {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            max-width: 100%;
+            margin-bottom: 0;
+            padding: 0 10px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .button-group {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .cta-button {
+            width: 100%;
+            max-width: 100%;
+            padding: 18px 20px;
+            font-size: 1.05rem;
+            font-weight: 500;
+            border-radius: 25px;
+            margin-bottom: 0;
+        }
+
+        .login-link {
+            font-size: 1rem;
+            gap: 10px;
+            padding: 10px 0;
+        }
+
+        .arrow-icon {
+            width: 28px;
+            height: 28px;
+            padding: 4px;
+        }
+
+        /* Mobile cookie banner adjustments */
+        .cookie-banner {
+            bottom: 15px;
+            width: 92%;
+            max-width: none;
+            padding: 18px 20px;
+            border-radius: 16px;
+        }
+
+        .cookie-text {
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .cookie-buttons {
+            gap: 10px;
+        }
+
+        .cookie-btn {
+            padding: 10px 18px;
+            font-size: 0.85rem;
+            max-width: none;
+        }
+    }
+
+    /* ============================================
+       SMALL MOBILE STYLES (max-width: 380px)
+       ============================================ */
+    @media (max-width: 380px) {
+        .content-container {
+            padding: 50px 20px;
+            padding-top: 60px;
+            padding-bottom: 50px;
+        }
+
+        .site-name {
+            font-size: 2rem;
+            margin-top: 10px;
+        }
+
+        .description {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .button-group {
+            gap: 16px;
+            margin-bottom: 10px;
+        }
+
+        .cta-button {
+            padding: 16px 18px;
+            font-size: 1rem;
+        }
+
+        .login-link {
+            font-size: 0.95rem;
+        }
+
+        .cookie-banner {
+            padding: 16px 18px;
+        }
+
+        .cookie-text {
+            font-size: 0.8rem;
+        }
+
+        .cookie-btn {
+            padding: 10px 16px;
+            font-size: 0.8rem;
+        }
+    }
+
+    /* ============================================
+       VERY SMALL DEVICES (max-width: 320px)
+       ============================================ */
+    @media (max-width: 320px) {
+        .content-container {
+            padding: 40px 16px;
+            padding-top: 50px;
+            padding-bottom: 40px;
+        }
+
+        .site-name {
+            font-size: 1.75rem;
+            margin-top: 0;
+        }
+
+        .description {
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .button-group {
+            gap: 12px;
+        }
+
+        .cta-button {
+            padding: 14px 16px;
+            font-size: 0.95rem;
+        }
+
+        .login-link {
+            font-size: 0.9rem;
+            gap: 8px;
+        }
+
+        .arrow-icon {
+            width: 24px;
+            height: 24px;
+        }
+    }
+
+    /* ============================================
+       LANDSCAPE MOBILE OPTIMIZATION
+       ============================================ */
+    @media (max-width: 768px) and (orientation: landscape) {
+        .content-container {
+            padding: 30px 40px;
+            padding-top: 40px;
+            padding-bottom: 30px;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .site-name {
+            font-size: 1.75rem;
+            margin: 0;
+        }
+
+        .description {
+            font-size: 0.95rem;
+            margin: 0;
+            flex: 0;
+        }
+
+        .button-group {
+            margin: 0;
+            gap: 15px;
+        }
+
+        .cta-button {
+            padding: 14px 30px;
+            font-size: 0.95rem;
+            width: auto;
+            min-width: 200px;
+        }
+
+        .cookie-banner {
+            bottom: 10px;
+            width: 80%;
+            max-width: 400px;
+        }
+    }
+
+    /* Loading animation */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .content-container > * {
+        animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    .content-container > *:nth-child(1) { animation-delay: 0.1s; }
+    .content-container > *:nth-child(2) { animation-delay: 0.2s; }
+    .content-container > *:nth-child(3) { animation-delay: 0.3s; }
+    .content-container > *:nth-child(4) { animation-delay: 0.4s; }
+</style>
+</head>
+<body>
+    <!-- Loader Overlay -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader-container">
+            <div class="loader-ball"></div>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer">
+        <!-- Left Side: Image Container -->
+        <div class="image-container">
+            <img src="img/bg1.jpg" alt="Modern workspace" class="active">
+            <img src="img/bg2.jpg" alt="Team collaboration">
+            <img src="img/bg1.jpg" alt="Creative meeting">
+            <img src="img/bg2.jpg" alt="Team collaboration">
+        </div>
+
+        <!-- Right Side: Content -->
+        <div class="content-container">
+            <h1 class="site-name"><span>HIM</span>.clothiers</h1>
+            <p class="description">
+                <br>
+                "Premium clothing designed for <br> confidence and comfort".
+            </p>
+            <a href="signup.html" class="cta-button">Let's Get Started</a>
+            <a href="login.html" class="login-link">
+                I already have an account
+                <svg class="arrow-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <!-- Cookie Consent Banner -->
+    <div class="cookie-banner" id="cookieBanner">
+        <div class="cookie-content">
+            <div class="cookie-icon">🍪</div>
+            <p class="cookie-text">
+                We use cookies to enhance your shopping experience. By continuing to browse <strong>HIM.clothiers</strong>, you agree to our use of cookies.
+            </p>
+            <div class="cookie-buttons">
+                <button class="cookie-btn cookie-btn-accept" onclick="handleCookieConsent(true)">Accept</button>
+                <button class="cookie-btn cookie-btn-decline" onclick="handleCookieConsent(false)">Decline</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Image rotation functionality
+        const images = document.querySelectorAll('.image-container img');
+        let currentImage = 0;
+
+        function rotateImages() {
+            images[currentImage].classList.remove('active');
+            currentImage = (currentImage + 1) % images.length;
+            images[currentImage].classList.add('active');
+        }
+
+        setInterval(rotateImages, 4000);
+
+        // Loader functionality - hide after 3 seconds
+        window.addEventListener('load', function() {
+            const loaderOverlay = document.getElementById('loaderOverlay');
+            const mainContainer = document.getElementById('mainContainer');
+            
+            mainContainer.classList.add('loading');
+            
+            setTimeout(function() {
+                loaderOverlay.classList.add('hidden');
+                mainContainer.classList.remove('loading');
+                
+                // Show cookie banner after loader disappears
+                setTimeout(showCookieBanner, 500);
+            }, 3000);
+        });
+
+        // ============================================
+        // COOKIE CONSENT FUNCTIONALITY
+        // ============================================
+        
+        const COOKIE_CONSENT_KEY = 'him_clothiers_cookie_consent';
+
+        function showCookieBanner() {
+            // Check if user has already made a choice
+            const hasConsent = localStorage.getItem(COOKIE_CONSENT_KEY);
+            
+            if (hasConsent === null) {
+                // No choice made yet - show banner
+                const banner = document.getElementById('cookieBanner');
+                banner.classList.add('show');
+            }
+        }
+
+        function handleCookieConsent(accepted) {
+            const banner = document.getElementById('cookieBanner');
+            
+            // Save choice to localStorage (one time only)
+            localStorage.setItem(COOKIE_CONSENT_KEY, accepted ? 'accepted' : 'declined');
+            
+            // Hide banner with animation
+            banner.classList.remove('show');
+            banner.classList.add('hide');
+            
+            // Remove from DOM after animation
+            setTimeout(() => {
+                banner.style.display = 'none';
+            }, 500);
+            
+            // Optional: Log for debugging
+            console.log('Cookie consent:', accepted ? 'accepted' : 'declined');
+            
+            // Here you can add actual cookie setting logic based on choice
+            if (accepted) {
+                // Enable analytics, tracking cookies, etc.
+                enableCookies();
+            } else {
+                // Keep only essential cookies
+                disableNonEssentialCookies();
+            }
+        }
+
+        function enableCookies() {
+            // Placeholder for enabling analytics, tracking, etc.
+            console.log('Non-essential cookies enabled');
+        }
+
+        function disableNonEssentialCookies() {
+            // Placeholder for disabling non-essential cookies
+            console.log('Only essential cookies kept');
+        }
+
+        // Check on page load if banner should be shown
+        document.addEventListener('DOMContentLoaded', function() {
+            const hasConsent = localStorage.getItem(COOKIE_CONSENT_KEY);
+            if (hasConsent !== null) {
+                // Already decided - keep banner hidden
+                const banner = document.getElementById('cookieBanner');
+                banner.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm OTP - HIM.clothiers</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Lexend', sans-serif;
+        scrollbar-width: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    *::-webkit-scrollbar {
+        display: none;
+    }
+
+    html {
+        height: 100%;
+        width: 100%;
+    }
+
+    body {
+        background: white;
+        min-height: 100vh;
+        min-height: 100dvh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        overflow-x: hidden;
+    }
+
+    .container {
+        display: flex;
+        background: white;
+        overflow: hidden;
+        max-width: 1200px;
+        width: 100%;
+        min-height: 600px;
+        height: 100vh;
+        height: 100dvh;
+    }
+
+    .image-container {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+        min-height: 400px;
+    }
+
+    .image-container img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+    }
+
+    .image-container img.active {
+        opacity: 1;
+    }
+
+    .content-container {
+        flex: 1;
+        padding: 60px 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #000;
+        margin-bottom: 16px;
+        letter-spacing: 1px;
+    }
+
+    .description {
+        font-size: 1rem;
+        font-weight: 300;
+        color: #000;
+        margin-bottom: 8px;
+        line-height: 1.6;
+    }
+
+    .user-email {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #6F4D38;
+        margin-bottom: 50px;
+        letter-spacing: 0.5px;
+        word-break: break-all;
+    }
+
+    .otp-inputs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 40px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .otp-input {
+        width: 55px;
+        height: 55px;
+        border: 2px solid #e0e0e0;
+        border-radius: 50%;
+        text-align: center;
+        font-size: 1.4rem;
+        font-weight: 500;
+        color: #000;
+        background-color: #fdf8f5;
+        transition: all 0.3s ease;
+        outline: none;
+        font-family: 'Lexend', sans-serif;
+    }
+
+    .otp-input:focus {
+        border-color: #6F4D38;
+        background-color: #f5ebe4;
+        box-shadow: 0 0 0 3px rgba(111, 77, 56, 0.1);
+    }
+
+    .otp-input::-webkit-outer-spin-button,
+    .otp-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .btn-enter {
+        width: 100%;
+        max-width: 300px;
+        padding: 16px 20px;
+        background-color: #6F4D38;
+        color: white;
+        border: none;
+        border-radius: 200px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Lexend', sans-serif;
+        box-shadow: 0 4px 15px rgba(111, 77, 56, 0.3);
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .btn-enter:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(111, 77, 56, 0.4);
+        background-color: #5a3f2d;
+    }
+
+    .btn-enter:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ffffff;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-left: 10px;
+        vertical-align: middle;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .resend-text {
+        color: #000;
+        font-size: 0.9rem;
+        margin-top: 24px;
+        font-weight: 400;
+    }
+
+    .resend-link {
+        color: #6F4D38;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .resend-link:hover {
+        text-decoration: underline;
+    }
+
+    .resend-link.disabled {
+        color: #999;
+        pointer-events: none;
+    }
+
+    .message {
+        margin-top: 16px;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        display: none;
+        max-width: 350px;
+        width: 100%;
+        font-weight: 400;
+    }
+
+    .message.error {
+        background-color: #fee;
+        color: #c33;
+        display: block;
+    }
+
+    .message.success {
+        background-color: #efe;
+        color: #3c3;
+        display: block;
+    }
+
+    /* ============================================
+       DESKTOP STYLES (min-width: 769px)
+       ============================================ */
+    @media (min-width: 769px) {
+        body {
+            padding: 20px;
+        }
+
+        .btn-enter {
+            width: 60% !important;
+            max-width: 400px !important;
+        }
+    }
+
+    /* ============================================
+       MOBILE STYLES (max-width: 768px)
+       ============================================ */
+    @media (max-width: 768px) {
+        body {
+            padding: 0;
+        }
+
+        .container {
+            flex-direction: column;
+            border-radius: 0;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        .image-container {
+            display: none;
+        }
+
+        .content-container {
+            padding: 60px 24px;
+            min-height: 100vh;
+            min-height: 100dvh;
+            width: 100%;
+            justify-content: space-between; /* PERFECT SPACING: Title top, button bottom */
+            padding-top: 100px; /* Space from top */
+            padding-bottom: 60px; /* Space from bottom */
+        }
+
+        .header-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 1.875rem;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .description {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            max-width: 100%;
+        }
+
+        .user-email {
+            font-size: 1rem;
+            margin-bottom: 40px; /* Reduced for better fit */
+            letter-spacing: 0;
+        }
+
+        .otp-inputs {
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .otp-input {
+            width: 50px; /* Slightly larger */
+            height: 50px;
+            font-size: 1.3rem;
+            border-radius: 50%;
+        }
+
+        .btn-enter {
+            width: 100%;
+            max-width: 100%;
+            padding: 16px 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 25px;
+            margin-bottom: 20px; /* Space from bottom */
+        }
+
+        .message {
+            margin-top: 12px;
+            padding: 12px 16px;
+            font-size: 0.875rem;
+            border-radius: 12px;
+            max-width: 100%;
+        }
+
+        .resend-text {
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+    }
+
+    /* ============================================
+       SMALL MOBILE STYLES (max-width: 380px)
+       ============================================ */
+    @media (max-width: 380px) {
+        .content-container {
+            padding: 50px 20px;
+            padding-top: 80px;
+            padding-bottom: 50px;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .user-email {
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+        }
+
+        .otp-inputs {
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .otp-input {
+            width: 45px;
+            height: 45px;
+            font-size: 1.2rem;
+        }
+
+        .btn-enter {
+            padding: 14px 18px;
+            font-size: 0.95rem;
+        }
+
+        .resend-text {
+            font-size: 0.875rem;
+            margin-top: 16px;
+        }
+    }
+
+    /* ============================================
+       VERY SMALL DEVICES (max-width: 320px)
+       ============================================ */
+    @media (max-width: 320px) {
+        .content-container {
+            padding: 40px 16px;
+            padding-top: 60px;
+            padding-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .user-email {
+            font-size: 0.875rem;
+            margin-bottom: 25px;
+        }
+
+        .otp-inputs {
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .otp-input {
+            width: 40px;
+            height: 40px;
+            font-size: 1.1rem;
+            border-width: 1.5px;
+        }
+
+        .btn-enter {
+            padding: 12px 16px;
+            font-size: 0.9rem;
+        }
+
+        .resend-text {
+            font-size: 0.85rem;
+            margin-top: 12px;
+        }
+
+        .message {
+            padding: 10px 12px;
+            font-size: 0.8rem;
+        }
+    }
+
+    /* ============================================
+       LANDSCAPE MOBILE OPTIMIZATION
+       ============================================ */
+    @media (max-width: 768px) and (orientation: landscape) {
+        .content-container {
+            padding: 30px 40px;
+            padding-top: 40px;
+            padding-bottom: 30px;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .user-email {
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .otp-inputs {
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .otp-input {
+            width: 40px;
+            height: 40px;
+            font-size: 1.1rem;
+        }
+
+        .btn-enter {
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            max-width: 250px;
+        }
+
+        .resend-text {
+            margin-top: 12px;
+        }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .content-container > * {
+        animation: fadeIn 0.6s ease-out forwards;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="image-container">
+            <img src="img/bg1.jpg" alt="Modern workspace" class="active">
+            <img src="img/bg2.jpg" alt="Team collaboration">
+            <img src="img/bg1.jpg" alt="Creative meeting">
+            <img src="img/bg2.jpg" alt="Team collaboration">
+        </div>
+
+        <div class="content-container">
+            <h1 class="page-title">Confirm OTP</h1>
+            <p class="description">Enter the 6-digit code sent to your email</p>
+            <p class="user-email" id="userEmail">email@example.com</p>
+            
+            <div class="otp-inputs" id="otpInputs">
+                <input type="number" class="otp-input" maxlength="1" id="otp1" oninput="handleInput(this, 0)" onkeydown="handleKeydown(event, 0)">
+                <input type="number" class="otp-input" maxlength="1" id="otp2" oninput="handleInput(this, 1)" onkeydown="handleKeydown(event, 1)">
+                <input type="number" class="otp-input" maxlength="1" id="otp3" oninput="handleInput(this, 2)" onkeydown="handleKeydown(event, 2)">
+                <input type="number" class="otp-input" maxlength="1" id="otp4" oninput="handleInput(this, 3)" onkeydown="handleKeydown(event, 3)">
+                <input type="number" class="otp-input" maxlength="1" id="otp5" oninput="handleInput(this, 4)" onkeydown="handleKeydown(event, 4)">
+                <input type="number" class="otp-input" maxlength="1" id="otp6" oninput="handleInput(this, 5)" onkeydown="handleKeydown(event, 5)">
+            </div>
+            
+            <button type="button" class="btn-enter" id="enterBtn" onclick="submitOTP()">Enter</button>
+            
+            <div class="message" id="message"></div>
+            
+            <p class="resend-text">Didn't receive the code? <a href="#" class="resend-link" id="resendLink" onclick="resendOTP()">Resend</a></p>
+        </div>
+    </div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const SUPABASE_URL = 'https://ddrhpjiaotwtblnlqytw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkcmhwamlhb3R3dGJsbmxxeXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NTI0MjMsImV4cCI6MjA4ODMyODQyM30.GNb6OTErsgNbb0PlEysXD7BtUhkjk0ldQCPbO_5EsKU';
+const EMAIL_API_URL = 'https://him-clothiers-email-api.onrender.com';
+    
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Image rotation
+    const images = document.querySelectorAll('.image-container img');
+    let currentImage = 0;
+    setInterval(() => {
+        images[currentImage].classList.remove('active');
+        currentImage = (currentImage + 1) % images.length;
+        images[currentImage].classList.add('active');
+    }, 3000);
+
+    // Display email
+    window.addEventListener('load', function() {
+        const email = localStorage.getItem('pendingEmail');
+        if (!email) {
+            showMessage('Session expired. Please sign up again.', 'error');
+            setTimeout(() => window.location.href = 'signup.html', 2000);
+            return;
+        }
+        document.getElementById('userEmail').textContent = email;
+        document.getElementById('otp1').focus();
+    });
+
+    // OTP input handling
+    const inputs = document.querySelectorAll('.otp-input');
+
+    function handleInput(current, index) {
+        current.value = current.value.replace(/[^0-9]/g, '');
+        if (current.value.length === 1 && index < 5) {
+            inputs[index + 1].focus();
+        }
+        if (index === 5 && current.value.length === 1) {
+            setTimeout(submitOTP, 200);
+        }
+    }
+
+    function handleKeydown(event, index) {
+        if (event.key === 'Backspace' && event.target.value === '' && index > 0) {
+            inputs[index - 1].focus();
+        }
+    }
+
+    function showMessage(text, type) {
+        const msgEl = document.getElementById('message');
+        msgEl.textContent = text;
+        msgEl.className = 'message ' + type;
+        if (type !== 'success') {
+            setTimeout(() => msgEl.className = 'message', 5000);
+        }
+    }
+
+    async function submitOTP() {
+        let fullOTP = '';
+        for (let i = 0; i < 6; i++) fullOTP += inputs[i].value;
+
+        const email = localStorage.getItem('pendingEmail');
+        const password = localStorage.getItem('pendingPassword');
+        const storedOtp = localStorage.getItem('pendingOtp');
+
+        if (fullOTP !== storedOtp) {
+            showMessage('Invalid OTP code', 'error');
+            return;
+        }
+
+        try {
+            // CREATE USER via Railway API (FIXED URL)
+            const createResponse = await fetch(`${EMAIL_API_URL}/create-user`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email, password,
+                    phone: localStorage.getItem('pendingPhone') || '',
+                    avatar_url: localStorage.getItem('pendingAvatarUrl') || ''
+                })
+            });
+
+            const createResult = await createResponse.json();
+            if (!createResponse.ok) throw new Error(createResult.error || 'Failed to create account');
+
+            // Success! Cleanup and redirect
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('userId', createResult.user.id);
+            localStorage.setItem('userAvatarUrl', createResult.user.avatar_url || '');
+            
+            // Clear pending data
+            localStorage.removeItem('pendingEmail');
+            localStorage.removeItem('pendingPassword');
+            localStorage.removeItem('pendingPhone');
+            localStorage.removeItem('pendingAvatarUrl');
+            localStorage.removeItem('pendingOtp');
+
+            showMessage('Account created successfully!', 'success');
+            setTimeout(() => window.location.href = 'welcomepage.html', 1500);
+            
+        } catch (error) {
+            showMessage(error.message || 'Failed to create account', 'error');
+            console.error('OTP verification error:', error);
+        }
+    }
+</script>
+
+</body>
+</html>

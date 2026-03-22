@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Help Center - HIM.CLOTHIERS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --brand-color: #6F4D38;
+            --brand-hover: #5a3f2e;
+            --brand-light: rgba(111, 77, 56, 0.1);
+            --brand-lighter: rgba(111, 77, 56, 0.05);
+            --bg-white: #ffffff;
+            --bg-light: #f8f9fa;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6c757d;
+            --text-muted: #adb5bd;
+            --border-color: #e9ecef;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --radius: 16px;
+            --radius-sm: 12px;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            background: var(--bg-white);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 16px;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: var(--brand-light);
+        }
+
+        .back-btn i {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 24px 20px 100px;
+        }
+
+        /* Hero Section */
+        .help-hero {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, var(--brand-color) 0%, #8B6F5C 100%);
+            border-radius: var(--radius);
+            margin-bottom: 32px;
+            color: white;
+        }
+
+        .help-hero h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .help-hero p {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 24px;
+        }
+
+        /* Search Box */
+        .search-container {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 16px 20px 16px 52px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            background: rgba(255,255,255,0.95);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--brand-color);
+            font-size: 1.2rem;
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: var(--border-color);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .search-clear.visible {
+            display: flex;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .quick-action {
+            background: var(--bg-white);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid var(--border-color);
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .quick-action:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+            border-color: var(--brand-color);
+        }
+
+        .quick-action i {
+            font-size: 1.8rem;
+            color: var(--brand-color);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .quick-action span {
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: block;
+        }
+
+        .quick-action small {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 24px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .category-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-tab {
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-white);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .category-tab:hover {
+            border-color: var(--brand-color);
+            color: var(--brand-color);
+        }
+
+        .category-tab.active {
+            background: var(--brand-color);
+            border-color: var(--brand-color);
+            color: white;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--brand-color);
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .faq-question:hover {
+            color: var(--brand-color);
+        }
+
+        .faq-question i {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+            color: var(--brand-color);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease-out;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding-bottom: 20px;
+        }
+
+        .faq-answer p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .faq-answer ul {
+            margin: 12px 0;
+            padding-left: 20px;
+            color: var(--text-secondary);
+        }
+
+        .faq-answer li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .faq-answer a {
+            color: var(--brand-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .faq-answer a:hover {
+            text-decoration: underline;
+        }
+
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .no-results i {
+            font-size: 4rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .no-results h3 {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .contact-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: var(--brand-lighter);
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .contact-card:hover {
+            background: var(--brand-light);
+            border-color: var(--brand-color);
+            transform: translateX(4px);
+        }
+
+        .contact-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-sm);
+            background: var(--brand-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .contact-info h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .contact-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Live Chat Button */
+        .live-chat-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--brand-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 30px rgba(111, 77, 56, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .live-chat-btn:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 12px 40px rgba(111, 77, 56, 0.5);
+        }
+
+        .live-chat-btn::after {
+            content: 'Chat';
+            position: absolute;
+            bottom: -30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--brand-color);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .live-chat-btn:hover::after {
+            opacity: 1;
+            bottom: -25px;
+        }
+
+        /* Chat Modal */
+        .chat-modal {
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            width: calc(100% - 48px);
+            max-width: 350px;
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            display: none;
+            flex-direction: column;
+            z-index: 999;
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-modal.active {
+            display: flex;
+        }
+
+        .chat-header {
+            background: var(--brand-color);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .chat-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-body {
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .chat-message {
+            background: var(--brand-lighter);
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+        }
+
+        .chat-message p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .chat-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chat-option {
+            padding: 12px 16px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .chat-option:hover {
+            background: var(--brand-light);
+            border-color: var(--brand-color);
+            color: var(--brand-color);
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .container {
+                padding: 40px 24px 120px;
+            }
+
+            .help-hero {
+                padding: 60px 40px;
+            }
+
+            .help-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .contact-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .chat-modal {
+                width: 350px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 1000px;
+            }
+
+            .faq-section,
+            .contact-section {
+                padding: 32px;
+            }
+        }
+
+        /* Highlight search results */
+        .highlight {
+            background: rgba(255, 193, 7, 0.3);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <button class="back-btn" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h1 class="header-title">Help Center</h1>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Hero Section with Search -->
+        <div class="help-hero">
+            <h1>How can we help you?</h1>
+            <p>Find answers to your questions or get in touch with us</p>
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-box" id="searchInput" placeholder="Search for answers..." oninput="searchFAQs()">
+                <button class="search-clear" id="clearSearch" onclick="clearSearch()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="#orders" class="quick-action" onclick="filterCategory('orders')">
+                <i class="fas fa-box"></i>
+                <span>Track Order</span>
+                <small>Check your order status</small>
+            </a>
+            <a href="#payments" class="quick-action" onclick="filterCategory('payments')">
+                <i class="fas fa-credit-card"></i>
+                <span>Payment</span>
+                <small>Payment issues & refunds</small>
+            </a>
+            <a href="#shipping" class="quick-action" onclick="filterCategory('shipping')">
+                <i class="fas fa-shipping-fast"></i>
+                <span>Shipping</span>
+                <small>Delivery info & costs</small>
+            </a>
+            <a href="#returns" class="quick-action" onclick="filterCategory('returns')">
+                <i class="fas fa-undo"></i>
+                <span>Returns</span>
+                <small>Return & exchange policy</small>
+            </a>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="category-tabs" id="categoryTabs">
+            <button class="category-tab active" onclick="filterCategory('all')">All Topics</button>
+            <button class="category-tab" onclick="filterCategory('orders')">Orders</button>
+            <button class="category-tab" onclick="filterCategory('payments')">Payments</button>
+            <button class="category-tab" onclick="filterCategory('shipping')">Shipping</button>
+            <button class="category-tab" onclick="filterCategory('returns')">Returns</button>
+            <button class="category-tab" onclick="filterCategory('account')">Account</button>
+            <button class="category-tab" onclick="filterCategory('products')">Products</button>
+        </div>
+
+        <!-- No Results State -->
+        <div class="no-results" id="noResults" style="display: none;">
+            <i class="fas fa-search"></i>
+            <h3>No results found</h3>
+            <p>Try different keywords or browse the categories below</p>
+        </div>
+
+        <!-- FAQ Sections -->
+        <div id="faqContainer">
+            <!-- Orders Section -->
+            <div class="faq-section" data-category="orders">
+                <h2 class="section-title">
+                    <i class="fas fa-shopping-bag"></i>
+                    Orders & Purchases
+                </h2>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        How do I place an order?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Placing an order is easy:</p>
+                        <ul>
+                            <li>Browse our collection and select your desired items</li>
+                            <li>Choose your size and color preferences</li>
+                            <li>Click "Add to Cart" and proceed to checkout</li>
+                            <li>Fill in your delivery details and complete payment</li>
+                            <li>You'll receive an order confirmation via email</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        How can I track my order?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>You can track your order in multiple ways:</p>
+                        <ul>
+                            <li>Check your <a href="orders.html">Orders page</a> for real-time status updates</li>
+                            <li>Click on any order to see detailed tracking information</li>
+                            <li>You'll receive SMS and email updates at each stage</li>
+                            <li>Contact our support team with your order ID for assistance</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        Can I modify or cancel my order?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Order modifications depend on the status:</p>
+                        <ul>
+                            <li><strong>Pending Payment:</strong> You can cancel and reorder</li>
+                            <li><strong>Paid/Processing:</strong> Contact us immediately for changes</li>
+                            <li><strong>Shipped:</strong> Cannot be modified, but can be returned after delivery</li>
+                        </ul>
+                        <p>Call us at <a href="tel:+2349012949580">0901 294 9580</a> for urgent changes.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        What do the order statuses mean?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <ul>
+                            <li><strong>Pending:</strong> Awaiting payment confirmation</li>
+                            <li><strong>Paid:</strong> Payment verified, preparing for shipment</li>
+                            <li><strong>Processing:</strong> Being packed and prepared</li>
+                            <li><strong>Shipped:</strong> On its way to you</li>
+                            <li><strong>Delivered:</strong> Successfully delivered</li>
+                            <li><strong>Rejected:</strong> Order cancelled or payment issue</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payments Section -->
+            <div class="faq-section" data-category="payments">
+                <h2 class="section-title">
+                    <i class="fas fa-credit-card"></i>
+                    Payments & Pricing
+                </h2>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        What payment methods do you accept?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>We currently accept:</p>
+                        <ul>
+                            <li><strong>Bank Transfer:</strong> Transfer to our Moniepoint account</li>
+                            <li><strong>Account Details:</strong> Moniepoint MFB, 9012949580, Isah David Olearekhai</li>
+                        </ul>
+                        <p>After payment, upload your receipt in the checkout page or orders section for verification.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        How do I confirm my payment?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>To confirm your bank transfer:</p>
+                        <ul>
+                            <li>Take a screenshot or photo of your payment receipt</li>
+                            <li>Go to your <a href="orders.html">Orders page</a></li>
+                            <li>Click on the pending order</li>
+                            <li>Upload the receipt and click "I have made this transfer"</li>
+                            <li>Wait for admin verification (usually within 24 hours)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        Is my payment information secure?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Absolutely. We take security seriously:</p>
+                        <ul>
+                            <li>All payment receipts are encrypted and stored securely</li>
+                            <li>We never store your bank login details</li>
+                            <li>Our platform uses SSL encryption for all transactions</li>
+                            <li>Only authorized admin staff can view payment confirmations</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        Can I get a refund?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Refunds are available in these cases:</p>
+                        <ul>
+                            <li>Order cancelled before shipping - full refund</li>
+                            <li>Defective or wrong item received - full refund or exchange</li>
+                            <li>Item out of stock - full refund within 3-5 business days</li>
+                        </ul>
+                        <p>Refunds are processed to the original payment method within 5-7 business days.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Section -->
+            <div class="faq-section" data-category="shipping">
+                <h2 class="section-title">
+                    <i class="fas fa-shipping-fast"></i>
+                    Shipping & Delivery
+                </h2>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        How long does delivery take?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Delivery times vary by location:</p>
+                        <ul>
+                            <li><strong>Lagos:</strong> 1-2 business days</li>
+                            <li><strong>Abuja, Port Harcourt:</strong> 2-3 business days</li>
+                            <li><strong>Other major cities:</strong> 3-5 business days</li>
+                            <li><strong>Remote areas:</strong> 5-7 business days</li>
+                        </ul>
+                        <p>Business days are Monday to Saturday, excluding public holidays.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        How much is shipping?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Our shipping rates:</p>
+                        <ul>
+                            <li><strong>Standard Shipping:</strong> ₦2,500 (5-7 business days)</li>
+                            <li><strong>Express Shipping:</strong> ₦5,000 (1-3 business days)</li>
+                            <li><strong>Free Shipping:</strong> Available on orders over ₦50,000</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        Do you deliver nationwide?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes! We deliver to all 36 states in Nigeria plus FCT Abuja. We partner with reliable logistics companies including GIG Logistics, DHL, and local courier services to ensure your package arrives safely.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        What if I'm not home when my package arrives?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>If you're not available:</p>
+                        <ul>
+                            <li>Our delivery partner will call you to schedule a convenient time</li>
+                            <li>You can authorize someone else to receive on your behalf</li>
+                            <li>Package can be held at the nearest pickup location for 3 days</li>
+                            <li>Second delivery attempt may attract additional charges</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Returns Section -->
+            <div class="faq-section" data-category="returns">
+                <h2 class="section-title">
+                    <i class="fas fa-undo"></i>
+                    Returns & Exchanges
+                </h2>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        What is your return policy?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Our return policy:</p>
+                        <ul>
+                            <li><strong>Timeframe:</strong> 7 days from delivery date</li>
+                            <li><strong>Condition:</strong> Items must be unworn, unwashed, with original tags attached</li>
+                            <li><strong>Exceptions:</strong> Underwear, socks, and customized items cannot be returned</li>
+                            <li><strong>Process:</strong> Initiate return through your orders page or contact support</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        How do I return an item?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>To return an item:</p>
+                        <ol style="padding-left: 20px; color: var(--text-secondary); line-height: 1.8;">
+                            <li>Go to your <a href="orders.html">Orders page</a> and select the order</li>
+                            <li>Click "Request Return" and select the item(s)</li>
+                            <li>Choose reason for return and preferred resolution (refund/exchange)</li>
+                            <li>Package the item securely in original packaging</li>
+                            <li>Our courier will pick up within 48 hours</li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        Can I exchange for a different size?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes! Size exchanges are free within the 7-day window, subject to availability. If your size is out of stock, you can choose to:</p>
+                        <ul>
+                            <li>Wait for restock (we'll notify you)</li>
+                            <li>Select a different item of same value</li>
+                            <li>Receive store credit</li>
+                            <li>Get a refund to original payment method</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Section -->
+            <div class="faq-section" data-category="account">
+                <h2 class="section-title">
+                    <i class="fas fa-user"></i>
+                    Account & Profile
+                </h2>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        How do I create an account?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Creating an account is simple:</p>
+                        <ul>
+                            <li>Click "Sign Up" on the login page</li>
+                            <li>Enter your email and create a password</li>
+                            <li>Verify your email via the link sent</li>
+                            <li>Complete your profile with delivery address</li>
+                            <li>Start shopping!</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        How do I update my delivery address?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Update your address:</p>
+                        <ul>
+                            <li>Go to <a href="profile.html">Profile Settings</a></li>
+                            <li>Click "Edit" next to your current address</li>
+                            <li>Enter new address details</li>
+                            <li>Save changes</li>
+                        </ul>
+                        <p>You can also add multiple addresses and select which one to use during checkout.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        I forgot my password. What should I do?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Reset your password:</p>
+                        <ul>
+                            <li>Click "Forgot Password" on the login page</li>
+                            <li>Enter your registered email address</li>
+                            <li>Check your email for the reset link</li>
+                            <li>Create a new secure password</li>
+                        </ul>
+                        <p>Reset links expire after 24 hours for security.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Section -->
+            <div class="faq-section" data-category="products">
+                <h2 class="section-title">
+                    <i class="fas fa-tshirt"></i>
+                    Products & Sizing
+                </h2>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        How do I find my correct size?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Finding your perfect fit:</p>
+                        <ul>
+                            <li>Check our detailed <a href="#">Size Guide</a> with measurements</li>
+                            <li>Measure your chest, waist, and hips in inches</li>
+                            <li>Compare with our size chart on each product page</li>
+                            <li>When in doubt, size up for a relaxed fit or down for fitted</li>
+                            <li>Read customer reviews for fit feedback</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        How do I care for my clothes?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Care instructions by material:</p>
+                        <ul>
+                            <li><strong>Cotton:</strong> Machine wash cold, tumble dry low, iron medium heat</li>
+                            <li><strong>Polyester blends:</strong> Machine wash cold, do not bleach, hang dry</li>
+                            <li><strong>Wool:</strong> Dry clean only or hand wash cold</li>
+                            <li><strong>Denim:</strong> Wash inside out, avoid frequent washing</li>
+                        </ul>
+                        <p>Always check the care label inside your garment.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
+                        Are your products authentic?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes, all HIM.CLOTHIERS products are 100% authentic and designed in-house. We source high-quality materials from verified suppliers and manufacture under strict quality control. Each item passes through 3 quality checks before shipping.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="contact-section">
+            <h2 class="section-title">
+                <i class="fas fa-headset"></i>
+                Still Need Help?
+            </h2>
+            <div class="contact-grid">
+                <a href="tel:+2349012949580" class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="contact-info">
+                        <h4>Call Us</h4>
+                        <p>0901 294 9580</p>
+                        <p style="font-size: 0.75rem; margin-top: 4px;">Mon-Sat, 9am - 6pm</p>
+                    </div>
+                </a>
+                <a href="mailto:support@himclothiers.com" class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="contact-info">
+                        <h4>Email Us</h4>
+                        <p>support@himclothiers.com</p>
+                        <p style="font-size: 0.75rem; margin-top: 4px;">Response within 24 hours</p>
+                    </div>
+                </a>
+                <a href="https://wa.me/2349012949580" class="contact-card" target="_blank">
+                    <div class="contact-icon" style="background: #25D366;">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <div class="contact-info">
+                        <h4>WhatsApp</h4>
+                        <p>Chat with us instantly</p>
+                        <p style="font-size: 0.75rem; margin-top: 4px;">Fastest response time</p>
+                    </div>
+                </a>
+                <div class="contact-card" onclick="openChat()" style="cursor: pointer;">
+                    <div class="contact-icon" style="background: var(--warning);">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="contact-info">
+                        <h4>Live Chat</h4>
+                        <p>Talk to our team</p>
+                        <p style="font-size: 0.75rem; margin-top: 4px;">Usually replies in minutes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Live Chat Button -->
+    <button class="live-chat-btn" onclick="toggleChat()">
+        <i class="fas fa-comment-dots"></i>
+    </button>
+
+    <!-- Chat Modal -->
+    <div class="chat-modal" id="chatModal">
+        <div class="chat-header">
+            <h3><i class="fas fa-robot" style="margin-right: 8px;"></i> HIM Assistant</h3>
+            <button class="chat-close" onclick="toggleChat()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chat-body">
+            <div class="chat-message">
+                <p>Hi there! 👋 I'm here to help you with:</p>
+                <div class="chat-options">
+                    <button class="chat-option" onclick="handleChatOption('track')">
+                        <i class="fas fa-box" style="margin-right: 8px;"></i> Track my order
+                    </button>
+                    <button class="chat-option" onclick="handleChatOption('payment')">
+                        <i class="fas fa-credit-card" style="margin-right: 8px;"></i> Payment issues
+                    </button>
+                    <button class="chat-option" onclick="handleChatOption('return')">
+                        <i class="fas fa-undo" style="margin-right: 8px;"></i> Return an item
+                    </button>
+                    <button class="chat-option" onclick="handleChatOption('size')">
+                        <i class="fas fa-ruler" style="margin-right: 8px;"></i> Size guidance
+                    </button>
+                    <button class="chat-option" onclick="handleChatOption('human')">
+                        <i class="fas fa-user" style="margin-right: 8px;"></i> Talk to a human
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Go back function
+        function goBack() {
+            const isAdmin = localStorage.getItem('adminLoggedIn') === 'true';
+            if (isAdmin) {
+                window.location.href = 'dashboard.html';
+            } else {
+                window.location.href = 'HIM-coursepage.html';
+            }
+        }
+
+        // Toggle FAQ
+        function toggleFAQ(button) {
+            const item = button.parentElement;
+            const isActive = item.classList.contains('active');
+            
+            // Close all other FAQs
+            document.querySelectorAll('.faq-item.active').forEach(faq => {
+                if (faq !== item) faq.classList.remove('active');
+            });
+            
+            // Toggle current
+            item.classList.toggle('active');
+        }
+
+        // Filter by category
+        function filterCategory(category) {
+            // Update tabs
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.textContent.toLowerCase().includes(category) || 
+                    (category === 'all' && tab.textContent === 'All Topics')) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // Show/hide sections
+            const sections = document.querySelectorAll('.faq-section');
+            let visibleCount = 0;
+
+            sections.forEach(section => {
+                if (category === 'all' || section.dataset.category === category) {
+                    section.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+
+            // Scroll to content
+            if (category !== 'all') {
+                document.getElementById('faqContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Search functionality
+        function searchFAQs() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const clearBtn = document.getElementById('clearSearch');
+            const noResults = document.getElementById('noResults');
+            const sections = document.querySelectorAll('.faq-section');
+            
+            // Show/hide clear button
+            clearBtn.classList.toggle('visible', searchTerm.length > 0);
+
+            if (searchTerm.length === 0) {
+                // Reset view
+                sections.forEach(section => section.style.display = 'block');
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    item.style.display = 'block';
+                    item.classList.remove('active');
+                });
+                noResults.style.display = 'none';
+                return;
+            }
+
+            let totalMatches = 0;
+
+            sections.forEach(section => {
+                const items = section.querySelectorAll('.faq-item');
+                let sectionMatches = 0;
+
+                items.forEach(item => {
+                    const question = item.querySelector('.faq-question').textContent.toLowerCase();
+                    const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+
+                    if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                        item.style.display = 'block';
+                        item.classList.add('active');
+                        sectionMatches++;
+                        
+                        // Highlight matches
+                        highlightText(item, searchTerm);
+                    } else {
+                        item.style.display = 'none';
+                        item.classList.remove('active');
+                    }
+                });
+
+                section.style.display = sectionMatches > 0 ? 'block' : 'none';
+                totalMatches += sectionMatches;
+            });
+
+            noResults.style.display = totalMatches === 0 ? 'block' : 'none';
+        }
+
+        // Highlight search matches
+        function highlightText(item, term) {
+            const question = item.querySelector('.faq-question');
+            const answer = item.querySelector('.faq-answer');
+            
+            // Simple highlight implementation
+            const regex = new RegExp(`(${term})`, 'gi');
+            
+            // Note: In production, you'd want a more robust highlighting solution
+            // that doesn't break HTML tags
+        }
+
+        // Clear search
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            searchFAQs();
+            document.getElementById('searchInput').focus();
+        }
+
+        // Chat functionality
+        function toggleChat() {
+            const modal = document.getElementById('chatModal');
+            modal.classList.toggle('active');
+        }
+
+        function openChat() {
+            const modal = document.getElementById('chatModal');
+            modal.classList.add('active');
+        }
+
+        function handleChatOption(option) {
+            const messages = {
+                track: "You can track your order in the Orders page. Would you like me to take you there?",
+                payment: "For payment issues, please have your order ID ready. You can also call us at 0901 294 9580 for immediate assistance.",
+                return: "To return an item, go to your Orders page, select the order, and click 'Request Return'. Need help with something specific?",
+                size: "Check our size guide on each product page. If you're between sizes, we recommend sizing up for a comfortable fit.",
+                human: "Connecting you to a human agent... Please wait or call 0901 294 9580 for faster service."
+            };
+
+            const chatBody = document.querySelector('.chat-body');
+            const response = document.createElement('div');
+            response.className = 'chat-message';
+            response.style.background = 'white';
+            response.style.border = '1px solid var(--border-color)';
+            response.innerHTML = `
+                <p style="color: var(--text-primary);"><strong>Assistant:</strong> ${messages[option]}</p>
+                ${option === 'track' ? '<button class="chat-option" onclick="window.location.href=\'orders.html\'" style="margin-top: 12px;">Go to Orders</button>' : ''}
+                ${option === 'human' ? '<button class="chat-option" onclick="window.location.href=\'tel:+2349012949580\'" style="margin-top: 12px; background: var(--success); color: white;">Call Now</button>' : ''}
+            `;
+            
+            chatBody.appendChild(response);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        // Close chat when clicking outside
+        document.addEventListener('click', (e) => {
+            const chatModal = document.getElementById('chatModal');
+            const chatBtn = document.querySelector('.live-chat-btn');
+            
+            if (!chatModal.contains(e.target) && !chatBtn.contains(e.target)) {
+                chatModal.classList.remove('active');
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Press / to focus search
+            if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+            
+            // Press Escape to close chat
+            if (e.key === 'Escape') {
+                document.getElementById('chatModal').classList.remove('active');
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if coming from specific context
+            const urlParams = new URLSearchParams(window.location.search);
+            const category = urlParams.get('category');
+            if (category) {
+                filterCategory(category);
+            }
+        });
+    </script>
+</body>
+</html>

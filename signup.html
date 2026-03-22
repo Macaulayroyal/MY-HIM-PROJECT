@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - HIM.clothiers</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Lexend', sans-serif;
+        scrollbar-width: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    *::-webkit-scrollbar {
+        display: none;
+    }
+
+    html {
+        height: 100%;
+        width: 100%;
+    }
+
+    body {
+        background: white;
+        min-height: 100vh;
+        min-height: 100dvh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        overflow-x: hidden;
+    }
+
+    .container {
+        display: flex;
+        background: white;
+        overflow: hidden;
+        max-width: 1200px;
+        width: 100%;
+        min-height: 600px;
+        height: 100vh;
+        height: 100dvh;
+    }
+
+    .image-container {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+        min-height: 400px;
+    }
+
+    .image-container img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+    }
+
+    .image-container img.active {
+        opacity: 1;
+    }
+
+    .content-container {
+        flex: 1;
+        padding: 60px 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+    }
+
+    .header-section {
+        width: 100%;
+        max-width: 400px;
+        text-align: left;
+        margin-bottom: 50px;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #000;
+        letter-spacing: 2px;
+        margin-bottom: 50px;
+    }
+
+    .profile-upload {
+        width: 60px;
+        height: 60px;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        display: inline-block;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .profile-upload:hover {
+        transform: scale(1.1);
+    }
+
+    .profile-upload img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .profile-upload.has-image {
+        border: 3px solid #6F4D38;
+        border-radius: 50%;
+    }
+
+    .signup-form {
+        width: 100%;
+        max-width: 400px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .input-group {
+        width: 100%;
+        position: relative;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 16px 20px;
+        border: 2px solid #e0e0e0;
+        font-size: 1rem;
+        font-weight: 300;
+        color: #333;
+        transition: all 0.3s ease;
+        font-family: 'Lexend', sans-serif;
+        border-radius: 200px;
+        background: white;
+    }
+
+    .input-field:focus {
+        outline: none;
+        border-color: #6F4D38;
+        box-shadow: 0 0 0 3px rgba(111, 77, 56, 0.1);
+    }
+
+    .input-field::placeholder {
+        color: #999;
+    }
+
+    .phone-input-wrapper {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        position: relative;
+        border: 2px solid #e0e0e0;
+        border-radius: 200px;
+        transition: all 0.3s ease;
+        background: white;
+        overflow: hidden;
+    }
+
+    .phone-input-wrapper:focus-within {
+        border-color: #6F4D38;
+        box-shadow: 0 0 0 3px rgba(111, 77, 56, 0.1);
+    }
+
+    .country-select {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 12px;
+        background: white;
+        cursor: pointer;
+        min-width: 100px;
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 0;
+        flex-shrink: 0;
+    }
+
+    .country-select:hover {
+        background-color: #f9f5f2;
+    }
+
+    .divider {
+        width: 1px;
+        height: 24px;
+        background-color: #e0e0e0;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .phone-input-wrapper:focus-within .divider {
+        background-color: #6F4D38;
+    }
+
+    .country-flag {
+        width: 24px;
+        height: 16px;
+        object-fit: cover;
+        border-radius: 2px;
+    }
+
+    .country-code {
+        font-size: 0.9rem;
+        color: #333;
+        font-weight: 400;
+        white-space: nowrap;
+    }
+
+    .dropdown-arrow {
+        width: 12px;
+        height: 12px;
+        fill: #666;
+        flex-shrink: 0;
+    }
+
+    .phone-input {
+        flex: 1;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        padding: 16px 20px;
+        font-size: 1rem;
+        font-weight: 300;
+        color: #333;
+        font-family: 'Lexend', sans-serif;
+        min-width: 0;
+    }
+
+    .phone-input:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .country-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        margin-top: 5px;
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        width: 200px;
+        max-height: 200px;
+        overflow-y: auto;
+        display: none;
+        z-index: 100;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .country-dropdown.active {
+        display: block;
+    }
+
+    .country-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .country-option:hover {
+        background: #f5f5f5;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 16px 20px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        border-radius: 200px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Lexend', sans-serif;
+        border: none;
+        margin-top: 0;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .btn-primary {
+        background-color: #6F4D38;
+        color: white;
+        box-shadow: 0 4px 15px rgba(111, 77, 56, 0.3);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(111, 77, 56, 0.4);
+        background-color: #5a3f2d;
+    }
+
+    .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .btn-secondary {
+        background-color: white;
+        color: #6F4D38;
+        border: 2px solid #6F4D38;
+    }
+
+    .btn-secondary:hover {
+        background-color: #f9f5f2;
+        transform: translateY(-2px);
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ffffff;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-left: 10px;
+        vertical-align: middle;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .error-message {
+        color: #e74c3c;
+        font-size: 0.9rem;
+        margin-top: 10px;
+        display: none;
+        padding: 12px 16px;
+        background: #fee;
+        border-radius: 12px;
+        width: 100%;
+        text-align: center;
+        font-weight: 400;
+    }
+
+    .error-message.show {
+        display: block;
+    }
+
+    .success-message {
+        color: #27ae60;
+        font-size: 0.9rem;
+        margin-top: 10px;
+        display: none;
+        padding: 12px 16px;
+        background: #efe;
+        border-radius: 12px;
+        width: 100%;
+        text-align: center;
+        font-weight: 400;
+    }
+
+    .success-message.show {
+        display: block;
+    }
+
+    /* ============================================
+       DESKTOP STYLES (min-width: 769px)
+       ============================================ */
+    @media (min-width: 769px) {
+        body {
+            padding: 20px;
+        }
+
+        .btn {
+            width: 100% !important;
+            max-width: 400px !important;
+        }
+    }
+
+    /* ============================================
+       MOBILE STYLES (max-width: 768px)
+       ============================================ */
+    @media (max-width: 768px) {
+        body {
+            padding: 0;
+        }
+
+        .container {
+            flex-direction: column;
+            border-radius: 0;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        .image-container {
+            display: none;
+        }
+
+        .content-container {
+            padding: 60px 24px;
+            min-height: 100vh;
+            min-height: 100dvh;
+            width: 100%;
+            justify-content: space-between; /* KEY: Space between header and form */
+            padding-top: 80px;
+            padding-bottom: 60px;
+        }
+
+        .header-section {
+            max-width: 100%;
+            width: 100%;
+            margin-bottom: 0; /* Remove margin, use flex spacing */
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .profile-upload {
+            width: 70px;
+            height: 70px;
+            align-self: flex-start;
+            margin-left: 0;
+        }
+
+        .signup-form {
+            max-width: 100%;
+            width: 100%;
+            gap: 20px;
+            margin-bottom: 20px; /* Space from bottom */
+        }
+
+        .input-field {
+            padding: 16px 20px;
+            font-size: 16px;
+            border-radius: 25px;
+            width: 100%;
+        }
+
+        .phone-input-wrapper {
+            border-radius: 25px;
+            width: 100%;
+        }
+
+        .country-select {
+            padding: 16px 12px;
+            min-width: 90px;
+        }
+
+        .country-code {
+            font-size: 0.875rem;
+        }
+
+        .phone-input {
+            padding: 16px 16px;
+            font-size: 16px;
+        }
+
+        .country-dropdown {
+            width: 100%;
+            max-height: 250px;
+            border-radius: 16px;
+            left: 0;
+            right: 0;
+        }
+
+        .btn {
+            padding: 16px 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            width: 100%;
+            border-radius: 25px;
+        }
+
+        .error-message,
+        .success-message {
+            font-size: 0.875rem;
+            padding: 12px;
+            border-radius: 12px;
+        }
+    }
+
+    /* ============================================
+       SMALL MOBILE STYLES (max-width: 380px)
+       ============================================ */
+    @media (max-width: 380px) {
+        .content-container {
+            padding: 50px 20px;
+            padding-top: 60px;
+            padding-bottom: 50px;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            margin-bottom: 24px;
+        }
+
+        .profile-upload {
+            width: 60px;
+            height: 60px;
+        }
+
+        .signup-form {
+            gap: 16px;
+            margin-bottom: 10px;
+        }
+
+        .input-field {
+            padding: 14px 18px;
+        }
+
+        .country-select {
+            padding: 14px 10px;
+            min-width: 85px;
+            gap: 6px;
+        }
+
+        .country-flag {
+            width: 20px;
+            height: 14px;
+        }
+
+        .phone-input {
+            padding: 14px 14px;
+        }
+
+        .btn {
+            padding: 14px 18px;
+        }
+    }
+
+    /* ============================================
+       VERY SMALL DEVICES (max-width: 320px)
+       ============================================ */
+    @media (max-width: 320px) {
+        .content-container {
+            padding: 40px 16px;
+            padding-top: 50px;
+            padding-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .profile-upload {
+            width: 50px;
+            height: 50px;
+        }
+
+        .signup-form {
+            gap: 14px;
+        }
+
+        .input-field {
+            font-size: 14px;
+        }
+
+        .phone-input {
+            font-size: 14px;
+        }
+
+        .country-select {
+            min-width: 80px;
+            padding: 12px 8px;
+        }
+
+        .country-code {
+            font-size: 0.8rem;
+        }
+    }
+
+    /* ============================================
+       LANDSCAPE MOBILE OPTIMIZATION
+       ============================================ */
+    @media (max-width: 768px) and (orientation: landscape) {
+        .content-container {
+            padding: 30px 40px;
+            padding-top: 30px;
+            padding-bottom: 30px;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .header-section {
+            margin-bottom: 0;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .profile-upload {
+            width: 50px;
+            height: 50px;
+        }
+
+        .signup-form {
+            gap: 12px;
+            margin-bottom: 0;
+        }
+
+        .input-field {
+            padding: 12px 16px;
+        }
+
+        .phone-input-wrapper {
+            padding: 0;
+        }
+
+        .btn {
+            padding: 12px 16px;
+        }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .content-container > * {
+        animation: fadeIn 0.8s ease-out forwards;
+    }
+
+        /* ============================================
+       MOBILE STYLES (max-width: 768px)
+       ============================================ */
+    @media (max-width: 768px) {
+        body {
+            padding: 0;
+        }
+
+        .container {
+            flex-direction: column;
+            border-radius: 0;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        .image-container {
+            display: none;
+        }
+
+        .content-container {
+            padding: 60px 24px;
+            min-height: 100vh;
+            min-height: 100dvh;
+            width: 100%;
+            justify-content: space-between;
+            padding-top: 100px; /* INCREASED: More space from top */
+            padding-bottom: 60px;
+        }
+
+        .header-section {
+            max-width: 100%;
+            width: 100%;
+            margin-bottom: 0;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            letter-spacing: 1px;
+            margin-bottom: 40px; /* INCREASED: More space below title */
+            text-align: left;
+            width: 100%;
+        }
+
+        .profile-upload {
+            width: 100px; /* INCREASED: From 70px to 100px */
+            height: 100px; /* INCREASED: From 70px to 100px */
+            align-self: flex-start;
+            margin-left: 0;
+            margin-top: 20px; /* ADDED: Pushes icon down from title */
+            border-width: 4px; /* Thicker border for larger size */
+        }
+
+        .profile-upload.has-image {
+            border-width: 4px;
+        }
+
+        .signup-form {
+            max-width: 100%;
+            width: 100%;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            padding: 16px 20px;
+            font-size: 16px;
+            border-radius: 25px;
+            width: 100%;
+        }
+
+        .phone-input-wrapper {
+            border-radius: 25px;
+            width: 100%;
+        }
+
+        .country-select {
+            padding: 16px 12px;
+            min-width: 90px;
+        }
+
+        .country-code {
+            font-size: 0.875rem;
+        }
+
+        .phone-input {
+            padding: 16px 16px;
+            font-size: 16px;
+        }
+
+        .country-dropdown {
+            width: 100%;
+            max-height: 250px;
+            border-radius: 16px;
+            left: 0;
+            right: 0;
+        }
+
+        .btn {
+            padding: 16px 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            width: 100%;
+            border-radius: 25px;
+        }
+
+        .error-message,
+        .success-message {
+            font-size: 0.875rem;
+            padding: 12px;
+            border-radius: 12px;
+        }
+    }
+
+    /* ============================================
+       SMALL MOBILE STYLES (max-width: 380px)
+       ============================================ */
+    @media (max-width: 380px) {
+        .content-container {
+            padding: 50px 20px;
+            padding-top: 80px;
+            padding-bottom: 50px;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            margin-bottom: 30px;
+        }
+
+        .profile-upload {
+            width: 90px; /* INCREASED: From 60px to 90px */
+            height: 90px; /* INCREASED: From 60px to 90px */
+            margin-top: 15px;
+        }
+
+        .signup-form {
+            gap: 16px;
+            margin-bottom: 10px;
+        }
+
+        .input-field {
+            padding: 14px 18px;
+        }
+
+        .country-select {
+            padding: 14px 10px;
+            min-width: 85px;
+            gap: 6px;
+        }
+
+        .country-flag {
+            width: 20px;
+            height: 14px;
+        }
+
+        .phone-input {
+            padding: 14px 14px;
+        }
+
+        .btn {
+            padding: 14px 18px;
+        }
+    }
+
+    /* ============================================
+       VERY SMALL DEVICES (max-width: 320px)
+       ============================================ */
+    @media (max-width: 320px) {
+        .content-container {
+            padding: 40px 16px;
+            padding-top: 60px;
+            padding-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+            margin-bottom: 25px;
+        }
+
+        .profile-upload {
+            width: 80px; /* INCREASED: From 50px to 80px */
+            height: 80px; /* INCREASED: From 50px to 80px */
+            margin-top: 10px;
+            border-width: 3px;
+        }
+
+        .signup-form {
+            gap: 14px;
+        }
+
+        .input-field {
+            font-size: 14px;
+        }
+
+        .phone-input {
+            font-size: 14px;
+        }
+
+        .country-select {
+            min-width: 80px;
+            padding: 12px 8px;
+        }
+
+        .country-code {
+            font-size: 0.8rem;
+        }
+    }
+
+    /* ============================================
+       LANDSCAPE MOBILE OPTIMIZATION
+       ============================================ */
+    @media (max-width: 768px) and (orientation: landscape) {
+        .content-container {
+            padding: 30px 40px;
+            padding-top: 30px;
+            padding-bottom: 30px;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .header-section {
+            margin-bottom: 0;
+            flex-direction: row; /* Side by side in landscape */
+            align-items: center;
+            gap: 20px;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        .profile-upload {
+            width: 70px; /* Medium size for landscape */
+            height: 70px;
+            margin-top: 0;
+        }
+
+        .signup-form {
+            gap: 12px;
+            margin-bottom: 0;
+        }
+
+        .input-field {
+            padding: 12px 16px;
+        }
+
+        .phone-input-wrapper {
+            padding: 0;
+        }
+
+        .btn {
+            padding: 12px 16px;
+        }
+    }
+
+    .content-container > *:nth-child(1) { animation-delay: 0.1s; }
+    .signup-form { animation-delay: 0.2s; }
+
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="image-container">
+            <img src="img/bg1.jpg" alt="Modern workspace" class="active">
+            <img src="img/bg2.jpg" alt="Team collaboration">
+            <img src="img/bg1.jpg" alt="Creative meeting">
+            <img src="img/bg2.jpg" alt="Team collaboration">
+        </div>
+
+        <div class="content-container">
+            <div class="header-section">
+                <h1 class="page-title">Create Account</h1>
+                <div class="profile-upload" id="profileUpload" onclick="document.getElementById('profileInput').click()">
+                    <img src="img/profileicon.jpg" alt="Upload Profile" id="profileImg">
+                    <input type="file" id="profileInput" accept="image/*" style="display: none;">
+                </div>
+            </div>
+
+            <form class="signup-form" id="signupForm">
+                <div class="input-group">
+                    <input type="email" class="input-field" id="emailInput" placeholder="Email Address" required>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" class="input-field" id="passwordInput" placeholder="Password" required minlength="6">
+                </div>
+
+                <div class="input-group" style="position: relative;">
+                    <div class="phone-input-wrapper">
+                        <div class="country-select" onclick="toggleDropdown()">
+                            <img src="https://flagcdn.com/w40/ng.png" alt="Nigeria" class="country-flag" id="selectedFlag">
+                            <span class="country-code" id="selectedCode">+234</span>
+                            <svg class="dropdown-arrow" viewBox="0 0 24 24">
+                                <path d="M7 10l5 5 5-5z"/>
+                            </svg>
+                        </div>
+                        <div class="divider"></div>
+                        <input type="tel" class="phone-input" id="phoneInput" placeholder="Phone Number" required>
+                    </div>
+                    
+                    <div class="country-dropdown" id="countryDropdown">
+                        <div class="country-option" onclick="selectCountry('ng', '+234')">
+                            <img src="https://flagcdn.com/w40/ng.png" alt="Nigeria" class="country-flag">
+                            <span>Nigeria (+234)</span>
+                        </div>
+                        <div class="country-option" onclick="selectCountry('us', '+1')">
+                            <img src="https://flagcdn.com/w40/us.png" alt="USA" class="country-flag">
+                            <span>USA (+1)</span>
+                        </div>
+                        <div class="country-option" onclick="selectCountry('gb', '+44')">
+                            <img src="https://flagcdn.com/w40/gb.png" alt="UK" class="country-flag">
+                            <span>UK (+44)</span>
+                        </div>
+                        <div class="country-option" onclick="selectCountry('gh', '+233')">
+                            <img src="https://flagcdn.com/w40/gh.png" alt="Ghana" class="country-flag">
+                            <span>Ghana (+233)</span>
+                        </div>
+                        <div class="country-option" onclick="selectCountry('za', '+27')">
+                            <img src="https://flagcdn.com/w40/za.png" alt="South Africa" class="country-flag">
+                            <span>South Africa (+27)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="error-message" id="errorMessage"></div>
+                <div class="success-message" id="successMessage"></div>
+
+                <button type="submit" class="btn btn-primary" id="doneBtn">Done</button>
+                <button style="border: none; color: black; font-weight: 100;" type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const SUPABASE_URL = 'https://ddrhpjiaotwtblnlqytw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkcmhwamlhb3R3dGJsbmxxeXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NTI0MjMsImV4cCI6MjA4ODMyODQyM30.GNb6OTErsgNbb0PlEysXD7BtUhkjk0ldQCPbO_5EsKU';
+const EMAIL_API_URL = 'https://him-clothiers-email-api.onrender.com';
+    
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Image rotation
+    const images = document.querySelectorAll('.image-container img');
+    let currentImage = 0;
+    setInterval(() => {
+        images[currentImage].classList.remove('active');
+        currentImage = (currentImage + 1) % images.length;
+        images[currentImage].classList.add('active');
+    }, 3000);
+
+    // Phone dropdown
+    function toggleDropdown() {
+        document.getElementById('countryDropdown').classList.toggle('active');
+    }
+
+    function selectCountry(code, phoneCode) {
+        document.getElementById('selectedFlag').src = `https://flagcdn.com/w40/${code}.png`;
+        document.getElementById('selectedCode').textContent = phoneCode;
+        document.getElementById('countryDropdown').classList.remove('active');
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.country-select') && !e.target.closest('.country-dropdown')) {
+            document.getElementById('countryDropdown').classList.remove('active');
+        }
+    });
+
+    // Profile image
+    let uploadedProfileImage = null;
+    document.getElementById('profileInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                showError('Image size must be less than 2MB');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('profileImg').src = e.target.result;
+                document.getElementById('profileUpload').classList.add('has-image');
+                uploadedProfileImage = file;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function showError(message) {
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        errorMessage.textContent = message;
+        errorMessage.classList.add('show');
+        successMessage.classList.remove('show');
+    }
+
+    function showSuccess(message) {
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        successMessage.textContent = message;
+        successMessage.classList.add('show');
+        errorMessage.classList.remove('show');
+    }
+
+    function resetButton() {
+        const doneBtn = document.getElementById('doneBtn');
+        doneBtn.disabled = false;
+        doneBtn.innerHTML = 'Done';
+    }
+
+    // COMPLETE FIXED SIGNUP FORM
+    document.getElementById('signupForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const doneBtn = document.getElementById('doneBtn');
+        const email = document.getElementById('emailInput').value.trim().toLowerCase();
+        const password = document.getElementById('passwordInput').value;
+        const phoneCode = document.getElementById('selectedCode').textContent;
+        const phoneNumber = document.getElementById('phoneInput').value.trim();
+        const fullPhoneNumber = phoneCode + phoneNumber;
+
+        console.log('Signup started:', { email, phoneNumber });
+
+        // Validation
+        if (!email || !password || !phoneNumber || password.length < 6 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            showError('Please fill all fields correctly');
+            return;
+        }
+
+        doneBtn.disabled = true;
+        doneBtn.innerHTML = 'Creating account... <span class="spinner"></span>';
+
+        try {
+            // 1. Generate OTP
+            const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+            console.log('Generated OTP:', otpCode);
+
+            // 2. Avatar upload (works or skips)
+            let avatarUrl = null;
+            if (uploadedProfileImage) {
+                console.log('Uploading avatar...');
+                try {
+                    const fileExt = uploadedProfileImage.name.split('.').pop() || 'jpg';
+                    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+                    
+                    const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                        .from('avatars')
+                        .upload(fileName, uploadedProfileImage, {
+                            cacheControl: '3600',
+                            upsert: false
+                        });
+                    
+                    if (!uploadError && uploadData) {
+                        const { data: urlData } = supabaseClient.storage
+                            .from('avatars')
+                            .getPublicUrl(fileName);
+                        avatarUrl = urlData.publicUrl;
+                        console.log('Avatar uploaded:', avatarUrl);
+                    }
+                } catch (uploadErr) {
+                    console.warn('Avatar upload failed, continuing without:', uploadErr.message);
+                }
+            }
+
+            // 3. SEND OTP via Railway API (FIXED URL)
+            console.log('Sending OTP to:', email);
+            const emailResponse = await fetch(`${EMAIL_API_URL}/send-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, otp: otpCode })
+            });
+
+            const emailResult = await emailResponse.json();
+            console.log('Email API response:', emailResult);
+            
+            if (!emailResponse.ok || !emailResult.success) {
+                throw new Error(`OTP failed: ${emailResult.error || emailResponse.statusText}`);
+            }
+
+            // 4. Store in localStorage
+            localStorage.setItem('pendingEmail', email);
+            localStorage.setItem('pendingPassword', password);
+            localStorage.setItem('pendingPhone', fullPhoneNumber);
+            localStorage.setItem('pendingAvatarUrl', avatarUrl || '');
+            localStorage.setItem('pendingOtp', otpCode);
+
+            console.log('Stored in localStorage, redirecting...');
+            showSuccess('Verification code sent! Check your email.');
+            
+            setTimeout(() => {
+                window.location.href = 'confirmotp.html';
+            }, 1500);
+
+        } catch (error) {
+            console.error('Signup error:', error);
+            showError(error.message || 'Signup failed. Check console (F12).');
+            resetButton();
+        }
+    });
+</script>
+</body>
+</html>

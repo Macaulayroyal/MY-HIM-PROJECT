@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - HIM.clothiers</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Lexend', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            scrollbar-width: thin;
+            scrollbar-color: #6F4D38 #f9f5f2;
+        }
+
+        *::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: #f9f5f2;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: #6F4D38;
+            border-radius: 3px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: #ffffff;
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loader-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-container {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            border-radius: 6px;
+        }
+
+        .loader-ball {
+            width: 12px;
+            height: 12px;
+            background-color: #6F4D38;
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            animation: squareMove 1.5s infinite linear;
+            border-radius: 2px;
+        }
+
+        @keyframes squareMove {
+            0% { top: 4px; left: 4px; }
+            25% { top: 4px; left: 14px; }
+            50% { top: 14px; left: 14px; }
+            75% { top: 14px; left: 4px; }
+            100% { top: 4px; left: 4px; }
+        }
+
+        body {
+            background: #ffffff;
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 24px 20px;
+        }
+
+        .container.loading { filter: blur(8px); }
+        /* Main Container */
+        .main-container {
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* Header Section */
+        .privacy-header {
+            background: linear-gradient(135deg, #6F4D38 0%, #8b6f5c 100%);
+            padding: 60px 20px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .privacy-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(-3px);
+        }
+
+        .back-btn i {
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .header-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .header-icon i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        .header-title {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: white;
+            text-align: center;
+            margin-bottom: 12px;
+            animation: fadeInUp 0.8s ease 0.1s both;
+        }
+
+        .header-subtitle {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.85);
+            text-align: center;
+            font-weight: 300;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .last-updated {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 0.8s ease 0.3s both;
+        }
+
+        /* Main Content */
+        .privacy-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px 100px;
+        }
+
+        /* Table of Contents */
+        .toc-card {
+            background: #f9f5f2;
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(111, 77, 56, 0.1);
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .toc-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #6F4D38;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: grid;
+            gap: 12px;
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .toc-item:hover {
+            border-color: rgba(111, 77, 56, 0.3);
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(111, 77, 56, 0.08);
+        }
+
+        .toc-number {
+            width: 28px;
+            height: 28px;
+            background: #6F4D38;
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .toc-text {
+            font-size: 0.95rem;
+            color: #333;
+            font-weight: 400;
+        }
+
+        /* Privacy Sections */
+        .privacy-section {
+            margin-bottom: 48px;
+            animation: fadeInUp 0.8s ease both;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #6F4D38 0%, #8b6f5c 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .section-icon i {
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .section-title-group {
+            flex: 1;
+        }
+
+        .section-number {
+            font-size: 0.8rem;
+            color: #6F4D38;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .section-content {
+            padding-left: 0;
+        }
+
+        .section-content p {
+            font-size: 1rem;
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 16px;
+            font-weight: 300;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #f9f5f2 0%, #fff 100%);
+            border-left: 4px solid #6F4D38;
+            padding: 20px;
+            border-radius: 0 16px 16px 0;
+            margin: 20px 0;
+        }
+
+        .highlight-box p {
+            margin: 0;
+            color: #333;
+        }
+
+        .info-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .info-list li {
+            padding: 12px 0 12px 36px;
+            position: relative;
+            font-size: 0.95rem;
+            color: #555;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .info-list li:last-child {
+            border-bottom: none;
+        }
+
+        .info-list li::before {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            color: #6F4D38;
+            width: 24px;
+            height: 24px;
+            background: rgba(111, 77, 56, 0.1);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .data-card {
+            background: #f9f5f2;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(111, 77, 56, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .data-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(111, 77, 56, 0.1);
+        }
+
+        .data-card-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            color: #6F4D38;
+            font-size: 1.1rem;
+        }
+
+        .data-card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 6px;
+        }
+
+        .data-card-desc {
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .contact-box {
+            background: linear-gradient(135deg, #6F4D38 0%, #8b6f5c 100%);
+            border-radius: 20px;
+            padding: 28px;
+            color: white;
+            margin-top: 32px;
+        }
+
+        .contact-box h3 {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .contact-box p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+        }
+
+        .contact-email {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px 20px;
+            border-radius: 25px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .contact-email:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* ============================================
+           MOBILE BOTTOM NAVIGATION (default)
+           ============================================ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #6F4D38;
+            border-radius: 30px;
+            padding: 12px 32px;
+            display: flex;
+            gap: 24px;
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(111, 77, 56, 0.3);
+        }
+
+        .nav-item {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+            width: 44px;
+            height: 44px;
+        }
+
+        .nav-item i {
+            font-size: 1.4rem;
+            color: rgba(255,255,255,0.6);
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px) saturate(180%);
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 
+                inset 0 1px 0 rgba(255,255,255,0.2),
+                0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover i {
+            transform: scale(1.1);
+            background: rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.9);
+        }
+
+        .nav-item.active i {
+            background: rgba(255,255,255,0.35);
+            color: white;
+            box-shadow: 
+                inset 0 1px 0 rgba(255,255,255,0.4),
+                0 0 20px rgba(255,255,255,0.3),
+                0 4px 12px rgba(0,0,0,0.2);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .cart-badge, .fav-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 20px;
+            height: 20px;
+            background: #f44336;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #6F4D38;
+            display: none;
+        }
+
+        /* ============================================
+           DESKTOP SIDEBAR NAVIGATION (1024px+)
+           ============================================ */
+        .desktop-sidebar {
+            display: none;
+        }
+
+        @media (min-width: 1024px) {
+            body {
+                background: #f8f5f2;
+            }
+
+            .desktop-sidebar {
+                display: flex;
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 80px;
+                height: 100vh;
+                background: white;
+                border-right: 1px solid rgba(111, 77, 56, 0.1);
+                flex-direction: column;
+                align-items: center;
+                padding: 20px 0;
+                z-index: 1000;
+                box-shadow: 4px 0 20px rgba(0,0,0,0.05);
+            }
+
+            .sidebar-logo {
+                width: 50px;
+                height: 50px;
+                background: linear-gradient(135deg, #6F4D38 0%, #8b6f5c 100%);
+                border-radius: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 40px;
+                color: white;
+                font-weight: 700;
+                font-size: 1.2rem;
+                box-shadow: 0 4px 15px rgba(111, 77, 56, 0.3);
+            }
+
+            .sidebar-nav {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+                flex: 1;
+            }
+
+            .sidebar-item {
+                width: 48px;
+                height: 48px;
+                border-radius: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                position: relative;
+                background: transparent;
+                border: none;
+            }
+
+            .sidebar-item:hover {
+                background: rgba(111, 77, 56, 0.1);
+                transform: scale(1.1);
+            }
+
+            .sidebar-item.active {
+                background: #6F4D38;
+                box-shadow: 0 4px 15px rgba(111, 77, 56, 0.3);
+            }
+
+            .sidebar-item i {
+                font-size: 1.3rem;
+                color: #6F4D38;
+                transition: all 0.3s ease;
+            }
+
+            .sidebar-item.active i {
+                color: white;
+            }
+
+            .sidebar-badge {
+                position: absolute;
+                top: -2px;
+                right: -2px;
+                width: 18px;
+                height: 18px;
+                background: #f44336;
+                color: white;
+                font-size: 0.65rem;
+                font-weight: 700;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 2px solid white;
+                display: none;
+            }
+
+            .sidebar-bottom {
+                margin-top: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .sidebar-avatar {
+                width: 48px;
+                height: 48px;
+                border-radius: 16px;
+                overflow: hidden;
+                border: 2px solid #6F4D38;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .sidebar-avatar:hover {
+                transform: scale(1.1);
+                box-shadow: 0 4px 15px rgba(111, 77, 56, 0.2);
+            }
+
+            .sidebar-avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .sidebar-avatar .placeholder {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #f9f5f2;
+                font-size: 1.5rem;
+            }
+
+            /* Hide mobile bottom nav on desktop */
+            .bottom-nav {
+                display: none;
+            }
+
+            /* Adjust main content for sidebar */
+            .main-container {
+                margin-left: 80px;
+                width: calc(100% - 80px);
+            }
+
+            .privacy-content {
+                padding: 40px 40px 60px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Styles */
+        @media (min-width: 769px) and (max-width: 1023px) {
+            .privacy-header {
+                padding: 80px 40px 60px;
+            }
+
+            .header-title {
+                font-size: 3rem;
+            }
+
+            .header-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .privacy-content {
+                padding: 60px 40px 100px;
+            }
+
+            .section-content {
+                padding-left: 66px;
+            }
+
+            .bottom-nav {
+                top: 50%;
+                right: 30px;
+                left: auto;
+                bottom: auto;
+                transform: translateY(-50%);
+                flex-direction: column;
+                padding: 20px 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .privacy-header {
+                padding: 50px 20px 30px;
+            }
+
+            .back-btn {
+                top: 15px;
+                left: 15px;
+                width: 40px;
+                height: 40px;
+            }
+
+            .header-icon {
+                width: 60px;
+                height: 60px;
+            }
+
+            .header-title {
+                font-size: 1.8rem;
+            }
+
+            .header-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .toc-card {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .section-icon {
+                width: 44px;
+                height: 44px;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+            }
+
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-box {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-title {
+                font-size: 1.5rem;
+            }
+
+            .toc-item {
+                padding: 10px 12px;
+            }
+
+            .toc-text {
+                font-size: 0.85rem;
+            }
+
+            .section-content p {
+                font-size: 0.9rem;
+            }
+
+            .info-list li {
+                font-size: 0.85rem;
+                padding-left: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <!-- Loader -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader-container">
+            <div class="loader-ball"></div>
+        </div>
+    </div>
+
+    <!-- Desktop Sidebar (Pinterest-style) - Hidden on mobile -->
+    <aside class="desktop-sidebar" id="desktopSidebar">
+        <div class="sidebar-logo">H</div>
+        
+        <nav class="sidebar-nav">
+            <button class="sidebar-item" onclick="window.location.href='HIM-coursepage.html'" title="Home">
+                <i class="fas fa-home"></i>
+            </button>
+            <button class="sidebar-item" onclick="goToCart()" title="Cart">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="sidebar-badge" id="sidebarCartBadge">0</span>
+            </button>
+            <button class="sidebar-item" onclick="goToFavorites()" title="Favorites">
+                <i class="fas fa-heart"></i>
+                <span class="sidebar-badge" id="sidebarFavBadge">0</span>
+            </button>
+            <button class="sidebar-item" onclick="window.location.href='profile.html'" title="Profile">
+                <i class="fas fa-user"></i>
+            </button>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <button class="sidebar-item" onclick="handleLogout()" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+            <div class="sidebar-avatar" id="sidebarAvatar">
+                <div class="placeholder">👤</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Header Section -->
+        <header class="privacy-header">
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            
+            <div class="header-content">
+                <div class="header-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h1 class="header-title">Privacy Policy</h1>
+                <p class="header-subtitle">Your privacy is our priority. Learn how we protect and handle your data.</p>
+                <div class="last-updated">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Last Updated: March 15, 2026</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="privacy-content">
+            <!-- Table of Contents -->
+            <nav class="toc-card">
+                <h2 class="toc-title">
+                    <i class="fas fa-list-ul"></i>
+                    Quick Navigation
+                </h2>
+                <ul class="toc-list">
+                    <li class="toc-item" onclick="scrollToSection('intro')">
+                        <span class="toc-number">01</span>
+                        <span class="toc-text">Introduction</span>
+                    </li>
+                    <li class="toc-item" onclick="scrollToSection('collect')">
+                        <span class="toc-number">02</span>
+                        <span class="toc-text">Information We Collect</span>
+                    </li>
+                    <li class="toc-item" onclick="scrollToSection('use')">
+                        <span class="toc-number">03</span>
+                        <span class="toc-text">How We Use Your Data</span>
+                    </li>
+                    <li class="toc-item" onclick="scrollToSection('share')">
+                        <span class="toc-number">04</span>
+                        <span class="toc-text">Data Sharing</span>
+                    </li>
+                    <li class="toc-item" onclick="scrollToSection('security')">
+                        <span class="toc-number">05</span>
+                        <span class="toc-text">Security Measures</span>
+                    </li>
+                    <li class="toc-item" onclick="scrollToSection('rights')">
+                        <span class="toc-number">06</span>
+                        <span class="toc-text">Your Rights</span>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Section 1: Introduction -->
+            <section class="privacy-section" id="intro" style="animation-delay: 0.1s;">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="section-title-group">
+                        <div class="section-number">Section 01</div>
+                        <h2 class="section-title">Introduction</h2>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <p>Welcome to HIM.clothiers. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we collect, use, disclose, and safeguard your information when you visit our website or make purchases from our store.</p>
+                    
+                    <div class="highlight-box">
+                        <p><strong>Our Promise:</strong> We never sell your personal data to third parties. Your information is used solely to provide you with the best shopping experience and to improve our services.</p>
+                    </div>
+
+                    <p>By using our website, you agree to the collection and use of information in accordance with this policy. If you do not agree with our policies and practices, please do not use our website or services.</p>
+                </div>
+            </section>
+
+            <!-- Section 2: Information We Collect -->
+            <section class="privacy-section" id="collect" style="animation-delay: 0.2s;">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="section-title-group">
+                        <div class="section-number">Section 02</div>
+                        <h2 class="section-title">Information We Collect</h2>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <p>We collect several types of information from and about users of our website, including:</p>
+
+                    <div class="data-grid">
+                        <div class="data-card">
+                            <div class="data-card-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h4 class="data-card-title">Personal Info</h4>
+                            <p class="data-card-desc">Name, email address, phone number, shipping and billing addresses</p>
+                        </div>
+                        <div class="data-card">
+                            <div class="data-card-icon">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                            <h4 class="data-card-title">Purchase Data</h4>
+                            <p class="data-card-desc">Order history, product preferences, cart items, wishlist items</p>
+                        </div>
+                        <div class="data-card">
+                            <div class="data-card-icon">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <h4 class="data-card-title">Payment Info</h4>
+                            <p class="data-card-desc">Payment method details (processed securely by our payment partners)</p>
+                        </div>
+                        <div class="data-card">
+                            <div class="data-card-icon">
+                                <i class="fas fa-laptop"></i>
+                            </div>
+                            <h4 class="data-card-title">Device Info</h4>
+                            <p class="data-card-desc">IP address, browser type, device type, operating system</p>
+                        </div>
+                    </div>
+
+                    <ul class="info-list">
+                        <li>Information you provide by filling in forms on our website</li>
+                        <li>Records and copies of your correspondence with us</li>
+                        <li>Your responses to surveys that we might ask you to complete</li>
+                        <li>Details of transactions you carry out through our website</li>
+                        <li>Your search queries on our website</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3: How We Use Your Data -->
+            <section class="privacy-section" id="use" style="animation-delay: 0.3s;">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="section-title-group">
+                        <div class="section-number">Section 03</div>
+                        <h2 class="section-title">How We Use Your Information</h2>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <p>We use the information we collect about you for various purposes, including:</p>
+
+                    <ul class="info-list">
+                        <li><strong>Order Processing:</strong> To process and fulfill your orders, including sending confirmation emails and delivery updates</li>
+                        <li><strong>Account Management:</strong> To manage your account, including verifying your identity and maintaining your preferences</li>
+                        <li><strong>Personalization:</strong> To personalize your shopping experience and recommend products you may like</li>
+                        <li><strong>Communication:</strong> To send you promotional materials, newsletters, and special offers (with your consent)</li>
+                        <li><strong>Improvement:</strong> To improve our website, products, and customer service</li>
+                        <li><strong>Security:</strong> To protect our website, business, and users from fraud and security threats</li>
+                        <li><strong>Legal Compliance:</strong> To comply with applicable laws and regulations</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <p><strong>Marketing Communications:</strong> You can opt-out of marketing emails at any time by clicking the "unsubscribe" link at the bottom of our emails or by contacting us directly.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Data Sharing -->
+            <section class="privacy-section" id="share" style="animation-delay: 0.4s;">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <div class="section-title-group">
+                        <div class="section-number">Section 04</div>
+                        <h2 class="section-title">Data Sharing & Disclosure</h2>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <p>We may disclose personal information that we collect or you provide as described in this privacy policy:</p>
+
+                    <ul class="info-list">
+                        <li><strong>Service Providers:</strong> To contractors, service providers, and other third parties we use to support our business (payment processors, shipping companies, email service providers)</li>
+                        <li><strong>Business Transfers:</strong> In connection with any merger, sale of company assets, financing, or acquisition of all or a portion of our business</li>
+                        <li><strong>Legal Requirements:</strong> To comply with any court order, law, or legal process, including to respond to any government or regulatory request</li>
+                        <li><strong>Protection:</strong> To enforce our terms of service and protect the rights, property, or safety of HIM.clothiers, our customers, or others</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <p><strong>Important:</strong> We require all third-party service providers to respect the security of your personal data and to treat it in accordance with the law. We do not allow them to use your personal data for their own purposes.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Security -->
+            <section class="privacy-section" id="security" style="animation-delay: 0.5s;">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="section-title-group">
+                        <div class="section-number">Section 05</div>
+                        <h2 class="section-title">Security Measures</h2>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <p>We have implemented appropriate technical and organizational measures to safeguard your personal information:</p>
+
+                    <div class="data-grid">
+                        <div class="data-card">
+                            <div class="data-card-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h4 class="data-card-title">SSL Encryption</h4>
+                            <p class="data-card-desc">All data transmitted between your browser and our servers is encrypted using industry-standard SSL technology</p>
+                        </div>
+                        <div class="data-card">
+                            <div class="data-card-icon">
+                                <i class="fas fa-key"></i>
+                            </div>
+                            <h4 class="data-card-title">Secure Storage</h4>
+                            <p class="data-card-desc">Your data is stored on secure servers with restricted access and regular security audits</p>
+                        </div>
+                        <div class="data-card">
+                            <div class="data-card-icon">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <h4 class="data-card-title">Access Control</h4>
+                            <p class="data-card-desc">Only authorized personnel can access your personal data, and only when necessary</p>
+                        </div>
+                        <div class="data-card">
+                            <div class="data-card-icon">
+                                <i class="fas fa-sync-alt"></i>
+                            </div>
+                            <h4 class="data-card-title">Regular Updates</h4>
+                            <p class="data-card-desc">We continuously update our security practices to protect against new threats</p>
+                        </div>
+                    </div>
+
+                    <p>Despite our efforts, no security measures are perfect or impenetrable. We cannot guarantee the security of your personal information, but we continuously work to protect it.</p>
+                </div>
+            </section>
+
+            <!-- Section 6: Your Rights -->
+            <section class="privacy-section" id="rights" style="animation-delay: 0.6s;">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="section-title-group">
+                        <div class="section-number">Section 06</div>
+                        <h2 class="section-title">Your Rights & Choices</h2>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <p>Depending on your location, you may have certain rights regarding your personal information:</p>
+
+                    <ul class="info-list">
+                        <li><strong>Access:</strong> You have the right to request copies of your personal data</li>
+                        <li><strong>Rectification:</strong> You have the right to request that we correct any information you believe is inaccurate</li>
+                        <li><strong>Erasure:</strong> You have the right to request that we erase your personal data, under certain conditions</li>
+                        <li><strong>Restrict Processing:</strong> You have the right to request that we restrict the processing of your personal data</li>
+                        <li><strong>Data Portability:</strong> You have the right to request that we transfer the data we have collected to another organization</li>
+                        <li><strong>Object to Processing:</strong> You have the right to object to our processing of your personal data</li>
+                        <li><strong>Withdraw Consent:</strong> You have the right to withdraw consent where we are relying on consent to process your personal data</li>
+                    </ul>
+
+                    <div class="contact-box">
+                        <h3><i class="fas fa-envelope"></i> Contact Us</h3>
+                        <p>If you have any questions about this Privacy Policy or wish to exercise your rights, please contact our Data Protection Officer:</p>
+                        <a href="mailto:privacy@himclothiers.com" class="contact-email">
+                            <i class="fas fa-paper-plane"></i>
+                            privacy@himclothiers.com
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav" id="mobileNav">
+        <button class="nav-item" onclick="window.location.href='HIM-coursepage.html'">
+            <i class="fas fa-home"></i>
+        </button>
+        <button class="nav-item" onclick="goToCart()">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-badge" id="navCartBadge">0</span>
+        </button>
+        <button class="nav-item" onclick="goToFavorites()">
+            <i class="fas fa-heart"></i>
+            <span class="fav-badge" id="navFavBadge">0</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='profile.html'">
+            <i class="fas fa-user"></i>
+        </button>
+    </nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const SUPABASE_URL = 'https://ddrhpjiaotwtblnlqytw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkcmhwamlhb3R3dGJsbmxxeXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NTI0MjMsImV4cCI6MjA4ODMyODQyM30.GNb6OTErsgNbb0PlEysXD7BtUhkjk0ldQCPbO_5EsKU';
+    
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUserId = null;
+    let cart = [];
+    let favorites = [];
+
+    // ============================================
+    // INITIALIZE - LOAD FROM LOCALSTORAGE IMMEDIATELY FIRST
+    // ============================================
+
+    window.addEventListener('load', () => {
+        // STEP 1: Load from localStorage IMMEDIATELY (don't wait for Supabase)
+        loadFromLocalStorage();
+        updateAllBadges();
+        loadUserAvatar();
+        
+        // STEP 2: Then try to sync with Supabase in background
+        syncWithSupabase();
+        
+        setTimeout(() => {
+            document.getElementById('loaderOverlay').classList.add('hidden');
+        }, 800);
+    });
+
+    // Refresh badges when returning to page
+    window.addEventListener('focus', () => {
+        loadFromLocalStorage();
+        updateAllBadges();
+    });
+
+    // ============================================
+    // STEP 1: IMMEDIATE LOCALSTORAGE LOAD
+    // ============================================
+
+    function loadFromLocalStorage() {
+        try {
+            const savedCart = localStorage.getItem('cart');
+            const savedFavorites = localStorage.getItem('favorites');
+            
+            console.log('Raw localStorage cart:', savedCart);
+            console.log('Raw localStorage favorites:', savedFavorites);
+            
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+                if (!Array.isArray(cart)) {
+                    console.warn('Cart is not array, resetting');
+                    cart = [];
+                }
+            } else {
+                cart = [];
+            }
+            
+            if (savedFavorites) {
+                favorites = JSON.parse(savedFavorites);
+                if (!Array.isArray(favorites)) {
+                    favorites = [];
+                }
+            } else {
+                favorites = [];
+            }
+            
+            console.log('Loaded from localStorage - Cart:', cart.length, 'items, Favorites:', favorites.length, 'items');
+            console.log('Cart contents:', cart);
+            
+        } catch (e) {
+            console.error('Error loading from localStorage:', e);
+            cart = [];
+            favorites = [];
+        }
+    }
+
+    // ============================================
+    // STEP 2: BACKGROUND SUPABASE SYNC
+    // ============================================
+
+    async function syncWithSupabase() {
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            
+            if (session?.user) {
+                currentUserId = session.user.id;
+                
+                // Try to load from Supabase, but DON'T overwrite localStorage if it has data
+                await mergeWithSupabase();
+            } else {
+                // No session - create temp ID
+                currentUserId = localStorage.getItem('tempUserId') || 'temp_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('tempUserId', currentUserId);
+                console.log('No session, using temp ID:', currentUserId);
+            }
+            
+        } catch (error) {
+            console.error('Supabase sync error:', error);
+            // Keep localStorage data (already loaded)
+        }
+        
+        // Always update badges after everything
+        updateAllBadges();
+    }
+
+    async function mergeWithSupabase() {
+        try {
+            // Load cart from Supabase
+            const { data: cartData, error: cartError } = await supabaseClient
+                .from('user_cart')
+                .select('*')
+                .eq('user_id', currentUserId);
+            
+            if (!cartError && cartData && cartData.length > 0) {
+                const supabaseCart = cartData.map(item => ({
+                    id: item.product_id,
+                    name: item.name,
+                    price: item.price,
+                    image: item.image,
+                    quantity: item.quantity || 1,
+                    size: item.size,
+                    color: item.color,
+                    addedAt: item.added_at
+                }));
+                
+                // Merge: if local cart is empty, use Supabase cart
+                if (cart.length === 0 && supabaseCart.length > 0) {
+                    cart = supabaseCart;
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    console.log('Loaded cart from Supabase:', cart.length, 'items');
+                }
+            }
+            
+            // Load favorites from Supabase
+            const { data: favData, error: favError } = await supabaseClient
+                .from('user_favorites')
+                .select('*')
+                .eq('user_id', currentUserId);
+            
+            if (!favError && favData && favData.length > 0) {
+                const supabaseFavorites = favData.map(item => item.product_id);
+                
+                if (favorites.length === 0 && supabaseFavorites.length > 0) {
+                    favorites = supabaseFavorites;
+                    localStorage.setItem('favorites', JSON.stringify(favorites));
+                    console.log('Loaded favorites from Supabase:', favorites.length, 'items');
+                }
+            }
+            
+        } catch (error) {
+            console.error('Error merging with Supabase:', error);
+        }
+    }
+
+    // ============================================
+    // BADGE UPDATES - SAME AS COURSE PAGE
+    // ============================================
+
+    function updateAllBadges() {
+        // Calculate cart total (handle missing quantity field)
+        const totalItems = cart.reduce((sum, item) => sum + (parseInt(item.quantity) || 1), 0);
+        const totalFavorites = favorites.length;
+        
+        console.log('Updating badges - Cart count:', totalItems, 'Favorites:', totalFavorites);
+        
+        // Mobile nav badges
+        const navCartBadge = document.getElementById('navCartBadge');
+        if (navCartBadge) {
+            navCartBadge.textContent = totalItems;
+            navCartBadge.style.display = totalItems > 0 ? 'flex' : 'none';
+            console.log('Updated navCartBadge:', totalItems);
+        }
+
+        const navFavBadge = document.getElementById('navFavBadge');
+        if (navFavBadge) {
+            navFavBadge.textContent = totalFavorites;
+            navFavBadge.style.display = totalFavorites > 0 ? 'flex' : 'none';
+            console.log('Updated navFavBadge:', totalFavorites);
+        }
+
+        // Desktop sidebar badges
+        const sidebarCartBadge = document.getElementById('sidebarCartBadge');
+        if (sidebarCartBadge) {
+            sidebarCartBadge.textContent = totalItems;
+            sidebarCartBadge.style.display = totalItems > 0 ? 'flex' : 'none';
+            console.log('Updated sidebarCartBadge:', totalItems);
+        }
+
+        const sidebarFavBadge = document.getElementById('sidebarFavBadge');
+        if (sidebarFavBadge) {
+            sidebarFavBadge.textContent = totalFavorites;
+            sidebarFavBadge.style.display = totalFavorites > 0 ? 'flex' : 'none';
+            console.log('Updated sidebarFavBadge:', totalFavorites);
+        }
+    }
+
+    // ============================================
+    // OTHER FUNCTIONS
+    // ============================================
+
+    async function loadUserAvatar() {
+        let avatarUrl = localStorage.getItem('userAvatarUrl') || localStorage.getItem('pendingAvatarUrl');
+        
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (session?.user && !avatarUrl) {
+            avatarUrl = session.user.user_metadata?.avatar_url;
+            localStorage.setItem('userAvatarUrl', avatarUrl);
+        }
+        
+        const sidebarAvatar = document.getElementById('sidebarAvatar');
+        if (avatarUrl && avatarUrl !== 'null' && avatarUrl !== '' && sidebarAvatar) {
+            sidebarAvatar.innerHTML = `<img src="${avatarUrl}" alt="Profile">`;
+        }
+    }
+
+    function scrollToSection(id) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    function goBack() {
+        window.location.href = 'profile.html';
+    }
+
+    function goToCart() {
+        window.location.href = 'HIM-coursepage.html?openCart=true';
+    }
+
+    function goToFavorites() {
+        window.location.href = 'HIM-coursepage.html?openFavorites=true';
+    }
+
+    async function handleLogout() {
+        if (confirm('Are you sure you want to logout?')) {
+            await supabaseClient.auth.signOut();
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - HIM.clothiers</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Lexend', sans-serif;
+        -webkit-tap-highlight-color: transparent;
+        scrollbar-width: none;
+    }
+
+    *::-webkit-scrollbar {
+        display: none;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        background: #ffffff;
+        min-height: 100vh;
+        padding-bottom: 100px;
+    }
+
+    /* Loader */
+    .loader-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .loader-overlay.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .loader-container {
+        width: 30px;
+        height: 30px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+        border-radius: 6px;
+    }
+
+    .loader-ball {
+        width: 12px;
+        height: 12px;
+        background-color: #6F4D38;
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        animation: squareMove 1.5s infinite linear;
+        border-radius: 2px;
+    }
+
+    @keyframes squareMove {
+        0% { top: 4px; left: 4px; }
+        25% { top: 4px; left: 14px; }
+        50% { top: 14px; left: 14px; }
+        75% { top: 14px; left: 4px; }
+        100% { top: 4px; left: 4px; }
+    }
+
+    /* MOBILE FIRST - Default Styles */
+    .profile-container {
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Top Section */
+    .profile-header-section {
+        height: 30vh;
+        min-height: 250px;
+        background: #b89a7a7a;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-shadow: 0 4px 20px rgba(111, 77, 56, 0.1);
+    }
+
+    /* Back Button */
+    .back-btn {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+
+    .back-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .back-btn i {
+        color: #6F4D38;
+        font-size: 1.2rem;
+    }
+
+    /* Profile Image */
+    .profile-image-container {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid #6F4D38;
+        background: #f9f5f2;
+        box-shadow: 0 4px 15px rgba(111, 77, 56, 0.2);
+        margin-bottom: 16px;
+        flex-shrink: 0;
+    }
+
+    .profile-image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .profile-image-container .placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: #6F4D38;
+    }
+
+    /* User Info */
+    .user-info {
+        text-align: center;
+    }
+
+    .user-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #000;
+        margin-bottom: 4px;
+    }
+
+    .user-email {
+        font-size: 0.9rem;
+        color: #000;
+        font-weight: 500;
+        opacity: 0.8;
+    }
+
+    /* Bottom Section */
+    .profile-menu-section {
+        flex: 1;
+        background: white;
+        padding: 30px 20px 100px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Menu Buttons Container */
+    .menu-buttons-container {
+        width: 100%;
+        max-width: 400px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    /* Individual Menu Button with Badge */
+    .menu-btn {
+        width: 100%;
+        padding: 5px 10px;
+        background: white;
+        border: none;
+        border-bottom: 2px solid #f0f0f0;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        position: relative;
+        background-color: whitesmoke;
+        border-bottom: 2px solid #6f4d3898;
+    }
+
+    .menu-btn:hover {
+        background: #f9f5f2;
+        border-bottom-color: #6F4D38;
+        transform: translateX(5px);
+    }
+
+    .menu-btn-content {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex: 1;
+    }
+
+    .menu-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(111, 77, 56, 0.1);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6F4D38;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .menu-btn:hover .menu-icon {
+        background: #6F4D38;
+        color: white;
+        transform: scale(1.1);
+    }
+
+    /* Badge Styles */
+    .menu-badge {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        min-width: 20px;
+        height: 20px;
+        background: #f44336;
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 700;
+        border-radius: 10px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 0 6px;
+        border: 2px solid white;
+        box-shadow: 0 2px 8px rgba(244, 67, 54, 0.4);
+        animation: badgePop 0.3s ease;
+    }
+
+    .menu-badge.active {
+        display: flex;
+    }
+
+    @keyframes badgePop {
+        0% { transform: scale(0); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+
+    .menu-badge.pulse {
+        animation: badgePulse 2s infinite;
+    }
+
+    @keyframes badgePulse {
+        0%, 100% { box-shadow: 0 2px 8px rgba(244, 67, 54, 0.4); }
+        50% { box-shadow: 0 2px 16px rgba(244, 67, 54, 0.8); }
+    }
+
+    .menu-text {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #333;
+        flex: 1;
+        text-align: left;
+    }
+
+    .menu-arrow {
+        color: #ccc;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .menu-btn:hover .menu-arrow {
+        color: #6F4D38;
+        transform: translateX(5px);
+    }
+
+    /* Logout button special styling */
+    .menu-btn.logout {
+        margin-top: 20px;
+        border-bottom-color: #ffebee;
+    }
+
+    .menu-btn.logout .menu-icon {
+        background: rgba(244, 67, 54, 0.1);
+        color: #f44336;
+    }
+
+    .menu-btn.logout:hover {
+        background: #ffebee;
+        border-bottom-color: #f44336;
+    }
+
+    .menu-btn.logout:hover .menu-icon {
+        background: #f44336;
+        color: white;
+    }
+
+    /* Mobile Bottom Navigation */
+    .bottom-nav {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #6F4D38;
+        border-radius: 30px;
+        padding: 12px 32px;
+        display: flex;
+        gap: 24px;
+        z-index: 1000;
+        box-shadow: 0 8px 32px rgba(111, 77, 56, 0.3);
+    }
+
+    .nav-item {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        position: relative;
+        width: 44px;
+        height: 44px;
+    }
+
+    .nav-item i {
+        font-size: 1.4rem;
+        color: rgba(255,255,255,0.6);
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px) saturate(180%);
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.2);
+        box-shadow: 
+            inset 0 1px 0 rgba(255,255,255,0.2),
+            0 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .nav-item:hover i {
+        transform: scale(1.1);
+        background: rgba(255,255,255,0.2);
+        color: rgba(255,255,255,0.9);
+    }
+
+    .nav-item.active i {
+        background: rgba(255,255,255,0.35);
+        color: white;
+        box-shadow: 
+            inset 0 1px 0 rgba(255,255,255,0.4),
+            0 0 20px rgba(255,255,255,0.3),
+            0 4px 12px rgba(0,0,0,0.2);
+        border-color: rgba(255,255,255,0.4);
+    }
+
+    /* Cart and Favorites Badges */
+    .cart-badge,
+    .fav-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        width: 20px;
+        height: 20px;
+        background: #f44336;
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 700;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #6F4D38;
+        display: none;
+    }
+
+    /* HIDE DESKTOP ELEMENTS ON MOBILE */
+    .profile-sidebar {
+        display: none;
+    }
+    
+    .menu-grid {
+        display: none;
+    }
+
+    /* DESKTOP STYLES - 1024px and above */
+    @media screen and (min-width: 1024px) {
+        body {
+            padding-bottom: 0;
+            background: #f8f5f2;
+        }
+
+        /* Hide mobile elements on desktop */
+        .bottom-nav {
+            display: none !important;
+        }
+        
+        #mobileMenu {
+            display: none !important;
+        }
+
+        /* Show desktop sidebar */
+        .profile-sidebar {
+            display: flex !important;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 80px;
+            height: 100vh;
+            background: white;
+            border-right: 1px solid rgba(111, 77, 56, 0.1);
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #6F4D38 0%, #8b6f5c 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(111, 77, 56, 0.3);
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .sidebar-item {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background: transparent;
+            border: none;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(111, 77, 56, 0.1);
+            transform: scale(1.1);
+        }
+
+        .sidebar-item.active {
+            background: #6F4D38;
+            box-shadow: 0 4px 15px rgba(111, 77, 56, 0.3);
+        }
+
+        .sidebar-item i {
+            font-size: 1.3rem;
+            color: #6F4D38;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-item.active i {
+            color: white;
+        }
+
+        .sidebar-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 18px;
+            height: 18px;
+            background: #f44336;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            display: none;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .sidebar-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid #6F4D38;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(111, 77, 56, 0.2);
+        }
+
+        .sidebar-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .sidebar-avatar .placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9f5f2;
+            font-size: 1.5rem;
+        }
+
+        /* Main content with sidebar offset */
+        .main-content {
+            margin-left: 80px !important;
+            width: calc(100% - 80px) !important;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Section - Desktop */
+        .profile-header-section {
+            height: auto;
+            min-height: 200px;
+            background: linear-gradient(135deg, #b89a7a 0%, #d4b896 100%);
+            flex-direction: row;
+            justify-content: flex-start;
+            padding: 40px 60px;
+            gap: 30px;
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            background: rgba(255,255,255,0.9);
+        }
+
+        .profile-image-container {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 0;
+            border-width: 3px;
+        }
+
+        .user-info {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .user-name {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+
+        .user-email {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Desktop Menu Grid */
+        .profile-menu-section {
+            flex: 1;
+            padding: 40px;
+            background: #f8f5f2;
+            display: block !important;
+        }
+
+        .menu-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .menu-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            position: relative;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(111, 77, 56, 0.12);
+        }
+
+        .menu-card-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(111, 77, 56, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6F4D38;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .menu-card:hover .menu-card-icon {
+            background: #6F4D38;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Desktop Card Badge */
+        .card-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            min-width: 24px;
+            height: 24px;
+            background: #f44336;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 12px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 8px;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+            animation: badgePop 0.3s ease;
+            z-index: 10;
+        }
+
+        .card-badge.active {
+            display: flex;
+        }
+
+        .card-badge.pulse {
+            animation: badgePulse 2s infinite;
+        }
+
+        .menu-card-content {
+            flex: 1;
+        }
+
+        .menu-card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .menu-card-desc {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .menu-card-arrow {
+            align-self: flex-end;
+            width: 40px;
+            height: 40px;
+            background: #f9f5f2;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6F4D38;
+            transition: all 0.3s ease;
+        }
+
+        .menu-card:hover .menu-card-arrow {
+            background: #6F4D38;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .menu-card.logout {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+            border: 2px solid rgba(244, 67, 54, 0.1);
+        }
+
+        .menu-card.logout .menu-card-icon {
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+        }
+
+        .menu-card.logout:hover .menu-card-icon {
+            background: #f44336;
+            color: white;
+        }
+
+        .menu-card.logout .menu-card-arrow {
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+        }
+
+        .menu-card.logout:hover .menu-card-arrow {
+            background: #f44336;
+            color: white;
+        }
+
+        .grid-section-header {
+            grid-column: 1 / -1;
+            margin-bottom: 10px;
+        }
+
+        .grid-section-title {
+            font-size: 0.85rem;
+            color: #6F4D38;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    }
+
+    /* TABLET STYLES (769px - 1023px) */
+    @media screen and (min-width: 769px) and (max-width: 1023px) {
+        body {
+            padding-bottom: 0;
+            background: #f5f5f5;
+        }
+
+        .profile-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 100vh;
+            flex-direction: row;
+            box-shadow: 0 0 40px rgba(0,0,0,0.1);
+        }
+
+        .profile-header-section {
+            width: 40%;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            border-radius: 0;
+            justify-content: flex-start;
+            padding-top: 60px;
+        }
+
+        .back-btn {
+            top: 30px;
+            left: 30px;
+        }
+
+        .profile-image-container {
+            width: 120px;
+            height: 120px;
+            margin-top: 40px;
+            margin-bottom: 24px;
+        }
+
+        .user-name {
+            font-size: 2rem;
+        }
+
+        .user-email {
+            font-size: 1rem;
+        }
+
+        .profile-menu-section {
+            width: 60%;
+            padding: 60px 40px;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .menu-buttons-container {
+            max-width: 500px;
+            gap: 16px;
+        }
+
+        .menu-btn {
+            padding: 22px 24px;
+        }
+
+        .menu-text {
+            font-size: 1.1rem;
+        }
+
+        .bottom-nav {
+            top: 50%;
+            right: 30px;
+            left: auto;
+            bottom: auto;
+            transform: translateY(-50%);
+            flex-direction: column;
+            padding: 20px 16px;
+            border-radius: 20px;
+        }
+    }
+
+    .sync-status {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        z-index: 10000;
+        display: none;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .sync-status.syncing {
+        display: flex;
+        background: #fff3e0;
+        color: #ff9800;
+    }
+    
+    .sync-status.synced {
+        display: flex;
+        background: #e8f5e9;
+        color: #4caf50;
+    }
+
+    .admin-link {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, #6F4D38 0%, #8b6f5c 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-decoration: none;
+        box-shadow: 0 4px 15px rgba(111, 77, 56, 0.4);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 9998;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .admin-link:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(111, 77, 56, 0.5);
+        background: linear-gradient(135deg, #5a3f2d 0%, #6F4D38 100%);
+    }
+
+    .admin-link i {
+        font-size: 1.2rem;
+        color: white;
+        transition: transform 0.3s ease;
+    }
+
+    .admin-link:hover i {
+        transform: rotate(15deg);
+    }
+
+    .admin-link::after {
+        content: 'Admin';
+        position: absolute;
+        top: 50%;
+        right: calc(100% + 12px);
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.85);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        pointer-events: none;
+    }
+
+    .admin-link:hover::after {
+        opacity: 1;
+        visibility: visible;
+        right: calc(100% + 16px);
+    }
+
+    @media screen and (min-width: 1024px) {
+        .admin-link {
+            top: 30px;
+            right: 30px;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+        }
+        
+        .admin-link i {
+            font-size: 1.3rem;
+        }
+    }
+
+    @media screen and (max-width: 360px) {
+        .admin-link {
+            width: 38px;
+            height: 38px;
+            top: 15px;
+            right: 15px;
+        }
+        
+        .admin-link i {
+            font-size: 1rem;
+        }
+    }
+</style>
+</head>
+<body>
+<!-- Admin Link -->
+<a href="https://himcladminpage.vercel.app" class="admin-link" title="Admin Panel" target="_blank" rel="noopener noreferrer">
+    <i class="fas fa-crown"></i>
+</a>
+    <!-- Sync Status -->
+    <div class="sync-status" id="syncStatus">
+        <i class="fas fa-sync fa-spin"></i>
+        <span>Syncing...</span>
+    </div>
+
+    <!-- Loader -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader-container">
+            <div class="loader-ball"></div>
+        </div>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <aside class="profile-sidebar" id="desktopSidebar">
+        <div class="sidebar-logo">H</div>
+        
+        <nav class="sidebar-nav">
+            <button class="sidebar-item" onclick="window.location.href='HIM-coursepage.html'" title="Home">
+                <i class="fas fa-home"></i>
+            </button>
+            <button class="sidebar-item" onclick="goToCart()" title="Cart">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="sidebar-badge" id="sidebarCartBadge">0</span>
+            </button>
+            <button class="sidebar-item" onclick="goToFavorites()" title="Favorites">
+                <i class="fas fa-heart"></i>
+                <span class="sidebar-badge" id="sidebarFavBadge">0</span>
+            </button>
+            <button class="sidebar-item active" title="Profile">
+                <i class="fas fa-user"></i>
+            </button>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <button class="sidebar-item" onclick="handleLogout()" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+            <div class="sidebar-avatar" id="sidebarAvatar">
+                <div class="placeholder">👤</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Profile Container -->
+    <div class="profile-container">
+        <div class="main-content">
+            <!-- Top Section: Profile Info -->
+            <div class="profile-header-section">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+
+                <div class="profile-image-container" id="profileImage">
+                    <div class="placeholder">👤</div>
+                </div>
+
+                <div class="user-info">
+                    <div class="user-name" id="userName">User Name</div>
+                    <div class="user-email" id="userEmail">user@email.com</div>
+                </div>
+            </div>
+
+            <!-- Bottom Section: Menu -->
+            <div class="profile-menu-section">
+                <!-- Mobile: List layout with badges -->
+                <div class="menu-buttons-container" id="mobileMenu">
+                    <button class="menu-btn" onclick="handleMenuClick('payment')">
+                        <div class="menu-btn-content">
+                            <div class="menu-icon">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <span class="menu-text">Payment Methods</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </button>
+
+                    <!-- Orders Button with Badge -->
+                    <button class="menu-btn" onclick="handleMenuClick('orders')" id="ordersMenuBtn">
+                        <div class="menu-btn-content">
+                            <div class="menu-icon">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span class="menu-badge" id="ordersBadge">0</span>
+                            </div>
+                            <span class="menu-text">My Orders</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </button>
+
+                    <!-- Notifications Button with Badge -->
+                    <button class="menu-btn" onclick="handleMenuClick('notifications')" id="notificationsMenuBtn">
+                        <div class="menu-btn-content">
+                            <div class="menu-icon">
+                                <i class="fas fa-bell"></i>
+                                <span class="menu-badge" id="notificationsBadge">0</span>
+                            </div>
+                            <span class="menu-text">Notifications</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </button>
+
+                    <button class="menu-btn" onclick="handleMenuClick('privacy')">
+                        <div class="menu-btn-content">
+                            <div class="menu-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <span class="menu-text">Privacy and Security</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </button>
+
+                    <button class="menu-btn" onclick="handleMenuClick('help')">
+                        <div class="menu-btn-content">
+                            <div class="menu-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <span class="menu-text">Help</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </button>
+
+                    <button class="menu-btn logout" onclick="handleLogout()">
+                        <div class="menu-btn-content">
+                            <div class="menu-icon">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </div>
+                            <span class="menu-text">Logout</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </button>
+                </div>
+
+                <!-- Desktop: Grid layout with badges -->
+                <div class="menu-grid" id="desktopMenu" style="display: none;">
+                    <div class="grid-section-header">
+                        <span class="grid-section-title">Account Settings</span>
+                    </div>
+                    
+                    <div class="menu-card" onclick="handleMenuClick('payment')">
+                        <div class="menu-card-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <div class="menu-card-content">
+                            <h3 class="menu-card-title">Payment Methods</h3>
+                            <p class="menu-card-desc">Manage your saved cards and payment preferences</p>
+                        </div>
+                        <div class="menu-card-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <!-- Desktop Orders Card with Badge -->
+                    <div class="menu-card" onclick="handleMenuClick('orders')" id="ordersCard">
+                        <span class="card-badge" id="ordersCardBadge">0</span>
+                        <div class="menu-card-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="menu-card-content">
+                            <h3 class="menu-card-title">My Orders</h3>
+                            <p class="menu-card-desc">View order history, track shipments, and request returns</p>
+                        </div>
+                        <div class="menu-card-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <!-- Desktop Notifications Card with Badge -->
+                    <div class="menu-card" onclick="handleMenuClick('notifications')" id="notificationsCard">
+                        <span class="card-badge" id="notificationsCardBadge">0</span>
+                        <div class="menu-card-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="menu-card-content">
+                            <h3 class="menu-card-title">Notifications</h3>
+                            <p class="menu-card-desc">Customize your email and push notification preferences</p>
+                        </div>
+                        <div class="menu-card-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="grid-section-header">
+                        <span class="grid-section-title">Support & Legal</span>
+                    </div>
+
+                    <div class="menu-card" onclick="handleMenuClick('privacy')">
+                        <div class="menu-card-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="menu-card-content">
+                            <h3 class="menu-card-title">Privacy & Security</h3>
+                            <p class="menu-card-desc">Manage your data, privacy settings, and security options</p>
+                        </div>
+                        <div class="menu-card-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="menu-card" onclick="handleMenuClick('help')">
+                        <div class="menu-card-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <div class="menu-card-content">
+                            <h3 class="menu-card-title">Help Center</h3>
+                            <p class="menu-card-desc">FAQs, contact support, and getting started guides</p>
+                        </div>
+                        <div class="menu-card-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="menu-card logout" onclick="handleLogout()">
+                        <div class="menu-card-icon">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </div>
+                        <div class="menu-card-content">
+                            <h3 class="menu-card-title">Logout</h3>
+                            <p class="menu-card-desc">Sign out of your account securely</p>
+                        </div>
+                        <div class="menu-card-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav" id="mobileNav">
+        <button class="nav-item" onclick="window.location.href='HIM-coursepage.html'">
+            <i class="fas fa-home"></i>
+        </button>
+        <button class="nav-item" onclick="goToCart()">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-badge" id="navCartBadge">0</span>
+        </button>
+        <button class="nav-item" onclick="goToFavorites()">
+            <i class="fas fa-heart"></i>
+            <span class="fav-badge" id="navFavBadge">0</span>
+        </button>
+        <button class="nav-item active">
+            <i class="fas fa-user"></i>
+        </button>
+    </nav>
+
+<script>
+    const SUPABASE_URL = 'https://ddrhpjiaotwtblnlqytw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkcmhwamlhb3R3dGJsbmxxeXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NTI0MjMsImV4cCI6MjA4ODMyODQyM30.GNb6OTErsgNbb0PlEysXD7BtUhkjk0ldQCPbO_5EsKU';
+    
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUserId = null;
+    let cart = [];
+    let favorites = [];
+    let notificationsSubscription = null;
+    let ordersSubscription = null;
+
+    // Badge State Management
+    const badgeState = {
+        notifications: {
+            count: 0,
+            unreadIds: JSON.parse(localStorage.getItem('unreadNotificationIds') || '[]')
+        },
+        orders: {
+            count: 0
+        }
+    };
+
+    // Initialize
+    window.addEventListener('load', async () => {
+        loadFromLocalStorage();
+        updateAllBadges();
+        
+        await syncWithSupabase();
+        await initializeBadges();
+        setupRealtimeSubscriptions();
+        
+        setTimeout(() => {
+            document.getElementById('loaderOverlay').classList.add('hidden');
+        }, 500);
+    });
+
+    // Handle page visibility changes
+    document.addEventListener('visibilitychange', async () => {
+        if (document.visibilityState === 'visible') {
+            console.log('Page visible, refreshing...');
+            await initializeBadges();
+        }
+    });
+
+    window.addEventListener('focus', async () => {
+        await initializeBadges();
+    });
+
+    window.addEventListener('resize', toggleLayout);
+
+    function toggleLayout() {
+        const isDesktop = window.innerWidth >= 1024;
+        console.log('Layout mode:', isDesktop ? 'desktop' : 'mobile');
+    }
+
+    async function initializeBadges() {
+        const userEmail = localStorage.getItem('userEmail');
+        if (!userEmail) return;
+
+        console.log('Initializing badges for:', userEmail);
+
+        // Check if returning from orders page
+        const referrer = document.referrer;
+        if (referrer && referrer.includes('orders.html')) {
+            console.log('Returned from orders, clearing orders badge cache');
+            badgeState.orders.count = 0;
+            localStorage.removeItem('ordersLastViewed');
+        }
+
+        // Always load fresh counts
+        await Promise.all([
+            loadNotificationCount(userEmail),
+            loadOrdersCount(userEmail)
+        ]);
+
+        updateBadgeDisplay();
+    }
+
+    async function loadNotificationCount(userEmail) {
+        try {
+            const { count, error } = await supabaseClient
+                .from('notifications')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_email', userEmail)
+                .eq('is_read', false);
+
+            if (error) throw error;
+
+            badgeState.notifications.count = count || 0;
+            
+            if (count > 0) {
+                const { data } = await supabaseClient
+                    .from('notifications')
+                    .select('id')
+                    .eq('user_email', userEmail)
+                    .eq('is_read', false);
+                
+                if (data) {
+                    badgeState.notifications.unreadIds = data.map(n => n.id);
+                    localStorage.setItem('unreadNotificationIds', JSON.stringify(badgeState.notifications.unreadIds));
+                }
+            }
+
+        } catch (error) {
+            console.error('Error loading notification count:', error);
+        }
+    }
+
+    async function loadOrdersCount(userEmail) {
+        try {
+            const { data, error } = await supabaseClient
+                .from('orders')
+                .select('id, status, inventory_status')
+                .eq('customer_email', userEmail)
+                .not('status', 'in', '(delivered,rejected)');
+
+            if (error) throw error;
+
+            const activeOrders = (data || []).filter(order => {
+                const status = order.inventory_status || order.status;
+                return !['delivered', 'rejected'].includes(status);
+            });
+
+            badgeState.orders.count = activeOrders.length;
+            console.log('Active orders count:', badgeState.orders.count);
+
+        } catch (error) {
+            console.error('Error loading orders count:', error);
+            badgeState.orders.count = 0;
+        }
+    }
+
+    function setupRealtimeSubscriptions() {
+        const userEmail = localStorage.getItem('userEmail');
+        if (!userEmail) return;
+
+        console.log('Setting up realtime for:', userEmail);
+
+        // Remove existing subscriptions if any
+        if (notificationsSubscription) {
+            supabaseClient.removeChannel(notificationsSubscription);
+        }
+        if (ordersSubscription) {
+            supabaseClient.removeChannel(ordersSubscription);
+        }
+
+        // Notifications subscription
+        notificationsSubscription = supabaseClient
+            .channel('profile-notifications')
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'notifications',
+                filter: `user_email=eq.${userEmail}`
+            }, (payload) => {
+                console.log('New notification:', payload);
+                badgeState.notifications.count++;
+                badgeState.notifications.unreadIds.push(payload.new.id);
+                localStorage.setItem('unreadNotificationIds', JSON.stringify(badgeState.notifications.unreadIds));
+                updateBadgeDisplay();
+                pulseBadge('notificationsBadge');
+                pulseBadge('notificationsCardBadge');
+                showNotificationToast(payload.new.title || 'New Notification', payload.new.message);
+            })
+            .on('postgres_changes', {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'notifications',
+                filter: `user_email=eq.${userEmail}`
+            }, (payload) => {
+                if (payload.new.is_read && !payload.old.is_read) {
+                    badgeState.notifications.count = Math.max(0, badgeState.notifications.count - 1);
+                    badgeState.notifications.unreadIds = badgeState.notifications.unreadIds.filter(
+                        id => id !== payload.new.id
+                    );
+                    localStorage.setItem('unreadNotificationIds', JSON.stringify(badgeState.notifications.unreadIds));
+                    updateBadgeDisplay();
+                }
+            })
+            .subscribe();
+
+        // Orders subscription
+        ordersSubscription = supabaseClient
+            .channel('profile-orders')
+            .on('postgres_changes', {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'orders',
+                filter: `customer_email=eq.${userEmail}`
+            }, (payload) => {
+                console.log('Order updated:', payload);
+                const oldStatus = payload.old.inventory_status || payload.old.status;
+                const newStatus = payload.new.inventory_status || payload.new.status;
+                
+                const wasActive = !['delivered', 'rejected'].includes(oldStatus);
+                const isActive = !['delivered', 'rejected'].includes(newStatus);
+                
+                if (!wasActive && isActive) {
+                    badgeState.orders.count++;
+                    updateBadgeDisplay();
+                    pulseBadge('ordersBadge');
+                    pulseBadge('ordersCardBadge');
+                } else if (wasActive && !isActive) {
+                    badgeState.orders.count = Math.max(0, badgeState.orders.count - 1);
+                    updateBadgeDisplay();
+                }
+            })
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'orders',
+                filter: `customer_email=eq.${userEmail}`
+            }, (payload) => {
+                console.log('New order:', payload);
+                const status = payload.new.inventory_status || payload.new.status;
+                if (!['delivered', 'rejected'].includes(status)) {
+                    badgeState.orders.count++;
+                    updateBadgeDisplay();
+                    pulseBadge('ordersBadge');
+                    pulseBadge('ordersCardBadge');
+                }
+            })
+            .subscribe();
+    }
+
+    function updateBadgeDisplay() {
+        // Mobile badges
+        const notifBadge = document.getElementById('notificationsBadge');
+        const ordersBadge = document.getElementById('ordersBadge');
+        
+        // Desktop card badges
+        const notifCardBadge = document.getElementById('notificationsCardBadge');
+        const ordersCardBadge = document.getElementById('ordersCardBadge');
+
+        // Update notification badges
+        if (badgeState.notifications.count > 0) {
+            const count = badgeState.notifications.count > 99 ? '99+' : badgeState.notifications.count;
+            if (notifBadge) {
+                notifBadge.textContent = count;
+                notifBadge.classList.add('active');
+            }
+            if (notifCardBadge) {
+                notifCardBadge.textContent = count;
+                notifCardBadge.classList.add('active');
+            }
+        } else {
+            if (notifBadge) notifBadge.classList.remove('active');
+            if (notifCardBadge) notifCardBadge.classList.remove('active');
+        }
+
+        // Update orders badges
+        if (badgeState.orders.count > 0) {
+            const count = badgeState.orders.count > 99 ? '99+' : badgeState.orders.count;
+            if (ordersBadge) {
+                ordersBadge.textContent = count;
+                ordersBadge.classList.add('active');
+            }
+            if (ordersCardBadge) {
+                ordersCardBadge.textContent = count;
+                ordersCardBadge.classList.add('active');
+            }
+        } else {
+            if (ordersBadge) ordersBadge.classList.remove('active');
+            if (ordersCardBadge) ordersCardBadge.classList.remove('active');
+        }
+    }
+
+    function pulseBadge(badgeId) {
+        const badge = document.getElementById(badgeId);
+        if (badge) {
+            badge.classList.add('pulse');
+            setTimeout(() => badge.classList.remove('pulse'), 2000);
+        }
+    }
+
+    function showNotificationToast(title, message) {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-left: 4px solid #6F4D38;
+            z-index: 10000;
+            max-width: 300px;
+            animation: slideIn 0.3s ease;
+        `;
+        toast.innerHTML = `
+            <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">${title}</div>
+            <div style="font-size: 0.85rem; color: #666;">${message}</div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 5000);
+    }
+
+    function handleMenuClick(menuType) {
+        console.log('Clicked:', menuType);
+        
+        if (menuType === 'notifications') {
+            clearNotificationBadge();
+        } else if (menuType === 'orders') {
+            // Don't clear here - let orders.html handle it
+            // Just navigate
+        }
+        
+        switch(menuType) {
+            case 'payment':
+                window.location.href = 'paymentmethod.html';
+                break;
+            case 'orders':
+                window.location.href = 'orders.html';
+                break;
+            case 'notifications':
+                window.location.href = 'notifications.html';
+                break;
+            case 'privacy':
+                window.location.href = 'privacy.html';
+                break;
+            case 'help':
+                window.location.href = 'help.html';
+                break;
+        }
+    }
+
+    function clearNotificationBadge() {
+        badgeState.notifications.count = 0;
+        badgeState.notifications.unreadIds = [];
+        localStorage.setItem('unreadNotificationIds', '[]');
+        updateBadgeDisplay();
+        
+        const userEmail = localStorage.getItem('userEmail');
+        if (userEmail) {
+            supabaseClient
+                .from('notifications')
+                .update({ is_read: true })
+                .eq('user_email', userEmail)
+                .eq('is_read', false)
+                .then(() => console.log('Notifications marked as read'))
+                .catch(err => console.error('Error:', err));
+        }
+    }
+
+    // ... rest of your existing functions (loadFromLocalStorage, syncWithSupabase, etc.) ...
+
+    function loadFromLocalStorage() {
+        try {
+            const savedCart = localStorage.getItem('cart');
+            const savedFavorites = localStorage.getItem('favorites');
+            
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+                if (!Array.isArray(cart)) cart = [];
+            } else {
+                cart = [];
+            }
+            
+            if (savedFavorites) {
+                favorites = JSON.parse(savedFavorites);
+                if (!Array.isArray(favorites)) favorites = [];
+            } else {
+                favorites = [];
+            }
+            
+        } catch (e) {
+            console.error('Error loading from localStorage:', e);
+            cart = [];
+            favorites = [];
+        }
+    }
+
+    async function syncWithSupabase() {
+        showSyncStatus('syncing');
+        
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            
+            if (session?.user) {
+                currentUserId = session.user.id;
+                await loadUserData();
+                await mergeWithSupabase();
+            } else {
+                currentUserId = localStorage.getItem('tempUserId') || 'temp_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('tempUserId', currentUserId);
+            }
+            
+            showSyncStatus('synced');
+            
+        } catch (error) {
+            console.error('Supabase sync error:', error);
+            showSyncStatus('error');
+        }
+        
+        updateAllBadges();
+    }
+
+    async function mergeWithSupabase() {
+        try {
+            const { data: cartData, error: cartError } = await supabaseClient
+                .from('user_cart')
+                .select('*')
+                .eq('user_id', currentUserId);
+            
+            if (!cartError && cartData && cartData.length > 0) {
+                const supabaseCart = cartData.map(item => ({
+                    id: item.product_id,
+                    name: item.name,
+                    price: item.price,
+                    image: item.image,
+                    quantity: item.quantity || 1,
+                    size: item.size,
+                    color: item.color,
+                    addedAt: item.added_at
+                }));
+                
+                if (cart.length === 0 && supabaseCart.length > 0) {
+                    cart = supabaseCart;
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                }
+            }
+            
+            const { data: favData, error: favError } = await supabaseClient
+                .from('user_favorites')
+                .select('*')
+                .eq('user_id', currentUserId);
+            
+            if (!favError && favData && favData.length > 0) {
+                const supabaseFavorites = favData.map(item => item.product_id);
+                
+                if (favorites.length === 0 && supabaseFavorites.length > 0) {
+                    favorites = supabaseFavorites;
+                    localStorage.setItem('favorites', JSON.stringify(favorites));
+                }
+            }
+            
+        } catch (error) {
+            console.error('Error merging with Supabase:', error);
+        }
+    }
+
+    function updateAllBadges() {
+        const cartCount = cart.reduce((sum, item) => sum + (parseInt(item.quantity) || 1), 0);
+        const favCount = favorites.length;
+        
+        const navCartBadge = document.getElementById('navCartBadge');
+        const navFavBadge = document.getElementById('navFavBadge');
+        const sidebarCartBadge = document.getElementById('sidebarCartBadge');
+        const sidebarFavBadge = document.getElementById('sidebarFavBadge');
+        
+        if (navCartBadge) {
+            navCartBadge.textContent = cartCount;
+            navCartBadge.style.display = cartCount > 0 ? 'flex' : 'none';
+        }
+        
+        if (navFavBadge) {
+            navFavBadge.textContent = favCount;
+            navFavBadge.style.display = favCount > 0 ? 'flex' : 'none';
+        }
+        
+        if (sidebarCartBadge) {
+            sidebarCartBadge.textContent = cartCount;
+            sidebarCartBadge.style.display = cartCount > 0 ? 'flex' : 'none';
+        }
+        
+        if (sidebarFavBadge) {
+            sidebarFavBadge.textContent = favCount;
+            sidebarFavBadge.style.display = favCount > 0 ? 'flex' : 'none';
+        }
+    }
+
+    function showSyncStatus(status) {
+        const statusEl = document.getElementById('syncStatus');
+        if (!statusEl) return;
+        
+        statusEl.className = 'sync-status ' + status;
+        statusEl.style.display = 'flex';
+        
+        if (status === 'syncing') {
+            statusEl.innerHTML = '<i class="fas fa-sync fa-spin"></i><span>Syncing...</span>';
+        } else if (status === 'synced') {
+            statusEl.innerHTML = '<i class="fas fa-check"></i><span>Saved</span>';
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 2000);
+        } else if (status === 'error') {
+            statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>Error</span>';
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 3000);
+        }
+    }
+
+    function goToCart() {
+        window.location.href = 'HIM-coursepage.html?openCart=true';
+    }
+
+    function goToFavorites() {
+        window.location.href = 'HIM-coursepage.html?openFavorites=true';
+    }
+
+    async function loadUserData() {
+        let userName = localStorage.getItem('userName');
+        let userEmail = localStorage.getItem('userEmail');
+        let avatarUrl = localStorage.getItem('userAvatarUrl') || localStorage.getItem('pendingAvatarUrl');
+        
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (session?.user) {
+            userEmail = session.user.email;
+            localStorage.setItem('userEmail', userEmail);
+            
+            if (!userName) {
+                userName = session.user.user_metadata?.full_name;
+                
+                if (!userName && userEmail) {
+                    const emailLocalPart = userEmail.split('@')[0];
+                    userName = formatNameFromEmail(emailLocalPart);
+                }
+                
+                localStorage.setItem('userName', userName);
+            }
+            
+            if (!avatarUrl) {
+                avatarUrl = session.user.user_metadata?.avatar_url;
+                localStorage.setItem('userAvatarUrl', avatarUrl);
+            }
+        }
+        
+        if (userName) {
+            const nameEl = document.getElementById('userName');
+            if (nameEl) nameEl.textContent = userName;
+        }
+        
+        if (userEmail) {
+            const emailEl = document.getElementById('userEmail');
+            if (emailEl) emailEl.textContent = userEmail;
+        }
+        
+        const avatarContainer = document.getElementById('profileImage');
+        const sidebarAvatar = document.getElementById('sidebarAvatar');
+        
+        if (avatarUrl && avatarUrl !== 'null' && avatarUrl !== '') {
+            const imgHtml = `<img src="${avatarUrl}" alt="Profile">`;
+            if (avatarContainer) avatarContainer.innerHTML = imgHtml;
+            if (sidebarAvatar) sidebarAvatar.innerHTML = imgHtml;
+        }
+    }
+
+    function formatNameFromEmail(localPart) {
+        const nameWithoutNumbers = localPart.replace(/^\d+/, '').replace(/\d+$/, '');
+        
+        const commonFirstNames = ['macaulay', 'john', 'jane', 'mike', 'sarah', 'david', 'emma', 'james', 'lisa', 'chris', 'anna', 'mark', 'laura', 'paul', 'grace', 'alex', 'kate', 'ryan', 'lucy', 'kevin'];
+        const commonSurnames = ['royal', 'smith', 'johnson', 'williams', 'brown', 'jones', 'garcia', 'miller', 'davis', 'rodriguez', 'martinez', 'hernandez', 'lopez', 'gonzalez', 'wilson', 'anderson', 'thomas', 'taylor', 'moore', 'jackson', 'martin', 'lee', 'perez', 'thompson', 'white', 'harris', 'sanchez', 'clark', 'ramirez', 'lewis', 'robinson', 'walker', 'young', 'allen', 'king', 'wright', 'scott', 'torres', 'nguyen', 'hill', 'flores', 'green', 'adams', 'nelson', 'baker', 'hall', 'rivera', 'campbell', 'mitchell', 'carter', 'roberts'];
+        
+        let lowerName = nameWithoutNumbers.toLowerCase();
+        let firstName = '';
+        let lastName = '';
+        
+        for (const name of commonFirstNames) {
+            if (lowerName.startsWith(name)) {
+                firstName = name;
+                lastName = lowerName.substring(name.length);
+                break;
+            }
+        }
+        
+        if (!firstName) {
+            for (const surname of commonSurnames) {
+                const index = lowerName.indexOf(surname);
+                if (index > 0) {
+                    firstName = lowerName.substring(0, index);
+                    lastName = surname;
+                    break;
+                }
+            }
+        }
+        
+        if (!firstName && !lastName) {
+            const camelCaseSplit = nameWithoutNumbers.replace(/([a-z])([A-Z])/g, '$1 $2').split(' ');
+            if (camelCaseSplit.length > 1) {
+                firstName = camelCaseSplit[0];
+                lastName = camelCaseSplit.slice(1).join('');
+            }
+        }
+        
+        const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+        
+        if (firstName && lastName) {
+            return `${capitalize(firstName)} ${capitalize(lastName)}`;
+        } else if (firstName) {
+            return capitalize(firstName);
+        } else if (lastName) {
+            return capitalize(lastName);
+        }
+        
+        return capitalize(nameWithoutNumbers);
+    }
+
+    function goBack() {
+        window.location.href = 'HIM-coursepage.html';
+    }
+
+    async function handleLogout() {
+        if (confirm('Are you sure you want to logout?')) {
+            if (notificationsSubscription) {
+                supabaseClient.removeChannel(notificationsSubscription);
+            }
+            if (ordersSubscription) {
+                supabaseClient.removeChannel(ordersSubscription);
+            }
+            
+            await supabaseClient.auth.signOut();
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    }
+
+    window.addEventListener('beforeunload', () => {
+        if (notificationsSubscription) {
+            supabaseClient.removeChannel(notificationsSubscription);
+        }
+        if (ordersSubscription) {
+            supabaseClient.removeChannel(ordersSubscription);
+        }
+    });
+</script>
+<style>
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideOut {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(100%); }
+    }
+</style>
+</body>
+</html>
