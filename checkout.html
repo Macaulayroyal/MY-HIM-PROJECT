@@ -1321,24 +1321,11 @@ document.body.removeChild(tempLink);
 
 }
 
-// ✅ Always redirect to profile after WhatsApp
 setTimeout(() => {
     hideLoading();
-    localStorage.setItem('showGuestModal', 'true');
-    window.location.href = 'profile.html';
 }, 1200);
 
-// ✅ PAGE VISIBILITY HANDLER (fixes iPhone stuck loading)
-document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-        // If user returns from WhatsApp, go to profile
-        if (localStorage.getItem('showGuestModal') === 'true') {
-            hideLoading();
-            localStorage.setItem('showGuestModal', 'pending');
-            window.location.href = 'profile.html';
-        }
-    }
-});
+
 
 // ✅ WINDOW FOCUS HANDLER (iPhone fix)
 window.addEventListener('focus', () => {
