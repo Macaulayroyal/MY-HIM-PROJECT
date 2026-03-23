@@ -818,12 +818,12 @@
                 </div>
 
                 <div class="field-row required">
-                    <label class="field-label" for="customerBankName">Your Bank Name</label>
+                    <label class="field-label" for="customerBankName">Your Name</label>
                     <input id="customerBankName" class="field-input" type="text" placeholder="Enter your bank name">
                 </div>
 
                 <div class="field-row required">
-                    <label class="field-label" for="customerBankAccountName">Name of Bank</label>
+                    <label class="field-label" for="customerBankAccountName">Name of Your Bank</label>
                     <input id="customerBankAccountName" class="field-input" type="text" placeholder="Enter account holder name">
                 </div>
             </div>
@@ -1309,22 +1309,24 @@ async function confirmTransfer() {
     const whatsappUrl = `https://wa.me/2349129629049?text=${encodedMessage}`;
     
     // ✅ FORCE OPEN WHATSAPP (iPhone Safari fix)
-    const whatsappWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    
-    if (whatsappWindow) {
-        // ✅ iPhone Safari - redirect to profile after WhatsApp opens
-        setTimeout(() => {
-            hideLoading();
-            // Store redirect flag for profile page
-            localStorage.setItem('showGuestModal', 'true');
-            window.location.href = 'profile.html';
-        }, 1500);
-    } else {
-        // Fallback if popup blocked
-        hideLoading();
-        showToast('Please enable popups and try again.', true);
-    }
+  // ✅ BETTER WAY - Create a temporary link and click it
+const tempLink = document.createElement('a');
+tempLink.href = whatsappUrl;
+tempLink.target = '_blank';
+tempLink.rel = 'noopener noreferrer';
+tempLink.style.display = 'none';
+document.body.appendChild(tempLink);
+tempLink.click();
+document.body.removeChild(tempLink);
+
 }
+
+// ✅ Always redirect to profile after WhatsApp
+setTimeout(() => {
+    hideLoading();
+    localStorage.setItem('showGuestModal', 'true');
+    window.location.href = 'profile.html';
+}, 1200);
 
 // ✅ PAGE VISIBILITY HANDLER (fixes iPhone stuck loading)
 document.addEventListener('visibilitychange', () => {
