@@ -1104,6 +1104,24 @@
                         </div>
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </button>
+                    <button class="menu-btn" onclick="handleMenuClick('signup')">
+                        <div class="menu-btn-content">
+                            <div class="menu-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <span class="menu-text">Sign Up</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </button>
+                    <button class="menu-btn" onclick="handleMenuClick('login')">
+                        <div class="menu-btn-content">
+                            <div class="menu-icon">
+                                <i class="fas fa-sign-in-alt"></i>
+                            </div>
+                            <span class="menu-text">Login</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </button>
 
                     <button class="menu-btn logout" onclick="handleLogout()">
                         <div class="menu-btn-content">
@@ -1559,6 +1577,12 @@
                 break;
             case 'help':
                 window.location.href = 'help.html';
+                break;
+            case 'signup':
+                window.location.href = 'signup.html';
+                break;
+            case 'login':
+                window.location.href = 'login.html';
                 break;
         }
     }
