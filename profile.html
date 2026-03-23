@@ -1117,6 +1117,31 @@
         width: 100%;
     }
 }
+
+.guest-modal-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.guest-modal-btn {
+    flex: 1;
+    min-height: 50px;
+    padding: 14px 18px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 14px;
+}
+
+@media (max-width: 480px) {
+    .guest-modal-actions {
+        flex-direction: column;
+    }
+
+    .guest-modal-btn {
+        width: 100%;
+        min-height: 52px;
+    }
+}
     </style>
 </head>
 <body>
@@ -1443,6 +1468,8 @@
 </nav>
 
 <script>
+if (localStorage.getItem('showGuestModal')) { const isGuest = !localStorage.getItem('userEmail'); if (isGuest) openGuestModal('notifications'); localStorage.removeItem('showGuestModal'); }
+
     const SUPABASE_URL = 'https://ddrhpjiaotwtblnlqytw.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkcmhwamlhb3R3dGJsbmxxeXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NTI0MjMsImV4cCI6MjA4ODMyODQyM30.GNb6OTErsgNbb0PlEysXD7BtUhkjk0ldQCPbO_5EsKU';
     
@@ -1732,15 +1759,23 @@
     let pendingGuestAction = null;
 
 function handleMenuClick(menuType) {
-    if (menuType === 'notifications' || menuType === 'orders') {
-        if (isAuthenticated) {
-            if (menuType === 'notifications') clearNotificationBadge();
-            if (menuType === 'orders') window.location.href = 'orders.html';
-            return;
-        }
+    const isGuest = !localStorage.getItem('userEmail');
 
-        pendingGuestAction = menuType;
-        openGuestModal(menuType);
+    if (menuType === 'notifications') {
+        if (isGuest) {
+            openGuestModal('notifications');
+        } else {
+            window.location.href = 'notifications.html';
+        }
+        return;
+    }
+
+    if (menuType === 'orders') {
+        if (isGuest) {
+            openGuestModal('orders');
+        } else {
+            window.location.href = 'orders.html';
+        }
         return;
     }
 
@@ -1762,7 +1797,6 @@ function handleMenuClick(menuType) {
             break;
     }
 }
-
 function openGuestModal(type) {
     const modal = document.getElementById('guestModal');
     const title = document.getElementById('guestModalTitle');
@@ -2138,6 +2172,8 @@ async function submitGuestEmail() {
         if (notificationsSubscription) supabaseClient.removeChannel(notificationsSubscription);
         if (ordersSubscription) supabaseClient.removeChannel(ordersSubscription);
     });
+
+    
 </script>
 
 <style>
