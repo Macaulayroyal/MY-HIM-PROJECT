@@ -1219,7 +1219,6 @@ async function cancelPendingOrder(orderId) {
 async function confirmTransfer() {
     if (!validateCheckoutFields()) return;
 
-    const orderId = getOrderId();
     const total = getCheckoutTotal();
     const cart = JSON.parse(localStorage.getItem('checkoutCart') || localStorage.getItem('cart') || '[]');
     const customer = getFieldValues();
@@ -1234,20 +1233,21 @@ async function confirmTransfer() {
     try {
         // Save order with customer email
         await supabaseClient
-            .from('orders')
-            .update({ 
-                status: 'submitted',
-                customer_email: customer.email,
-                customer_address: customer.address,
-                customer_state: customer.state,
-                customer_phone: customer.phone || null,
-                customer_bank_name: customer.bankName,
-                customer_account_name: customer.accountName,
-                items: cart,  // Ensure items are saved
-                total_amount: total,
-                updated_at: new Date().toISOString()
-            })
-            .eq('id', orderId);
+  .from('orders')
+  .insert([
+    {
+      status: 'submitted',
+      customer_email: customer.email,
+      customer_address: customer.address,
+      customer_state: customer.state,
+      customer_phone: customer.phone || null,
+      customer_bank_name: customer.bankName,
+      customer_account_name: customer.accountName,
+      items: cart,
+      total_amount: total,
+      created_at: new Date().toISOString()
+    }
+  ]);
         
         // CRITICAL: Save email for guest tracking
         localStorage.setItem('guestTrackEmail', customer.email);
