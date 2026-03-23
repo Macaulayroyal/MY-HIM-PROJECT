@@ -1229,40 +1229,40 @@ async function confirmTransfer() {
         return;
     }
     
-    // ✅ ALWAYS SHOW LOADING FIRST
     showLoading(true);
     
-    // ✅ TRY TO SAVE DATA (NON-BLOCKING)
     try {
+        // Save order with customer email
         await supabaseClient
             .from('orders')
             .update({ 
-                status: 'submitted',  // ✅ Changes from pending to submitted
+                status: 'submitted',
                 customer_email: customer.email,
                 customer_address: customer.address,
                 customer_state: customer.state,
                 customer_phone: customer.phone || null,
                 customer_bank_name: customer.bankName,
                 customer_account_name: customer.accountName,
+                items: cart,  // Ensure items are saved
+                total_amount: total,
                 updated_at: new Date().toISOString()
             })
             .eq('id', orderId);
         
-        // ✅ Save for guest tracking
+        // CRITICAL: Save email for guest tracking
         localStorage.setItem('guestTrackEmail', customer.email);
-        localStorage.setItem('checkoutEmail', customer.email);
+        localStorage.setItem('userEmail', customer.email);  // Also set as userEmail for compatibility
         
     } catch (error) {
-        console.error('Database save failed (non-blocking):', error);
-        // ✅ NO ERROR TOAST - just log it
+        console.error('Save failed:', error);
     }
     
-    // ✅ ALWAYS CLEANUP CART
+    // Clear cart
     localStorage.removeItem('cart');
     localStorage.removeItem('checkoutCart');
     localStorage.removeItem('pendingOrderId');
     
-    // ✅ ALWAYS SEND TO WHATSAPP
+    // Send to WhatsApp
     const userName = localStorage.getItem('userName') || 'Guest';
     let message = `╭─────────────────────────────╮\n`;
     message += `│     *HIM.CLOTHIERS ORDER*     │\n`;
@@ -1277,54 +1277,36 @@ async function confirmTransfer() {
     message += `Address: ${customer.address}\n`;
     message += `State: ${customer.state}\n`;
     if (customer.phone) message += `Phone: ${customer.phone}\n`;
-    message += `Your Bank Name: ${customer.bankName}\n`;
-    message += `Name of Bank: ${customer.accountName}\n\n`;
-    message += `*ITEMS PURCHASED*\n`;
-    message += `─────────────────────────────\n`;
-    
+    message += `Bank: ${customer.bankName}\n`;
+    message += `Account Name: ${customer.accountName}\n\n`;
+    message += `*ITEMS*\n`;
     cart.forEach((item, index) => {
         message += `\n${index + 1}. *${item.name}*\n`;
-        message += `   Price: ₦${parseFloat(item.price).toLocaleString()}\n`;
-        message += `   Qty: ${item.quantity}\n`;
-        if (item.size) message += `   Size: ${item.size}\n`;
-        if (item.color) message += `   Color: ${item.color}\n`;
-        message += `   Subtotal: ₦${(parseFloat(item.price) * item.quantity).toLocaleString()}\n`;
+        message += `   ₦${parseFloat(item.price).toLocaleString()} x ${item.quantity}\n`;
     });
-    
-    message += `\n─────────────────────────────\n`;
-    message += `*TOTAL: ₦${total.toLocaleString()}*\n`;
-    message += `─────────────────────────────\n\n`;
-    message += `*PAYMENT INFO*\n`;
-    message += `Status: Transfer Completed\n`;
-    message += `Bank: Moniepoint MFB\n`;
-    message += `Account: 9012949580\n`;
-    message += `Name: Isah David Olearekhai\n\n`;
-    message += `─────────────────────────────\n`;
-    message += `Thank you for shopping with us!\n`;
-    message += `─────────────────────────────`;
+    message += `\n*TOTAL: ₦${total.toLocaleString()}*\n`;
     
     showToast('Order submitted! Opening WhatsApp...');
     
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/2349129629049?text=${encodedMessage}`;
     
-    // ✅ FORCE OPEN WHATSAPP (iPhone Safari fix)
-  // ✅ BETTER WAY - Create a temporary link and click it
-const tempLink = document.createElement('a');
-tempLink.href = whatsappUrl;
-tempLink.target = '_blank';
-tempLink.rel = 'noopener noreferrer';
-tempLink.style.display = 'none';
-document.body.appendChild(tempLink);
-tempLink.click();
-document.body.removeChild(tempLink);
-
+    // Open WhatsApp
+    const tempLink = document.createElement('a');
+    tempLink.href = whatsappUrl;
+    tempLink.target = '_blank';
+    tempLink.rel = 'noopener noreferrer';
+    tempLink.style.display = 'none';
+    document.body.appendChild(tempLink);
+    tempLink.click();
+    document.body.removeChild(tempLink);
+    
+    setTimeout(() => {
+        hideLoading();
+        // Redirect to orders page after WhatsApp
+        window.location.href = `orders.html?email=${encodeURIComponent(customer.email)}`;
+    }, 2000);
 }
-
-setTimeout(() => {
-    hideLoading();
-}, 1200);
-
 
 
 // ✅ WINDOW FOCUS HANDLER (iPhone fix)

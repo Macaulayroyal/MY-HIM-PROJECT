@@ -941,599 +941,370 @@
         </div>
     </div>
 
-    <script>
-        // Supabase Configuration
-        const SUPABASE_URL = 'https://ddrhpjiaotwtblnlqytw.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkcmhwamlhb3R3dGJsbmxxeXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NTI0MjMsImV4cCI6MjA4ODMyODQyM30.GNb6OTErsgNbb0PlEysXD7BtUhkjk0ldQCPbO_5EsKU';
+  <script>
+    // Supabase Configuration
+const SUPABASE_URL = 'https://ddrhpjiaotwtblnlqytw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkcmhwamlhb3R3dGJsbmxxeXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NTI0MjMsImV4cCI6MjA4ODMyODQyM30.GNb6OTErsgNbb0PlEysXD7BtUhkjk0ldQCPbO_5EsKU';
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================
+// EMAIL DETECTION - FIXED: Clear cache on new URL param
+// ============================================
+const urlParams = new URLSearchParams(window.location.search);
+const emailFromUrl = urlParams.get('email');
+
+// CRITICAL FIX: If URL has email, always use it and update storage
+if (emailFromUrl) {
+    localStorage.setItem('guestTrackEmail', emailFromUrl);
+    localStorage.setItem('userEmail', emailFromUrl);
+}
+
+const emailFromStorage = localStorage.getItem('guestTrackEmail') || localStorage.getItem('userEmail');
+const emailFromAdmin = localStorage.getItem('adminEmail');
+
+const userEmail = emailFromUrl || emailFromStorage || emailFromAdmin;
+
+console.log('Using email:', userEmail);
+
+if (!userEmail) {
+    window.location.href = 'profile.html';
+}
+
+// State
+let notifications = [];
+let filteredNotifications = [];
+let currentFilter = 'all';
+let realtimeSubscription = null;
+
+// ============================================
+// INITIALIZATION
+// ============================================
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadNotifications();
+    setupRealtimeSubscription();
+    setupScrollEffects();
+});
+
+// ============================================
+// NAVIGATION
+// ============================================
+function goBack() {
+    window.location.href = 'profile.html';
+}
+
+// ============================================
+// SCROLL EFFECTS
+// ============================================
+function setupScrollEffects() {
+    const header = document.getElementById('header');
+    if (!header) return;
+    
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 10) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    }, { passive: true });
+}
+
+// ============================================
+// LOAD NOTIFICATIONS - FIXED: Force fresh load
+// ============================================
+async function loadNotifications() {
+    try {
+        console.log('Loading notifications for:', userEmail);
         
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        // State
-        let notifications = [];
-        let filteredNotifications = [];
-        let currentFilter = 'all';
-        let selectionMode = false;
-        let selectedIds = new Set();
-        let contextMenuTarget = null;
-        let touchStartY = 0;
-        let isPulling = false;
-        
-        // Check authentication
-        const userEmail = localStorage.getItem('userEmail') || localStorage.getItem('adminEmail');
-        if (!userEmail && !localStorage.getItem('adminLoggedIn')) {
-            window.location.href = 'index.html';
+        if (!userEmail) {
+            showEmptyState();
+            return;
         }
         
-        // Initialize
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadNotifications();
-            setupRealtimeSubscription();
-            setupPullToRefresh();
-            setupScrollEffects();
-            setupContextMenu();
-            startTimeUpdater();
-        });
+        // CRITICAL FIX: Always fetch fresh data from server
+        const { data, error } = await supabaseClient
+            .from('notifications')
+            .select('*')
+            .eq('user_email', userEmail)
+            .order('created_at', { ascending: false })
+            .limit(50);
         
-        // Scroll effects
-        function setupScrollEffects() {
-            const header = document.getElementById('header');
-            let lastScroll = 0;
-            
-            window.addEventListener('scroll', () => {
-                const currentScroll = window.pageYOffset;
+        if (error) {
+            console.error('Supabase error:', error);
+            throw error;
+        }
+        
+        console.log('Notifications loaded:', data);
+        
+        notifications = data || [];
+        updateCounts();
+        applyFilter();
+        
+    } catch (error) {
+        console.error('Error loading notifications:', error);
+        showEmptyState();
+    }
+}
+
+// ============================================
+// COUNTS & FILTERING
+// ============================================
+function updateCounts() {
+    const total = notifications.length;
+    const unread = notifications.filter(n => !n.is_read).length;
+    
+    const countAllEl = document.getElementById('countAll');
+    const countUnreadEl = document.getElementById('countUnread');
+    const unreadBadge = document.getElementById('unreadBadge');
+    
+    if (countAllEl) countAllEl.textContent = total;
+    if (countUnreadEl) countUnreadEl.textContent = unread;
+    if (unreadBadge) unreadBadge.style.display = unread > 0 ? 'block' : 'none';
+    
+    document.title = unread > 0 ? `(${unread}) Notifications - HIM.CLOTHIERS` : 'Notifications - HIM.CLOTHIERS';
+}
+
+function filterNotifications(type) {
+    currentFilter = type;
+    
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    const clickedTab = event?.target?.closest('.filter-tab');
+    if (clickedTab) clickedTab.classList.add('active');
+    
+    applyFilter();
+}
+
+function applyFilter() {
+    switch(currentFilter) {
+        case 'unread':
+            filteredNotifications = notifications.filter(n => !n.is_read);
+            break;
+        case 'accepted':
+            filteredNotifications = notifications.filter(n => 
+                n.type === 'accepted' || n.title?.includes('Confirmed')
+            );
+            break;
+        case 'rejected':
+            filteredNotifications = notifications.filter(n => 
+                n.type === 'rejected' || n.title?.includes('Rejected')
+            );
+            break;
+        default:
+            filteredNotifications = notifications;
+    }
+    renderNotifications();
+}
+
+// ============================================
+// RENDER
+// ============================================
+function renderNotifications() {
+    const container = document.getElementById('notificationsContainer');
+    if (!container) return;
+    
+    if (filteredNotifications.length === 0) {
+        showEmptyState();
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="notification-list">
+            ${filteredNotifications.map((notif, index) => {
+                const timeAgo = getTimeAgo(notif.created_at);
+                const isUnread = !notif.is_read;
+                const type = notif.type || 'general';
                 
-                if (currentScroll > 10) {
-                    header.classList.add('scrolled');
+                let icon, title, message, cardClass;
+                
+                if (type === 'accepted' || notif.title?.includes('Confirmed')) {
+                    icon = '✓';
+                    title = notif.title || 'Payment Confirmed';
+                    message = notif.message || 'Your payment has been verified.';
+                    cardClass = 'accepted';
+                } else if (type === 'rejected' || notif.title?.includes('Rejected')) {
+                    icon = '✕';
+                    title = notif.title || 'Payment Failed';
+                    message = notif.message || 'We could not verify your payment.';
+                    cardClass = 'rejected';
+                } else if (type === 'order_status') {
+                    icon = '📦';
+                    title = notif.title || 'Order Update';
+                    message = notif.message || 'Your order status has been updated.';
+                    cardClass = 'pending';
                 } else {
-                    header.classList.remove('scrolled');
+                    icon = '•';
+                    title = notif.title || 'Update';
+                    message = notif.message || 'You have a new notification.';
+                    cardClass = 'pending';
                 }
                 
-                lastScroll = currentScroll;
-            }, { passive: true });
-        }
-        
-        // Pull to refresh
-        function setupPullToRefresh() {
-            const mainContent = document.getElementById('mainContent');
-            const pullRefresh = document.getElementById('pullRefresh');
-            
-            mainContent.addEventListener('touchstart', (e) => {
-                if (window.pageYOffset === 0) {
-                    touchStartY = e.touches[0].clientY;
-                    isPulling = true;
-                }
-            }, { passive: true });
-            
-            mainContent.addEventListener('touchmove', (e) => {
-                if (!isPulling) return;
-                
-                const touchY = e.touches[0].clientY;
-                const diff = touchY - touchStartY;
-                
-                if (diff > 0 && diff < 100) {
-                    pullRefresh.style.transform = `translateY(${diff * 0.5}px)`;
-                    pullRefresh.style.opacity = diff / 100;
-                }
-                
-                if (diff > 100) {
-                    pullRefresh.classList.add('visible');
-                }
-            }, { passive: true });
-            
-            mainContent.addEventListener('touchend', async () => {
-                if (!isPulling) return;
-                isPulling = false;
-                
-                if (pullRefresh.classList.contains('visible')) {
-                    await refreshNotifications();
-                }
-                
-                pullRefresh.style.transform = '';
-                pullRefresh.style.opacity = '';
-                pullRefresh.classList.remove('visible');
-            });
-        }
-        
-        async function refreshNotifications() {
-            showToast('Refreshing...', 'info');
-            await loadNotifications();
-            showToast('Notifications updated', 'success');
-        }
-        
-        // Context menu
-        function setupContextMenu() {
-            const contextMenu = document.getElementById('contextMenu');
-            
-            document.addEventListener('click', () => {
-                contextMenu.classList.remove('active');
-            });
-            
-            document.addEventListener('contextmenu', (e) => {
-                const card = e.target.closest('.notification-card');
-                if (card) {
-                    e.preventDefault();
-                    contextMenuTarget = card.dataset.id;
-                    
-                    const x = Math.min(e.clientX, window.innerWidth - 200);
-                    const y = Math.min(e.clientY, window.innerHeight - 150);
-                    
-                    contextMenu.style.left = x + 'px';
-                    contextMenu.style.top = y + 'px';
-                    contextMenu.classList.add('active');
-                }
-            });
-        }
-        
-        function contextMarkAsRead() {
-            if (contextMenuTarget) {
-                markAsRead(contextMenuTarget);
-            }
-        }
-        
-        function contextViewOrder() {
-            const notif = notifications.find(n => n.id === contextMenuTarget);
-            if (notif?.order_id) {
-                window.location.href = `orders.html?id=${notif.order_id}`;
-            }
-        }
-        
-        function contextDelete() {
-            showToast('Delete feature coming soon', 'info');
-        }
-        
-        // Load notifications
-        async function loadNotifications() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('notifications')
-                    .select('*')
-                    .eq('user_email', userEmail)
-                    .order('created_at', { ascending: false })
-                    .limit(50);
-                
-                if (error) throw error;
-                
-                notifications = data || [];
-                updateCounts();
-                applyFilter();
-                
-            } catch (error) {
-                console.error('Error loading notifications:', error);
-                showEmptyState();
-            }
-        }
-        
-        function updateCounts() {
-            const total = notifications.length;
-            const unread = notifications.filter(n => !n.is_read).length;
-            
-            document.getElementById('countAll').textContent = total;
-            document.getElementById('countUnread').textContent = unread;
-            
-            const badge = document.getElementById('unreadBadge');
-            badge.style.display = unread > 0 ? 'block' : 'none';
-            
-            // Update page title
-            if (unread > 0) {
-                document.title = `(${unread}) Notifications - HIM.CLOTHIERS`;
-            } else {
-                document.title = 'Notifications - HIM.CLOTHIERS';
-            }
-        }
-        
-        function applyFilter() {
-            switch(currentFilter) {
-                case 'unread':
-                    filteredNotifications = notifications.filter(n => !n.is_read);
-                    break;
-                case 'accepted':
-                    filteredNotifications = notifications.filter(n => 
-                        n.type === 'accepted' || n.title?.includes('Confirmed')
-                    );
-                    break;
-                case 'rejected':
-                    filteredNotifications = notifications.filter(n => 
-                        n.type === 'rejected' || n.title?.includes('Rejected')
-                    );
-                    break;
-                default:
-                    filteredNotifications = notifications;
-            }
-            renderNotifications();
-        }
-        
-        function filterNotifications(type) {
-            currentFilter = type;
-            
-            document.querySelectorAll('.filter-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            event.target.closest('.filter-tab').classList.add('active');
-            
-            applyFilter();
-        }
-        
-        // Setup realtime
-        function setupRealtimeSubscription() {
-            realtimeSubscription = supabaseClient
-                .channel('notifications')
-                .on('postgres_changes', {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'notifications',
-                    filter: `user_email=eq.${userEmail}`
-                }, (payload) => {
-                    const newNotification = payload.new;
-                    notifications.unshift(newNotification);
-                    updateCounts();
-                    applyFilter();
-                    
-                    // Haptic feedback
-                    if (navigator.vibrate) {
-                        navigator.vibrate([50, 100, 50]);
-                    }
-                    
-                    showToast('New notification received', 'success');
-                    
-                    // Browser notification
-                    if ('Notification' in window && Notification.permission === 'granted') {
-                        new Notification(newNotification.title, {
-                            body: newNotification.message,
-                            icon: '/favicon.ico',
-                            badge: '/favicon.ico',
-                            tag: newNotification.id
-                        });
-                    }
-                })
-                .subscribe();
-        }
-        
-        // Render
-        function renderNotifications() {
-            const container = document.getElementById('notificationsContainer');
-            
-            if (filteredNotifications.length === 0) {
-                showEmptyState();
-                return;
-            }
-            
-            const html = `
-                <div class="notification-list">
-                    ${filteredNotifications.map((notif, index) => {
-                        const timeAgo = getTimeAgo(notif.created_at);
-                        const isUnread = !notif.is_read;
-                        const type = notif.type || 'general';
+                return `
+                    <div class="notification-card ${cardClass} ${isUnread ? 'unread' : 'read'}" 
+                         data-id="${notif.id}"
+                         onclick="markAsRead('${notif.id}')"
+                         style="animation-delay: ${index * 0.05}s">
                         
-                        let icon, title, message, cardClass;
-                        
-                        if (type === 'accepted' || notif.title?.includes('Confirmed')) {
-                            icon = '✓';
-                            title = notif.title || 'Payment Confirmed';
-                            message = notif.message || 'Your payment has been verified. We will notify you when your order arrives.';
-                            cardClass = 'accepted';
-                        } else if (type === 'rejected' || notif.title?.includes('Rejected')) {
-                            icon = '✕';
-                            title = notif.title || 'Payment Failed';
-                            message = notif.message || 'We could not verify your payment. Please contact support.';
-                            cardClass = 'rejected';
-                        } else {
-                            icon = '•';
-                            title = notif.title || 'Order Update';
-                            message = notif.message || 'Your order status has been updated.';
-                            cardClass = 'pending';
-                        }
-                        
-                        const isSelected = selectedIds.has(notif.id);
-                        
-                        return `
-                            <div class="notification-card ${cardClass} ${isUnread ? 'unread' : 'read'} ${isSelected ? 'selected' : ''}" 
-                                 data-id="${notif.id}"
-                                 onclick="handleCardClick('${notif.id}', event)"
-                                 onlongpress="handleLongPress('${notif.id}')"
-                                 style="animation-delay: ${index * 0.05}s">
-                                
-                                <div class="notification-header">
-                                    <div class="notification-icon ${cardClass}">${icon}</div>
-                                    <div class="notification-content">
-                                        <div class="notification-title">
-                                            ${escapeHtml(title)}
-                                            ${isUnread ? '<span class="unread-dot"></span>' : ''}
-                                        </div>
-                                        <div class="notification-time">
-                                            ${timeAgo}
-                                            ${isUnread ? '<span class="realtime-indicator">live</span>' : ''}
-                                        </div>
-                                    </div>
+                        <div class="notification-header">
+                            <div class="notification-icon ${cardClass}">${icon}</div>
+                            <div class="notification-content">
+                                <div class="notification-title">
+                                    ${escapeHtml(title)}
+                                    ${isUnread ? '<span class="unread-dot"></span>' : ''}
                                 </div>
-                                
-                                <div class="notification-message">${escapeHtml(message).replace(/\n/g, '<br>')}</div>
-                                
-                                <div class="notification-footer">
-                                    ${notif.order_id ? `
-                                        <span class="notification-order-id">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                                            </svg>
-                                            Order ${notif.order_id}
-                                        </span>
-                                    ` : '<span></span>'}
-                                    
-                                    <div class="notification-actions">
-                                        ${isUnread ? `
-                                            <button class="action-btn" onclick="event.stopPropagation(); markAsRead('${notif.id}')">
-                                                Mark as read
-                                            </button>
-                                        ` : ''}
-                                    </div>
+                                <div class="notification-time">
+                                    ${timeAgo}
+                                    ${isUnread ? '<span class="realtime-indicator">live</span>' : ''}
                                 </div>
-                                
-                                ${selectionMode ? `
-                                    <div style="position: absolute; top: 16px; right: 16px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid ${isSelected ? 'var(--brand-color)' : 'var(--border-color)'}; background: ${isSelected ? 'var(--brand-color)' : 'transparent'}; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">
-                                        ${isSelected ? '✓' : ''}
-                                    </div>
-                                ` : ''}
                             </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-            
-            container.innerHTML = html;
-        }
-        
-        function handleCardClick(id, event) {
-            if (selectionMode) {
-                toggleSelection(id);
-            } else {
-                markAsRead(id);
-            }
-        }
-        
-        function handleLongPress(id) {
-            if (!selectionMode) {
-                toggleSelectionMode();
-                toggleSelection(id);
-            }
-        }
-        
-        // Selection mode
-        function toggleSelectionMode() {
-            selectionMode = !selectionMode;
-            if (!selectionMode) {
-                selectedIds.clear();
-                document.getElementById('selectionBar').classList.remove('active');
-            }
-            renderNotifications();
-        }
-        
-        function toggleSelection(id) {
-            if (selectedIds.has(id)) {
-                selectedIds.delete(id);
-            } else {
-                selectedIds.add(id);
-            }
-            updateSelectionBar();
-            renderNotifications();
-        }
-        
-        function updateSelectionBar() {
-            const bar = document.getElementById('selectionBar');
-            const count = document.getElementById('selectionCount');
-            
-            if (selectedIds.size > 0) {
-                count.textContent = `${selectedIds.size} selected`;
-                bar.classList.add('active');
-            } else {
-                bar.classList.remove('active');
-            }
-        }
-        
-        function cancelSelection() {
-            selectionMode = false;
-            selectedIds.clear();
-            document.getElementById('selectionBar').classList.remove('active');
-            renderNotifications();
-        }
-        
-        async function markSelectedAsRead() {
-            try {
-                const promises = Array.from(selectedIds).map(id => 
-                    supabaseClient
-                        .from('notifications')
-                        .update({ is_read: true })
-                        .eq('id', id)
-                );
-                
-                await Promise.all(promises);
-                
-                notifications.forEach(n => {
-                    if (selectedIds.has(n.id)) {
-                        n.is_read = true;
-                    }
-                });
-                
-                updateCounts();
-                applyFilter();
-                cancelSelection();
-                showToast(`${selectedIds.size} notifications marked as read`, 'success');
-                
-            } catch (error) {
-                showToast('Failed to update notifications', 'error');
-            }
-        }
-        
-        // Mark as read
-        async function markAsRead(notificationId) {
-            const notif = notifications.find(n => n.id === notificationId);
-            if (!notif || notif.is_read) {
-                if (notif?.order_id) {
-                    window.location.href = `orders.html?id=${notif.order_id}`;
-                }
-                return;
-            }
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('notifications')
-                    .update({ is_read: true })
-                    .eq('id', notificationId);
-                
-                if (error) throw error;
-                
-                notif.is_read = true;
-                updateCounts();
-                applyFilter();
-                
-                if (notif.order_id) {
-                    setTimeout(() => {
-                        window.location.href = `orders.html?id=${notif.order_id}`;
-                    }, 300);
-                }
-                
-            } catch (error) {
-                showToast('Failed to mark as read', 'error');
-            }
-        }
-        
-        async function markAllAsRead() {
-            const unreadIds = notifications.filter(n => !n.is_read).map(n => n.id);
-            if (unreadIds.length === 0) return;
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('notifications')
-                    .update({ is_read: true })
-                    .in('id', unreadIds);
-                
-                if (error) throw error;
-                
-                notifications.forEach(n => n.is_read = true);
-                updateCounts();
-                applyFilter();
-                showToast('All notifications marked as read', 'success');
-                
-            } catch (error) {
-                showToast('Failed to update notifications', 'error');
-            }
-        }
-        
-        // Utilities
-        function getTimeAgo(dateString) {
-            const date = new Date(dateString);
-            const now = new Date();
-            const seconds = Math.floor((now - date) / 1000);
-            
-            if (seconds < 60) return 'Just now';
-            if (seconds < 120) return '1m ago';
-            if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
-            if (seconds < 7200) return '1h ago';
-            if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
-            if (seconds < 172800) return 'Yesterday';
-            if (seconds < 604800) return Math.floor(seconds / 86400) + 'd ago';
-            return date.toLocaleDateString();
-        }
-        
-        function startTimeUpdater() {
-            setInterval(() => {
-                document.querySelectorAll('.notification-time').forEach(el => {
-                    const time = el.getAttribute('data-time');
-                    if (time) {
-                        const newTime = getTimeAgo(time);
-                        const liveIndicator = el.querySelector('.realtime-indicator');
-                        el.innerHTML = newTime + (liveIndicator ? liveIndicator.outerHTML : '');
-                    }
-                });
-            }, 60000);
-        }
-        
-        // Toast system
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            
-            const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
-            
-            toast.innerHTML = `
-                <div class="toast-icon">${icon}</div>
-                <div class="toast-content">
-                    <div class="toast-title">${type === 'success' ? 'Success' : type === 'error' ? 'Error' : 'Info'}</div>
-                    <div class="toast-message">${message}</div>
-                </div>
-            `;
-            
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.animation = 'toastSlide 0.4s ease reverse';
-                setTimeout(() => toast.remove(), 400);
-            }, 3000);
-        }
-        
-        // Empty state
-        function showEmptyState() {
-            const container = document.getElementById('notificationsContainer');
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-illustration">
-                        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="100" cy="100" r="80" fill="rgba(111, 77, 56, 0.05)"/>
-                            <path d="M100 60v40l30 30" stroke="rgba(111, 77, 56, 0.2)" stroke-width="4" stroke-linecap="round"/>
-                            <circle cx="100" cy="100" r="60" stroke="rgba(111, 77, 56, 0.1)" stroke-width="2" stroke-dasharray="4 4"/>
-                            <path d="M70 130c10-15 50-15 60 0" stroke="rgba(111, 77, 56, 0.3)" stroke-width="3" stroke-linecap="round"/>
-                            <circle cx="85" cy="95" r="4" fill="rgba(111, 77, 56, 0.3)"/>
-                            <circle cx="115" cy="95" r="4" fill="rgba(111, 77, 56, 0.3)"/>
-                        </svg>
+                        </div>
+                        
+                        <div class="notification-message">${escapeHtml(message)}</div>
+                        
+                        <div class="notification-footer">
+                            ${notif.order_id ? `
+                                <span class="notification-order-id">
+                                    Order ${notif.order_id.slice(-8)}
+                                </span>
+                            ` : '<span></span>'}
+                        </div>
                     </div>
-                    <h3>All caught up!</h3>
-                    <p>You have no notifications at the moment. Check back later for updates on your orders.</p>
-                    <button class="empty-action" onclick="window.location.href='shop.html'">Browse Collection</button>
-                </div>
-            `;
+                `;
+            }).join('')}
+        </div>
+    `;
+}
+
+function getTimeAgo(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    
+    if (seconds < 60) return 'Just now';
+    if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
+    if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+    if (seconds < 604800) return Math.floor(seconds / 86400) + 'd ago';
+    return date.toLocaleDateString();
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function showEmptyState() {
+    const container = document.getElementById('notificationsContainer');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div class="empty-state">
+            <div class="empty-illustration">
+                <svg viewBox="0 0 200 200" fill="none">
+                    <circle cx="100" cy="100" r="80" fill="rgba(111, 77, 56, 0.05)"/>
+                    <path d="M100 60v40l30 30" stroke="rgba(111, 77, 56, 0.2)" stroke-width="4"/>
+                </svg>
+            </div>
+            <h3>No notifications</h3>
+            <p>No notifications for ${userEmail}.</p>
+        </div>
+    `;
+}
+
+// ============================================
+// ACTIONS
+// ============================================
+async function markAsRead(notificationId) {
+    const notif = notifications.find(n => n.id === notificationId);
+    if (!notif) return;
+    
+    if (!notif.is_read) {
+        try {
+            await supabaseClient
+                .from('notifications')
+                .update({ is_read: true })
+                .eq('id', notificationId);
+            
+            notif.is_read = true;
+            updateCounts();
+            applyFilter();
+        } catch (error) {
+            console.error('Error marking as read:', error);
         }
+    }
+    
+    if (notif.order_id) {
+        window.location.href = `orders.html?id=${notif.order_id}&email=${encodeURIComponent(userEmail)}`;
+    }
+}
+
+async function markAllAsRead() {
+    const unreadIds = notifications.filter(n => !n.is_read).map(n => n.id);
+    if (unreadIds.length === 0) return;
+    
+    try {
+        await supabaseClient
+            .from('notifications')
+            .update({ is_read: true })
+            .in('id', unreadIds);
         
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        function goBack() {
-            const isAdmin = localStorage.getItem('adminLoggedIn') === 'true';
-            window.location.href = isAdmin ? 'dashboard.html' : 'profile.html';
-        }
-        
-        // Request notification permission
-        if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission();
-        }
-        
-        // Cleanup
-        window.addEventListener('beforeunload', () => {
-            if (realtimeSubscription) {
-                supabaseClient.removeChannel(realtimeSubscription);
+        notifications.forEach(n => n.is_read = true);
+        updateCounts();
+        applyFilter();
+    } catch (error) {
+        console.error('Error marking all as read:', error);
+    }
+}
+
+function toggleSelectionMode() {
+    console.log('Selection mode toggled');
+}
+
+// ============================================
+// REALTIME - FIXED: Subscribe to specific user notifications
+// ============================================
+function setupRealtimeSubscription() {
+    if (!userEmail) return;
+    
+    realtimeSubscription = supabaseClient
+        .channel('notifications-channel')
+        .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_email=eq.${userEmail}`
+        }, (payload) => {
+            console.log('New notification:', payload);
+            notifications.unshift(payload.new);
+            updateCounts();
+            applyFilter();
+        })
+        .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_email=eq.${userEmail}`
+        }, (payload) => {
+            console.log('Notification updated:', payload);
+            const index = notifications.findIndex(n => n.id === payload.new.id);
+            if (index !== -1) {
+                notifications[index] = payload.new;
+                updateCounts();
+                applyFilter();
             }
-        });
-        
-        // Long press detection
-        let longPressTimer;
-        document.addEventListener('touchstart', (e) => {
-            const card = e.target.closest('.notification-card');
-            if (card && !selectionMode) {
-                longPressTimer = setTimeout(() => {
-                    handleLongPress(card.dataset.id);
-                }, 500);
-            }
-        }, { passive: true });
-        
-        document.addEventListener('touchend', () => {
-            clearTimeout(longPressTimer);
-        });
-        
-        document.addEventListener('touchmove', () => {
-            clearTimeout(longPressTimer);
-        });
-    </script>
+        })
+        .subscribe();
+}
+
+// Cleanup
+window.addEventListener('beforeunload', () => {
+    if (realtimeSubscription) {
+        supabaseClient.removeChannel(realtimeSubscription);
+    }
+});
+</script>
 </body>
 </html>

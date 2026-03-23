@@ -1844,21 +1844,29 @@ async function submitGuestEmail() {
     }
 
     try {
+        // Check if this email has any orders
         const { data, error } = await supabaseClient
-            .from('checkout_orders')
-            .select('email, transfer_confirmed')
-            .eq('email', email)
-            .eq('transfer_confirmed', true)
+            .from('orders')
+            .select('id, customer_email')
+            .eq('customer_email', email)
             .limit(1);
 
         if (error) throw error;
 
         if (!data || data.length === 0) {
-            showGuestModalWarning();
+            // Show warning - no orders found
+            const warning = document.getElementById('guestModalWarning');
+            const form = document.getElementById('guestModalForm');
+            warning.style.display = 'block';
+            form.style.display = 'none';
+            warning.textContent = 'No orders found for this email. Please check out first.';
             return;
         }
 
+        // SUCCESS - Save email and redirect
         localStorage.setItem('guestTrackEmail', email);
+        localStorage.setItem('userEmail', email);  // For compatibility
+        
         closeGuestModal();
 
         if (pendingGuestAction === 'orders') {
@@ -1866,12 +1874,12 @@ async function submitGuestEmail() {
         } else if (pendingGuestAction === 'notifications') {
             window.location.href = `notifications.html?email=${encodeURIComponent(email)}`;
         }
+        
     } catch (err) {
-        console.error(err);
+        console.error('Error checking email:', err);
         showGuestModalWarning();
     }
 }
-
     function clearNotificationBadge() {
         badgeState.notifications.count = 0;
         badgeState.notifications.unreadIds = [];
@@ -2172,6 +2180,27 @@ async function submitGuestEmail() {
         if (notificationsSubscription) supabaseClient.removeChannel(notificationsSubscription);
         if (ordersSubscription) supabaseClient.removeChannel(ordersSubscription);
     });
+
+// Guest enters email in modal → fetch their orders
+async function loadGuestOrders(email) {
+    const { data, error } = await supabaseClient
+        .from('orders')
+        .select(`
+            id,
+            status,
+            customer_email,
+            customer_address,
+            total_amount,
+            created_at,
+            items
+        `)
+        .eq('customer_email', email)  // ✅ Uses checkout email
+        .order('created_at', { ascending: false });
+    
+    if (data) {
+        displayOrders(data);
+    }
+}
 
     
 </script>
