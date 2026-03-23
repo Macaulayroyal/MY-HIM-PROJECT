@@ -35,7 +35,6 @@
         padding-bottom: 100px;
     }
 
-    /* Loader */
     .loader-overlay {
         position: fixed;
         top: 0;
@@ -88,7 +87,6 @@
         100% { top: 4px; left: 4px; }
     }
 
-    /* MOBILE FIRST - Default Styles */
     .profile-container {
         width: 100%;
         min-height: 100vh;
@@ -96,7 +94,6 @@
         flex-direction: column;
     }
 
-    /* Top Section */
     .profile-header-section {
         height: 30vh;
         min-height: 250px;
@@ -110,7 +107,6 @@
         box-shadow: 0 4px 20px rgba(111, 77, 56, 0.1);
     }
 
-    /* Back Button */
     .back-btn {
         position: absolute;
         top: 20px;
@@ -139,7 +135,6 @@
         font-size: 1.2rem;
     }
 
-    /* Profile Image */
     .profile-image-container {
         width: 80px;
         height: 80px;
@@ -168,7 +163,6 @@
         color: #6F4D38;
     }
 
-    /* User Info */
     .user-info {
         text-align: center;
     }
@@ -187,7 +181,6 @@
         opacity: 0.8;
     }
 
-    /* Bottom Section */
     .profile-menu-section {
         flex: 1;
         background: white;
@@ -197,7 +190,6 @@
         align-items: center;
     }
 
-    /* Menu Buttons Container */
     .menu-buttons-container {
         width: 100%;
         max-width: 400px;
@@ -206,7 +198,6 @@
         gap: 12px;
     }
 
-    /* Individual Menu Button with Badge */
     .menu-btn {
         width: 100%;
         padding: 5px 10px;
@@ -258,7 +249,6 @@
         transform: scale(1.1);
     }
 
-    /* Badge Styles */
     .menu-badge {
         position: absolute;
         top: -6px;
@@ -317,7 +307,6 @@
         transform: translateX(5px);
     }
 
-    /* Logout button special styling */
     .menu-btn.logout {
         margin-top: 20px;
         border-bottom-color: #ffebee;
@@ -338,7 +327,6 @@
         color: white;
     }
 
-    /* Mobile Bottom Navigation */
     .bottom-nav {
         position: fixed;
         bottom: 20px;
@@ -379,7 +367,7 @@
         justify-content: center;
         border-radius: 50%;
         border: 1px solid rgba(255,255,255,0.2);
-        box-shadow: 
+        box-shadow:
             inset 0 1px 0 rgba(255,255,255,0.2),
             0 2px 8px rgba(0,0,0,0.1);
         transition: all 0.3s ease;
@@ -394,14 +382,13 @@
     .nav-item.active i {
         background: rgba(255,255,255,0.35);
         color: white;
-        box-shadow: 
+        box-shadow:
             inset 0 1px 0 rgba(255,255,255,0.4),
             0 0 20px rgba(255,255,255,0.3),
             0 4px 12px rgba(0,0,0,0.2);
         border-color: rgba(255,255,255,0.4);
     }
 
-    /* Cart and Favorites Badges */
     .cart-badge,
     .fav-badge {
         position: absolute;
@@ -421,32 +408,28 @@
         display: none;
     }
 
-    /* HIDE DESKTOP ELEMENTS ON MOBILE */
     .profile-sidebar {
         display: none;
     }
-    
+
     .menu-grid {
         display: none;
     }
 
-    /* DESKTOP STYLES - 1024px and above */
     @media screen and (min-width: 1024px) {
         body {
             padding-bottom: 0;
             background: #f8f5f2;
         }
 
-        /* Hide mobile elements on desktop */
         .bottom-nav {
             display: none !important;
         }
-        
+
         #mobileMenu {
             display: none !important;
         }
 
-        /* Show desktop sidebar */
         .profile-sidebar {
             display: flex !important;
             position: fixed;
@@ -575,7 +558,6 @@
             font-size: 1.5rem;
         }
 
-        /* Main content with sidebar offset */
         .main-content {
             margin-left: 80px !important;
             width: calc(100% - 80px) !important;
@@ -584,7 +566,6 @@
             flex-direction: column;
         }
 
-        /* Header Section - Desktop */
         .profile-header-section {
             height: auto;
             min-height: 200px;
@@ -627,7 +608,6 @@
             opacity: 0.9;
         }
 
-        /* Desktop Menu Grid */
         .profile-menu-section {
             flex: 1;
             padding: 40px;
@@ -683,7 +663,6 @@
             transform: scale(1.1);
         }
 
-        /* Desktop Card Badge */
         .card-badge {
             position: absolute;
             top: -8px;
@@ -788,7 +767,6 @@
         }
     }
 
-    /* TABLET STYLES (769px - 1023px) */
     @media screen and (min-width: 769px) and (max-width: 1023px) {
         body {
             padding-bottom: 0;
@@ -977,300 +955,492 @@
             font-size: 1rem;
         }
     }
-</style>
+
+    .guest-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 20000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+}
+
+.guest-modal.show {
+    display: flex;
+}
+
+.guest-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+}
+
+.guest-modal-card {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 24px;
+    padding: 24px 20px 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(111, 77, 56, 0.12);
+    animation: modalPop 0.22s ease-out;
+    overflow: hidden;
+}
+
+.guest-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: #f7f2ee;
+    color: #6F4D38;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.guest-modal-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(111, 77, 56, 0.12), rgba(180, 154, 122, 0.18));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6F4D38;
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+}
+
+.guest-modal-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+}
+
+.guest-modal-text {
+    font-size: 0.95rem;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 14px;
+}
+
+.guest-modal-warning {
+    background: #fff3f3;
+    border: 1px solid rgba(244, 67, 54, 0.18);
+    color: #c62828;
+    padding: 12px 14px;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 14px;
+}
+
+.guest-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.guest-modal-input {
+    width: 100%;
+    height: 52px;
+    border-radius: 14px;
+    border: 1.5px solid rgba(111, 77, 56, 0.18);
+    background: #faf8f6;
+    padding: 0 16px;
+    outline: none;
+    font-size: 0.98rem;
+    color: #1a1a1a;
+}
+
+.guest-modal-input:focus {
+    border-color: #6F4D38;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(111, 77, 56, 0.08);
+}
+
+.guest-modal-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.guest-modal-btn {
+    flex: 1;
+    height: 48px;
+    border-radius: 14px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.guest-modal-btn.cancel {
+    background: #f3f3f3;
+    color: #444;
+}
+
+.guest-modal-btn.primary {
+    background: #6F4D38;
+    color: white;
+}
+
+.guest-modal-btn:active {
+    transform: scale(0.98);
+}
+
+@keyframes modalPop {
+    from { opacity: 0; transform: translateY(18px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media screen and (max-width: 480px) {
+    .guest-modal-card {
+        max-width: 100%;
+        border-radius: 20px;
+        padding: 22px 16px 18px;
+    }
+
+    .guest-modal-actions {
+        flex-direction: column;
+    }
+
+    .guest-modal-btn {
+        width: 100%;
+    }
+}
+    </style>
 </head>
 <body>
+    <!-- Guest Email Modal -->
+<div class="guest-modal" id="guestModal">
+    <div class="guest-modal-backdrop" onclick="closeGuestModal()"></div>
+
+    <div class="guest-modal-card">
+        <button class="guest-modal-close" onclick="closeGuestModal()" aria-label="Close modal">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="guest-modal-icon">
+            <i class="fas fa-user-shield"></i>
+        </div>
+
+        <h3 class="guest-modal-title" id="guestModalTitle">Enter your email</h3>
+        <p class="guest-modal-text" id="guestModalText">
+            Enter the same email you used during checkout to continue.
+        </p>
+
+        <div class="guest-modal-warning" id="guestModalWarning" style="display:none;">
+            You have to checkout before entering same email u entered when checking out to recieve notifications and track orders.
+        </div>
+
+        <div class="guest-modal-form" id="guestModalForm">
+            <input
+                type="email"
+                id="guestEmailInput"
+                class="guest-modal-input"
+                placeholder="Enter your email"
+                autocomplete="email"
+            >
+
+            <div class="guest-modal-actions">
+                <button class="guest-modal-btn cancel" onclick="closeGuestModal()">Cancel</button>
+                <button class="guest-modal-btn primary" onclick="submitGuestEmail()">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Admin Link -->
 <a href="https://himcladminpage.vercel.app" class="admin-link" title="Admin Panel" target="_blank" rel="noopener noreferrer">
     <i class="fas fa-crown"></i>
 </a>
-    <!-- Sync Status -->
-    <div class="sync-status" id="syncStatus">
-        <i class="fas fa-sync fa-spin"></i>
-        <span>Syncing...</span>
+
+<div class="sync-status" id="syncStatus">
+    <i class="fas fa-sync fa-spin"></i>
+    <span>Syncing...</span>
+</div>
+
+<div class="loader-overlay" id="loaderOverlay">
+    <div class="loader-container">
+        <div class="loader-ball"></div>
     </div>
+</div>
 
-    <!-- Loader -->
-    <div class="loader-overlay" id="loaderOverlay">
-        <div class="loader-container">
-            <div class="loader-ball"></div>
-        </div>
-    </div>
-
-    <!-- Desktop Sidebar -->
-    <aside class="profile-sidebar" id="desktopSidebar">
-        <div class="sidebar-logo">H</div>
-        
-        <nav class="sidebar-nav">
-            <button class="sidebar-item" onclick="window.location.href='HIM-coursepage.html'" title="Home">
-                <i class="fas fa-home"></i>
-            </button>
-            <button class="sidebar-item" onclick="goToCart()" title="Cart">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="sidebar-badge" id="sidebarCartBadge">0</span>
-            </button>
-            <button class="sidebar-item" onclick="goToFavorites()" title="Favorites">
-                <i class="fas fa-heart"></i>
-                <span class="sidebar-badge" id="sidebarFavBadge">0</span>
-            </button>
-            <button class="sidebar-item active" title="Profile">
-                <i class="fas fa-user"></i>
-            </button>
-        </nav>
-
-        <div class="sidebar-bottom">
-            <button class="sidebar-item" onclick="handleLogout()" title="Logout">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
-            <div class="sidebar-avatar" id="sidebarAvatar">
-                <div class="placeholder">👤</div>
-            </div>
-        </div>
-    </aside>
-
-    <!-- Main Profile Container -->
-    <div class="profile-container">
-        <div class="main-content">
-            <!-- Top Section: Profile Info -->
-            <div class="profile-header-section">
-                <button class="back-btn" onclick="goBack()">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-
-                <div class="profile-image-container" id="profileImage">
-                    <div class="placeholder">👤</div>
-                </div>
-
-                <div class="user-info">
-                    <div class="user-name" id="userName">Guest</div>
-                    <div class="user-email" id="userEmail">guest@email.com</div>
-                </div>
-            </div>
-
-            <!-- Bottom Section: Menu -->
-            <div class="profile-menu-section">
-                <!-- Mobile: List layout with badges -->
-                <div class="menu-buttons-container" id="mobileMenu">
-                    <button class="menu-btn" onclick="handleMenuClick('payment')">
-                        <div class="menu-btn-content">
-                            <div class="menu-icon">
-                                <i class="fas fa-credit-card"></i>
-                            </div>
-                            <span class="menu-text">Payment Methods</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-arrow"></i>
-                    </button>
-
-                    <!-- Orders Button with Badge -->
-                    <button class="menu-btn" onclick="handleMenuClick('orders')" id="ordersMenuBtn">
-                        <div class="menu-btn-content">
-                            <div class="menu-icon">
-                                <i class="fas fa-shopping-bag"></i>
-                                <span class="menu-badge" id="ordersBadge">0</span>
-                            </div>
-                            <span class="menu-text">My Orders</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-arrow"></i>
-                    </button>
-
-                    <!-- Notifications Button with Badge -->
-                    <button class="menu-btn" onclick="handleMenuClick('notifications')" id="notificationsMenuBtn">
-                        <div class="menu-btn-content">
-                            <div class="menu-icon">
-                                <i class="fas fa-bell"></i>
-                                <span class="menu-badge" id="notificationsBadge">0</span>
-                            </div>
-                            <span class="menu-text">Notifications</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-arrow"></i>
-                    </button>
-
-                    <button class="menu-btn" onclick="handleMenuClick('privacy')">
-                        <div class="menu-btn-content">
-                            <div class="menu-icon">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <span class="menu-text">Privacy and Security</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-arrow"></i>
-                    </button>
-
-                    <button class="menu-btn" onclick="handleMenuClick('help')">
-                        <div class="menu-btn-content">
-                            <div class="menu-icon">
-                                <i class="fas fa-question-circle"></i>
-                            </div>
-                            <span class="menu-text">Help</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-arrow"></i>
-                    </button>
-                    <button class="menu-btn" onclick="handleMenuClick('signup')">
-                        <div class="menu-btn-content">
-                            <div class="menu-icon">
-                                <i class="fas fa-user-plus"></i>
-                            </div>
-                            <span class="menu-text">Sign Up</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-arrow"></i>
-                    </button>
-                    <button class="menu-btn" onclick="handleMenuClick('login')">
-                        <div class="menu-btn-content">
-                            <div class="menu-icon">
-                                <i class="fas fa-sign-in-alt"></i>
-                            </div>
-                            <span class="menu-text">Login</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-arrow"></i>
-                    </button>
-
-                    <button class="menu-btn logout" onclick="handleLogout()">
-                        <div class="menu-btn-content">
-                            <div class="menu-icon">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </div>
-                            <span class="menu-text">Logout</span>
-                        </div>
-                        <i class="fas fa-chevron-right menu-arrow"></i>
-                    </button>
-                </div>
-
-                <!-- Desktop: Grid layout with badges -->
-                <div class="menu-grid" id="desktopMenu" style="display: none;">
-                    <div class="grid-section-header">
-                        <span class="grid-section-title">Account Settings</span>
-                    </div>
-                    
-                    <div class="menu-card" onclick="handleMenuClick('payment')">
-                        <div class="menu-card-icon">
-                            <i class="fas fa-credit-card"></i>
-                        </div>
-                        <div class="menu-card-content">
-                            <h3 class="menu-card-title">Payment Methods</h3>
-                            <p class="menu-card-desc">Manage your saved cards and payment preferences</p>
-                        </div>
-                        <div class="menu-card-arrow">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </div>
-
-                    <!-- Desktop Orders Card with Badge -->
-                    <div class="menu-card" onclick="handleMenuClick('orders')" id="ordersCard">
-                        <span class="card-badge" id="ordersCardBadge">0</span>
-                        <div class="menu-card-icon">
-                            <i class="fas fa-shopping-bag"></i>
-                        </div>
-                        <div class="menu-card-content">
-                            <h3 class="menu-card-title">My Orders</h3>
-                            <p class="menu-card-desc">View order history, track shipments, and request returns</p>
-                        </div>
-                        <div class="menu-card-arrow">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </div>
-
-                    <!-- Desktop Notifications Card with Badge -->
-                    <div class="menu-card" onclick="handleMenuClick('notifications')" id="notificationsCard">
-                        <span class="card-badge" id="notificationsCardBadge">0</span>
-                        <div class="menu-card-icon">
-                            <i class="fas fa-bell"></i>
-                        </div>
-                        <div class="menu-card-content">
-                            <h3 class="menu-card-title">Notifications</h3>
-                            <p class="menu-card-desc">Customize your email and push notification preferences</p>
-                        </div>
-                        <div class="menu-card-arrow">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </div>
-
-                    <div class="grid-section-header">
-                        <span class="grid-section-title">Support & Legal</span>
-                    </div>
-
-                    <div class="menu-card" onclick="handleMenuClick('privacy')">
-                        <div class="menu-card-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <div class="menu-card-content">
-                            <h3 class="menu-card-title">Privacy & Security</h3>
-                            <p class="menu-card-desc">Manage your data, privacy settings, and security options</p>
-                        </div>
-                        <div class="menu-card-arrow">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </div>
-
-                    <div class="menu-card" onclick="handleMenuClick('help')">
-                        <div class="menu-card-icon">
-                            <i class="fas fa-question-circle"></i>
-                        </div>
-                        <div class="menu-card-content">
-                            <h3 class="menu-card-title">Help Center</h3>
-                            <p class="menu-card-desc">FAQs, contact support, and getting started guides</p>
-                        </div>
-                        <div class="menu-card-arrow">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </div>
-                    <div class="menu-card" onclick="handleMenuClick('signup')">
-                        <div class="menu-card-icon">
-                            <i class="fas fa-user-plus"></i>
-                        </div>
-                        <div class="menu-card-content">
-                            <h3 class="menu-card-title">Create an account</h3>
-                            <p class="menu-card-desc">Be a real member of our brand!</p>
-                        </div>
-                        <div class="menu-card-arrow">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </div>
-                    <div class="menu-card" onclick="handleMenuClick('login')">
-                        <div class="menu-card-icon">
-                            <i class="fas fa-sign-in-alt"></i>
-                        </div>
-                        <div class="menu-card-content">
-                            <h3 class="menu-card-title">Login your account</h3>
-                            <p class="menu-card-desc">Continue with us, login to see notifications</p>
-                        </div>
-                        <div class="menu-card-arrow">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </div>
-
-                    <div class="menu-card logout" onclick="handleLogout()">
-                        <div class="menu-card-icon">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </div>
-                        <div class="menu-card-content">
-                            <h3 class="menu-card-title">Logout</h3>
-                            <p class="menu-card-desc">Sign out of your account securely</p>
-                        </div>
-                        <div class="menu-card-arrow">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mobile Bottom Navigation -->
-    <nav class="bottom-nav" id="mobileNav">
-        <button class="nav-item" onclick="window.location.href='HIM-coursepage.html'">
+<aside class="profile-sidebar" id="desktopSidebar">
+    <div class="sidebar-logo">H</div>
+    
+    <nav class="sidebar-nav">
+        <button class="sidebar-item" onclick="window.location.href='HIM-coursepage.html'" title="Home">
             <i class="fas fa-home"></i>
         </button>
-        <button class="nav-item" onclick="goToCart()">
+        <button class="sidebar-item" onclick="goToCart()" title="Cart">
             <i class="fas fa-shopping-cart"></i>
-            <span class="cart-badge" id="navCartBadge">0</span>
+            <span class="sidebar-badge" id="sidebarCartBadge">0</span>
         </button>
-        <button class="nav-item" onclick="goToFavorites()">
+        <button class="sidebar-item" onclick="goToFavorites()" title="Favorites">
             <i class="fas fa-heart"></i>
-            <span class="fav-badge" id="navFavBadge">0</span>
+            <span class="sidebar-badge" id="sidebarFavBadge">0</span>
         </button>
-        <button class="nav-item active">
+        <button class="sidebar-item active" title="Profile">
             <i class="fas fa-user"></i>
         </button>
     </nav>
+
+    <div class="sidebar-bottom">
+        <button class="sidebar-item" onclick="handleLogout()" title="Logout">
+            <i class="fas fa-sign-out-alt"></i>
+        </button>
+        <div class="sidebar-avatar" id="sidebarAvatar">
+            <div class="placeholder">👤</div>
+        </div>
+    </div>
+</aside>
+
+<div class="profile-container">
+    <div class="main-content">
+        <div class="profile-header-section">
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+
+            <div class="profile-image-container" id="profileImage">
+                <div class="placeholder">👤</div>
+            </div>
+
+            <div class="user-info">
+                <div class="user-name" id="userName">Guest</div>
+                <div class="user-email" id="userEmail">guest@email.com</div>
+            </div>
+        </div>
+
+        <div class="profile-menu-section">
+            <div class="menu-buttons-container" id="mobileMenu">
+                <button class="menu-btn" onclick="handleMenuClick('payment')">
+                    <div class="menu-btn-content">
+                        <div class="menu-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <span class="menu-text">Payment Methods</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </button>
+
+                <button class="menu-btn" onclick="handleMenuClick('orders')" id="ordersMenuBtn">
+                    <div class="menu-btn-content">
+                        <div class="menu-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span class="menu-badge" id="ordersBadge">0</span>
+                        </div>
+                        <span class="menu-text">My Orders</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </button>
+
+                <button class="menu-btn" onclick="handleMenuClick('notifications')" id="notificationsMenuBtn">
+                    <div class="menu-btn-content">
+                        <div class="menu-icon">
+                            <i class="fas fa-bell"></i>
+                            <span class="menu-badge" id="notificationsBadge">0</span>
+                        </div>
+                        <span class="menu-text">Notifications</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </button>
+
+                <button class="menu-btn" onclick="handleMenuClick('privacy')">
+                    <div class="menu-btn-content">
+                        <div class="menu-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <span class="menu-text">Privacy and Security</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </button>
+
+                <button class="menu-btn" onclick="handleMenuClick('help')">
+                    <div class="menu-btn-content">
+                        <div class="menu-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <span class="menu-text">Help</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </button>
+
+                <button class="menu-btn guest-only" onclick="handleMenuClick('signup')" id="signupMenuBtn">
+                    <div class="menu-btn-content">
+                        <div class="menu-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <span class="menu-text">Sign Up</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </button>
+
+                <button class="menu-btn guest-only" onclick="handleMenuClick('login')" id="loginMenuBtn">
+                    <div class="menu-btn-content">
+                        <div class="menu-icon">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </div>
+                        <span class="menu-text">Login</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </button>
+
+                <button class="menu-btn logout" onclick="handleLogout()">
+                    <div class="menu-btn-content">
+                        <div class="menu-icon">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </div>
+                        <span class="menu-text">Logout</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </button>
+            </div>
+
+            <div class="menu-grid" id="desktopMenu" style="display: none;">
+                <div class="grid-section-header">
+                    <span class="grid-section-title">Account Settings</span>
+                </div>
+                
+                <div class="menu-card" onclick="handleMenuClick('payment')">
+                    <div class="menu-card-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="menu-card-content">
+                        <h3 class="menu-card-title">Payment Methods</h3>
+                        <p class="menu-card-desc">Manage your saved cards and payment preferences</p>
+                    </div>
+                    <div class="menu-card-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+
+                <div class="menu-card" onclick="handleMenuClick('orders')" id="ordersCard">
+                    <span class="card-badge" id="ordersCardBadge">0</span>
+                    <div class="menu-card-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="menu-card-content">
+                        <h3 class="menu-card-title">My Orders</h3>
+                        <p class="menu-card-desc">View order history, track shipments, and request returns</p>
+                    </div>
+                    <div class="menu-card-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+
+                <div class="menu-card" onclick="handleMenuClick('notifications')" id="notificationsCard">
+                    <span class="card-badge" id="notificationsCardBadge">0</span>
+                    <div class="menu-card-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="menu-card-content">
+                        <h3 class="menu-card-title">Notifications</h3>
+                        <p class="menu-card-desc">Customize your email and push notification preferences</p>
+                    </div>
+                    <div class="menu-card-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+
+                <div class="grid-section-header">
+                    <span class="grid-section-title">Support & Legal</span>
+                </div>
+
+                <div class="menu-card" onclick="handleMenuClick('privacy')">
+                    <div class="menu-card-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="menu-card-content">
+                        <h3 class="menu-card-title">Privacy & Security</h3>
+                        <p class="menu-card-desc">Manage your data, privacy settings, and security options</p>
+                    </div>
+                    <div class="menu-card-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+
+                <div class="menu-card" onclick="handleMenuClick('help')">
+                    <div class="menu-card-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <div class="menu-card-content">
+                        <h3 class="menu-card-title">Help Center</h3>
+                        <p class="menu-card-desc">FAQs, contact support, and getting started guides</p>
+                    </div>
+                    <div class="menu-card-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+
+                <div class="menu-card guest-only" onclick="handleMenuClick('signup')" id="signupCard">
+                    <div class="menu-card-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="menu-card-content">
+                        <h3 class="menu-card-title">Create an account</h3>
+                        <p class="menu-card-desc">Be a real member of our brand!</p>
+                    </div>
+                    <div class="menu-card-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+
+                <div class="menu-card guest-only" onclick="handleMenuClick('login')" id="loginCard">
+                    <div class="menu-card-icon">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </div>
+                    <div class="menu-card-content">
+                        <h3 class="menu-card-title">Login your account</h3>
+                        <p class="menu-card-desc">Continue with us, login to see notifications</p>
+                    </div>
+                    <div class="menu-card-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+
+                <div class="menu-card logout" onclick="handleLogout()">
+                    <div class="menu-card-icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                    <div class="menu-card-content">
+                        <h3 class="menu-card-title">Logout</h3>
+                        <p class="menu-card-desc">Sign out of your account securely</p>
+                    </div>
+                    <div class="menu-card-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<nav class="bottom-nav" id="mobileNav">
+    <button class="nav-item" onclick="window.location.href='HIM-coursepage.html'">
+        <i class="fas fa-home"></i>
+    </button>
+    <button class="nav-item" onclick="goToCart()">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge" id="navCartBadge">0</span>
+    </button>
+    <button class="nav-item" onclick="goToFavorites()">
+        <i class="fas fa-heart"></i>
+        <span class="fav-badge" id="navFavBadge">0</span>
+    </button>
+    <button class="nav-item active">
+        <i class="fas fa-user"></i>
+    </button>
+</nav>
 
 <script>
     const SUPABASE_URL = 'https://ddrhpjiaotwtblnlqytw.supabase.co';
@@ -1283,8 +1453,8 @@
     let favorites = [];
     let notificationsSubscription = null;
     let ordersSubscription = null;
+    let isAuthenticated = false;
 
-    // Badge State Management
     const badgeState = {
         notifications: {
             count: 0,
@@ -1295,7 +1465,18 @@
         }
     };
 
-    // Initialize
+    function toggleGuestMenuItems(showGuestItems) {
+        const ids = ['signupMenuBtn', 'loginMenuBtn', 'signupCard', 'loginCard'];
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = showGuestItems ? '' : 'none';
+        });
+    }
+
+    function updateGuestStateUI() {
+        toggleGuestMenuItems(!isAuthenticated);
+    }
+
     window.addEventListener('load', async () => {
         loadFromLocalStorage();
         updateAllBadges();
@@ -1303,22 +1484,24 @@
         await syncWithSupabase();
         await initializeBadges();
         setupRealtimeSubscriptions();
+        updateGuestStateUI();
         
         setTimeout(() => {
-            document.getElementById('loaderOverlay').classList.add('hidden');
+            const loader = document.getElementById('loaderOverlay');
+            if (loader) loader.classList.add('hidden');
         }, 500);
     });
 
-    // Handle page visibility changes
     document.addEventListener('visibilitychange', async () => {
         if (document.visibilityState === 'visible') {
-            console.log('Page visible, refreshing...');
             await initializeBadges();
+            updateGuestStateUI();
         }
     });
 
     window.addEventListener('focus', async () => {
         await initializeBadges();
+        updateGuestStateUI();
     });
 
     window.addEventListener('resize', toggleLayout);
@@ -1332,17 +1515,12 @@
         const userEmail = localStorage.getItem('userEmail');
         if (!userEmail) return;
 
-        console.log('Initializing badges for:', userEmail);
-
-        // Check if returning from orders page
         const referrer = document.referrer;
         if (referrer && referrer.includes('orders.html')) {
-            console.log('Returned from orders, clearing orders badge cache');
             badgeState.orders.count = 0;
             localStorage.removeItem('ordersLastViewed');
         }
 
-        // Always load fresh counts
         await Promise.all([
             loadNotificationCount(userEmail),
             loadOrdersCount(userEmail)
@@ -1360,22 +1538,20 @@
                 .eq('is_read', false);
 
             if (error) throw error;
-
             badgeState.notifications.count = count || 0;
-            
-            if (count > 0) {
+
+            if ((count || 0) > 0) {
                 const { data } = await supabaseClient
                     .from('notifications')
                     .select('id')
                     .eq('user_email', userEmail)
                     .eq('is_read', false);
-                
+
                 if (data) {
                     badgeState.notifications.unreadIds = data.map(n => n.id);
                     localStorage.setItem('unreadNotificationIds', JSON.stringify(badgeState.notifications.unreadIds));
                 }
             }
-
         } catch (error) {
             console.error('Error loading notification count:', error);
         }
@@ -1397,8 +1573,6 @@
             });
 
             badgeState.orders.count = activeOrders.length;
-            console.log('Active orders count:', badgeState.orders.count);
-
         } catch (error) {
             console.error('Error loading orders count:', error);
             badgeState.orders.count = 0;
@@ -1409,17 +1583,9 @@
         const userEmail = localStorage.getItem('userEmail');
         if (!userEmail) return;
 
-        console.log('Setting up realtime for:', userEmail);
+        if (notificationsSubscription) supabaseClient.removeChannel(notificationsSubscription);
+        if (ordersSubscription) supabaseClient.removeChannel(ordersSubscription);
 
-        // Remove existing subscriptions if any
-        if (notificationsSubscription) {
-            supabaseClient.removeChannel(notificationsSubscription);
-        }
-        if (ordersSubscription) {
-            supabaseClient.removeChannel(ordersSubscription);
-        }
-
-        // Notifications subscription
         notificationsSubscription = supabaseClient
             .channel('profile-notifications')
             .on('postgres_changes', {
@@ -1428,14 +1594,13 @@
                 table: 'notifications',
                 filter: `user_email=eq.${userEmail}`
             }, (payload) => {
-                console.log('New notification:', payload);
                 badgeState.notifications.count++;
                 badgeState.notifications.unreadIds.push(payload.new.id);
                 localStorage.setItem('unreadNotificationIds', JSON.stringify(badgeState.notifications.unreadIds));
                 updateBadgeDisplay();
                 pulseBadge('notificationsBadge');
                 pulseBadge('notificationsCardBadge');
-                showNotificationToast(payload.new.title || 'New Notification', payload.new.message);
+                showNotificationToast(payload.new.title || 'New Notification', payload.new.message || '');
             })
             .on('postgres_changes', {
                 event: 'UPDATE',
@@ -1445,16 +1610,13 @@
             }, (payload) => {
                 if (payload.new.is_read && !payload.old.is_read) {
                     badgeState.notifications.count = Math.max(0, badgeState.notifications.count - 1);
-                    badgeState.notifications.unreadIds = badgeState.notifications.unreadIds.filter(
-                        id => id !== payload.new.id
-                    );
+                    badgeState.notifications.unreadIds = badgeState.notifications.unreadIds.filter(id => id !== payload.new.id);
                     localStorage.setItem('unreadNotificationIds', JSON.stringify(badgeState.notifications.unreadIds));
                     updateBadgeDisplay();
                 }
             })
             .subscribe();
 
-        // Orders subscription
         ordersSubscription = supabaseClient
             .channel('profile-orders')
             .on('postgres_changes', {
@@ -1463,13 +1625,11 @@
                 table: 'orders',
                 filter: `customer_email=eq.${userEmail}`
             }, (payload) => {
-                console.log('Order updated:', payload);
                 const oldStatus = payload.old.inventory_status || payload.old.status;
                 const newStatus = payload.new.inventory_status || payload.new.status;
-                
                 const wasActive = !['delivered', 'rejected'].includes(oldStatus);
                 const isActive = !['delivered', 'rejected'].includes(newStatus);
-                
+
                 if (!wasActive && isActive) {
                     badgeState.orders.count++;
                     updateBadgeDisplay();
@@ -1486,7 +1646,6 @@
                 table: 'orders',
                 filter: `customer_email=eq.${userEmail}`
             }, (payload) => {
-                console.log('New order:', payload);
                 const status = payload.new.inventory_status || payload.new.status;
                 if (!['delivered', 'rejected'].includes(status)) {
                     badgeState.orders.count++;
@@ -1499,15 +1658,11 @@
     }
 
     function updateBadgeDisplay() {
-        // Mobile badges
         const notifBadge = document.getElementById('notificationsBadge');
         const ordersBadge = document.getElementById('ordersBadge');
-        
-        // Desktop card badges
         const notifCardBadge = document.getElementById('notificationsCardBadge');
         const ordersCardBadge = document.getElementById('ordersCardBadge');
 
-        // Update notification badges
         if (badgeState.notifications.count > 0) {
             const count = badgeState.notifications.count > 99 ? '99+' : badgeState.notifications.count;
             if (notifBadge) {
@@ -1523,7 +1678,6 @@
             if (notifCardBadge) notifCardBadge.classList.remove('active');
         }
 
-        // Update orders badges
         if (badgeState.orders.count > 0) {
             const count = badgeState.orders.count > 99 ? '99+' : badgeState.orders.count;
             if (ordersBadge) {
@@ -1565,51 +1719,124 @@
         `;
         toast.innerHTML = `
             <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">${title}</div>
-            <div style="font-size: 0.85rem; color: #666;">${message}</div>
+            <div style="font-size: 0.85rem; color: #666;">${message || ''}</div>
         `;
-        
         document.body.appendChild(toast);
-        
+
         setTimeout(() => {
             toast.style.animation = 'slideOut 0.3s ease';
             setTimeout(() => toast.remove(), 300);
         }, 5000);
     }
 
-    function handleMenuClick(menuType) {
-        console.log('Clicked:', menuType);
-        
-        if (menuType === 'notifications') {
-            clearNotificationBadge();
-        } else if (menuType === 'orders') {
-            // Don't clear here - let orders.html handle it
-            // Just navigate
+    let pendingGuestAction = null;
+
+function handleMenuClick(menuType) {
+    if (menuType === 'notifications' || menuType === 'orders') {
+        if (isAuthenticated) {
+            if (menuType === 'notifications') clearNotificationBadge();
+            if (menuType === 'orders') window.location.href = 'orders.html';
+            return;
         }
-        
-        switch(menuType) {
-            case 'payment':
-                window.location.href = 'paymentmethod.html';
-                break;
-            case 'orders':
-                window.location.href = 'orders.html';
-                break;
-            case 'notifications':
-                window.location.href = 'notifications.html';
-                break;
-            case 'privacy':
-                window.location.href = 'privacy.html';
-                break;
-            case 'help':
-                window.location.href = 'help.html';
-                break;
-            case 'signup':
-                window.location.href = 'signup.html';
-                break;
-            case 'login':
-                window.location.href = 'login.html';
-                break;
-        }
+
+        pendingGuestAction = menuType;
+        openGuestModal(menuType);
+        return;
     }
+
+    switch (menuType) {
+        case 'payment':
+            window.location.href = 'paymentmethod.html';
+            break;
+        case 'privacy':
+            window.location.href = 'privacy.html';
+            break;
+        case 'help':
+            window.location.href = 'help.html';
+            break;
+        case 'signup':
+            window.location.href = 'signup.html';
+            break;
+        case 'login':
+            window.location.href = 'login.html';
+            break;
+    }
+}
+
+function openGuestModal(type) {
+    const modal = document.getElementById('guestModal');
+    const title = document.getElementById('guestModalTitle');
+    const text = document.getElementById('guestModalText');
+    const warning = document.getElementById('guestModalWarning');
+    const form = document.getElementById('guestModalForm');
+    const input = document.getElementById('guestEmailInput');
+
+    warning.style.display = 'none';
+    form.style.display = 'flex';
+
+    if (type === 'orders') {
+        title.textContent = 'Enter your email to track orders';
+        text.textContent = 'Type the same email you used at checkout to view order updates.';
+    } else {
+        title.textContent = 'Enter your email to view notifications';
+        text.textContent = 'Type the same email you used at checkout to receive your notifications.';
+    }
+
+    modal.classList.add('show');
+    setTimeout(() => input?.focus(), 100);
+}
+
+function closeGuestModal() {
+    const modal = document.getElementById('guestModal');
+    const warning = document.getElementById('guestModalWarning');
+    const form = document.getElementById('guestModalForm');
+    const input = document.getElementById('guestEmailInput');
+
+    modal.classList.remove('show');
+    warning.style.display = 'none';
+    form.style.display = 'flex';
+    if (input) input.value = '';
+    pendingGuestAction = null;
+}
+
+
+async function submitGuestEmail() {
+    const input = document.getElementById('guestEmailInput');
+    const email = (input.value || '').trim().toLowerCase();
+
+    if (!email) {
+        input.focus();
+        return;
+    }
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('checkout_orders')
+            .select('email, transfer_confirmed')
+            .eq('email', email)
+            .eq('transfer_confirmed', true)
+            .limit(1);
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            showGuestModalWarning();
+            return;
+        }
+
+        localStorage.setItem('guestTrackEmail', email);
+        closeGuestModal();
+
+        if (pendingGuestAction === 'orders') {
+            window.location.href = `orders.html?email=${encodeURIComponent(email)}`;
+        } else if (pendingGuestAction === 'notifications') {
+            window.location.href = `notifications.html?email=${encodeURIComponent(email)}`;
+        }
+    } catch (err) {
+        console.error(err);
+        showGuestModalWarning();
+    }
+}
 
     function clearNotificationBadge() {
         badgeState.notifications.count = 0;
@@ -1629,27 +1856,16 @@
         }
     }
 
-    // ... rest of your existing functions (loadFromLocalStorage, syncWithSupabase, etc.) ...
-
     function loadFromLocalStorage() {
         try {
             const savedCart = localStorage.getItem('cart');
             const savedFavorites = localStorage.getItem('favorites');
             
-            if (savedCart) {
-                cart = JSON.parse(savedCart);
-                if (!Array.isArray(cart)) cart = [];
-            } else {
-                cart = [];
-            }
-            
-            if (savedFavorites) {
-                favorites = JSON.parse(savedFavorites);
-                if (!Array.isArray(favorites)) favorites = [];
-            } else {
-                favorites = [];
-            }
-            
+            cart = savedCart ? JSON.parse(savedCart) : [];
+            favorites = savedFavorites ? JSON.parse(savedFavorites) : [];
+
+            if (!Array.isArray(cart)) cart = [];
+            if (!Array.isArray(favorites)) favorites = [];
         } catch (e) {
             console.error('Error loading from localStorage:', e);
             cart = [];
@@ -1662,7 +1878,8 @@
         
         try {
             const { data: { session } } = await supabaseClient.auth.getSession();
-            
+            isAuthenticated = !!session?.user;
+
             if (session?.user) {
                 currentUserId = session.user.id;
                 await loadUserData();
@@ -1670,16 +1887,17 @@
             } else {
                 currentUserId = localStorage.getItem('tempUserId') || 'temp_' + Math.random().toString(36).substr(2, 9);
                 localStorage.setItem('tempUserId', currentUserId);
+                await loadGuestData();
             }
             
             showSyncStatus('synced');
-            
         } catch (error) {
             console.error('Supabase sync error:', error);
             showSyncStatus('error');
         }
         
         updateAllBadges();
+        updateGuestStateUI();
     }
 
     async function mergeWithSupabase() {
@@ -1720,7 +1938,6 @@
                     localStorage.setItem('favorites', JSON.stringify(favorites));
                 }
             }
-            
         } catch (error) {
             console.error('Error merging with Supabase:', error);
         }
@@ -1794,6 +2011,7 @@
         const { data: { session } } = await supabaseClient.auth.getSession();
         
         if (session?.user) {
+            isAuthenticated = true;
             userEmail = session.user.email;
             localStorage.setItem('userEmail', userEmail);
             
@@ -1832,6 +2050,17 @@
             if (avatarContainer) avatarContainer.innerHTML = imgHtml;
             if (sidebarAvatar) sidebarAvatar.innerHTML = imgHtml;
         }
+
+        updateGuestStateUI();
+    }
+
+    async function loadGuestData() {
+        isAuthenticated = false;
+        const nameEl = document.getElementById('userName');
+        const emailEl = document.getElementById('userEmail');
+        if (nameEl) nameEl.textContent = 'Guest';
+        if (emailEl) emailEl.textContent = 'guest@email.com';
+        updateGuestStateUI();
     }
 
     function formatNameFromEmail(localPart) {
@@ -1873,45 +2102,44 @@
         
         const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
         
-        if (firstName && lastName) {
-            return `${capitalize(firstName)} ${capitalize(lastName)}`;
-        } else if (firstName) {
-            return capitalize(firstName);
-        } else if (lastName) {
-            return capitalize(lastName);
-        }
-        
-        return capitalize(nameWithoutNumbers);
+        if (firstName && lastName) return `${capitalize(firstName)} ${capitalize(lastName)}`;
+        if (firstName) return capitalize(firstName);
+        if (lastName) return capitalize(lastName);
+        return capitalize(nameWithoutNumbers || 'Guest');
     }
 
     function goBack() {
         window.location.href = 'HIM-coursepage.html';
     }
 
+    function showGuestModalWarning() {
+    const warning = document.getElementById('guestModalWarning');
+    const form = document.getElementById('guestModalForm');
+
+    warning.style.display = 'block';
+    form.style.display = 'none';
+    warning.textContent = 'You have to checkout before entering same email u entered when checking out to recieve notifications and track orders.';
+}
+
     async function handleLogout() {
         if (confirm('Are you sure you want to logout?')) {
-            if (notificationsSubscription) {
-                supabaseClient.removeChannel(notificationsSubscription);
-            }
-            if (ordersSubscription) {
-                supabaseClient.removeChannel(ordersSubscription);
-            }
+            if (notificationsSubscription) supabaseClient.removeChannel(notificationsSubscription);
+            if (ordersSubscription) supabaseClient.removeChannel(ordersSubscription);
             
             await supabaseClient.auth.signOut();
             localStorage.clear();
+            isAuthenticated = false;
+            updateGuestStateUI();
             window.location.href = 'login.html';
         }
     }
 
     window.addEventListener('beforeunload', () => {
-        if (notificationsSubscription) {
-            supabaseClient.removeChannel(notificationsSubscription);
-        }
-        if (ordersSubscription) {
-            supabaseClient.removeChannel(ordersSubscription);
-        }
+        if (notificationsSubscription) supabaseClient.removeChannel(notificationsSubscription);
+        if (ordersSubscription) supabaseClient.removeChannel(ordersSubscription);
     });
 </script>
+
 <style>
     @keyframes slideIn {
         from { opacity: 0; transform: translateX(100%); }
