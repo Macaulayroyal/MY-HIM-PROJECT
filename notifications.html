@@ -1030,7 +1030,7 @@ async function loadNotifications() {
         const { data, error } = await supabaseClient
             .from('notifications')
             .select('*')
-            .eq('user_email', userEmail)
+            .eq('customer_email', userEmail)
             .order('created_at', { ascending: false })
             .limit(50);
         
@@ -1278,7 +1278,7 @@ function setupRealtimeSubscription() {
             event: 'INSERT',
             schema: 'public',
             table: 'notifications',
-            filter: `user_email=eq.${userEmail}`
+            filter: `customer_email=eq.${userEmail}`
         }, (payload) => {
             console.log('New notification:', payload);
             notifications.unshift(payload.new);
@@ -1289,7 +1289,7 @@ function setupRealtimeSubscription() {
             event: 'UPDATE',
             schema: 'public',
             table: 'notifications',
-            filter: `user_email=eq.${userEmail}`
+            filter: `customer_email=eq.${userEmail}`
         }, (payload) => {
             console.log('Notification updated:', payload);
             const index = notifications.findIndex(n => n.id === payload.new.id);
