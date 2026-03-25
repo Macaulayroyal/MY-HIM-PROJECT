@@ -1215,24 +1215,25 @@
 
   // ---------- MAIN: CONFIRM TRANSFER ----------
   async function confirmTransfer() {
+  // Prevent double-click
   if (window.orderProcessing) {
     console.log('Order already processing...');
     return;
   }
   
-  // 🔥 VALIDATE FIRST - Before setting flag
-  if (!validateCheckoutFields()) return;
-  
+  const customer = getFieldValues();
   const total = getCheckoutTotal();
   const cart = JSON.parse(localStorage.getItem("checkoutCart")) || 
                JSON.parse(localStorage.getItem("cart")) || [];
   
+  // Validate BEFORE any processing
+  if (!validateCheckoutFields()) return;
   if (!cart || cart.length === 0 || total <= 0) {
     showToast("Your cart is empty. Please add items first.", true);
     return;
   }
   
-  // 🔥 NOW set flag AFTER validation
+  // NOW set flag after validation
   window.orderProcessing = true;
   
   const btn = document.querySelector(".confirm-btn") || 
@@ -1245,13 +1246,12 @@
   showLoading(true);
   
   try {
-    const customer = getFieldValues();
     const orderData = {
       customer_email: customer.email || getUserEmail(),
       customer_name: customer.accountName || "Guest",
       customer_address: customer.address,
       customer_state: customer.state,
-      customer_phone: customer.phone || null,
+      customer_phone: customer.phone || null,      
       customer_bank_name: customer.bankName,
       items: cart,
       total_amount: total,
@@ -1260,9 +1260,6 @@
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
-
-    // 🔥 REMOVE THIS RPC - It's breaking realtime
-    // await supabaseClient.rpc('set_current_user_email', { p_email: customer.email || getUserEmail() });
 
     const { data: newOrder, error } = await supabaseClient
       .from("orders")
@@ -1275,14 +1272,14 @@
     const createdOrder = newOrder[0];
     const orderId = createdOrder.id;
     
-    // Track email
+    // Track email for guest/signed-in
     const finalEmail = customer.email || getUserEmail();
     if (finalEmail) {
       localStorage.setItem("guestTrackEmail", finalEmail);
       localStorage.setItem("userEmail", finalEmail);
     }
 
-    // 🔥 WHATSAPP - This WILL work now
+    // WhatsApp message
     const message = buildWhatsAppMessage(orderId, customer, cart, total);
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/2349129629049?text=${encodedMessage}`;
@@ -1304,25 +1301,24 @@
     }
 
     if (!whatsappOpened) {
+      // Fallback: direct redirect
       setTimeout(() => {
         window.location.href = whatsappUrl;
       }, 1000);
-      return;  // Don't redirect to orders if WhatsApp opened
+      return;
     }
 
-    // Redirect to orders
+    // Success: redirect to orders page
     setTimeout(() => {
       hideLoading();
-      if (finalEmail) {
-        window.location.href = "orders.html?email=" + encodeURIComponent(finalEmail);
-      } else {
-        window.location.href = "orders.html";
-      }
-    }, 3000);
+      window.location.href = finalEmail 
+        ? `orders.html?email=${encodeURIComponent(finalEmail)}`
+        : "orders.html";
+    }, 2000);
     
   } catch (error) {
     console.error("Order error:", error);
-    showToast("Failed: " + error.message, true);
+    showToast("Failed to create order: " + error.message, true);
     hideLoading();
     if (btn) {
       btn.disabled = false;
@@ -1331,8 +1327,7 @@
   } finally {
     window.orderProcessing = false;
   }
-}
-  function buildWhatsAppMessage(orderId, customer, cart, total) {
+}  function buildWhatsAppMessage(orderId, customer, cart, total) {
     let message = "HIM.CLOTHIERS ORDER\n\n";
 
     message += "ORDER DETAILS\n";
