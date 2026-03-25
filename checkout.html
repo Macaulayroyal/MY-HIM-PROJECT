@@ -978,11 +978,6 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function getOrderId() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('order_id') || localStorage.getItem('pendingOrderId');
-}
-
 function getCheckoutTotal() {
     const urlParams = new URLSearchParams(window.location.search);
     const urlTotal = urlParams.get('total');
@@ -1070,7 +1065,7 @@ function getFieldValues() {
 
     return {
         address: (fields.address?.value || '').trim(),
-        email: (fields.email?.value || '').trim(),
+        email: (fields.email?.value || '').trim().toLowerCase(), // CRITICAL: lowercase email
         state: (fields.state?.value || 'Lagos').trim(),
         phone: (fields.phone?.value || '').trim(),
         bankName: (fields.bankName?.value || '').trim(),
@@ -1155,28 +1150,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         modernContainer.style.display = 'none';
     }
-
-    verifyOrderExists();
 });
-
-async function verifyOrderExists() {
-    const orderId = getOrderId();
-    if (!orderId) return;
-    
-    try {
-        const { data, error } = await supabaseClient
-            .from('orders')
-            .select('id, status')
-            .eq('id', orderId)
-            .single();
-        
-        if (error || !data) {
-            showToast('Order not found. Please try again.', true);
-        }
-    } catch (err) {
-        console.error('Error verifying order:', err);
-    }
-}
 
 window.addEventListener('resize', () => {
     const modernContainer = document.querySelector('.modern-container');
@@ -1188,32 +1162,7 @@ window.addEventListener('resize', () => {
 });
 
 function goBack() {
-    const orderId = getOrderId();
-    if (orderId) {
-        cancelPendingOrder(orderId);
-    }
-    
-    if (document.referrer.includes('coursepage') || document.referrer.includes('HIM-coursepage')) {
-        window.location.href = 'HIM-coursepage.html';
-    } else {
-        window.history.back();
-    }
-}
-
-async function cancelPendingOrder(orderId) {
-    try {
-        await supabaseClient
-            .from('orders')
-            .delete()
-            .eq('id', orderId)
-            .eq('status', 'pending');
-        
-        localStorage.removeItem('pendingOrderId');
-        localStorage.removeItem('checkoutCart');
-        localStorage.removeItem('checkoutTotal');
-    } catch (error) {
-        console.error('Error canceling order:', error);
-    }
+    window.location.href = 'HIM-coursepage.html';
 }
 
 async function confirmTransfer() {
@@ -1223,47 +1172,87 @@ async function confirmTransfer() {
     const cart = JSON.parse(localStorage.getItem('checkoutCart') || localStorage.getItem('cart') || '[]');
     const customer = getFieldValues();
     
-    if (!orderId || cart.length === 0 || total === 0) {
-        showToast('No order found. Please go back and try again.', true);
+    if (cart.length === 0 || total === 0) {
+        showToast('Your cart is empty. Please add items first.', true);
         return;
     }
     
     showLoading(true);
     
     try {
-        // Save order with customer email
-        await supabaseClient
-  .from('orders')
-  .insert([
-    {
-      status: 'submitted',
-      customer_email: customer.email,
-      customer_address: customer.address,
-      customer_state: customer.state,
-      customer_phone: customer.phone || null,
-      customer_bank_name: customer.bankName,
-      customer_account_name: customer.accountName,
-      items: cart,
-      total_amount: total,
-      created_at: new Date().toISOString()
-    }
-  ]);
+        // CRITICAL FIX: Create order WITH email, don't update existing order
+        const orderId = 'ORD-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
         
-        // CRITICAL: Save email for guest tracking
+        const { data: newOrder, error } = await supabaseClient
+            .from('orders')
+            .insert({
+                id: orderId,
+                customer_email: customer.email,  // CRITICAL: Save email
+                customer_name: customer.accountName || 'Guest',
+                customer_address: customer.address,
+                customer_state: customer.state,
+                customer_phone: customer.phone || null,
+                customer_bank_name: customer.bankName,
+                customer_account_name: customer.accountName,
+                items: cart,
+                total_amount: total,
+                status: 'submitted',  // Direct to submitted, not pending
+                payment_method: 'Bank Transfer',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            })
+            .select()
+            .single();
+        
+        if (error) {
+            console.error('Order creation error:', error);
+            showToast('Failed to create order. Please try again.', true);
+            hideLoading();
+            return;
+        }
+        
+        console.log('Order created:', newOrder);
+        
+        // CRITICAL: Save email to localStorage for tracking
         localStorage.setItem('guestTrackEmail', customer.email);
-        localStorage.setItem('userEmail', customer.email);  // Also set as userEmail for compatibility
+        localStorage.setItem('userEmail', customer.email);
+        
+        // Send WhatsApp message
+        const message = buildWhatsAppMessage(orderId, customer, cart, total);
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/2349129629049?text=${encodedMessage}`;
+        
+        // Open WhatsApp
+        const tempLink = document.createElement('a');
+        tempLink.href = whatsappUrl;
+        tempLink.target = '_blank';
+        tempLink.rel = 'noopener noreferrer';
+        tempLink.style.display = 'none';
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
+        
+        // Clear cart
+        localStorage.removeItem('cart');
+        localStorage.removeItem('checkoutCart');
+        localStorage.removeItem('pendingOrderId');
+        
+        showToast('Order submitted! Opening WhatsApp...');
+        
+        // Redirect to orders page with email
+        setTimeout(() => {
+            hideLoading();
+            window.location.href = `orders.html?email=${encodeURIComponent(customer.email)}`;
+        }, 2000);
         
     } catch (error) {
-        console.error('Save failed:', error);
+        console.error('Error:', error);
+        showToast('An error occurred. Please try again.', true);
+        hideLoading();
     }
-    
-    // Clear cart
-    localStorage.removeItem('cart');
-    localStorage.removeItem('checkoutCart');
-    localStorage.removeItem('pendingOrderId');
-    
-    // Send to WhatsApp
-    const userName = localStorage.getItem('userName') || 'Guest';
+}
+
+function buildWhatsAppMessage(orderId, customer, cart, total) {
     let message = `╭─────────────────────────────╮\n`;
     message += `│     *HIM.CLOTHIERS ORDER*     │\n`;
     message += `╰─────────────────────────────╯\n\n`;
@@ -1272,7 +1261,7 @@ async function confirmTransfer() {
     message += `Date: ${new Date().toLocaleDateString('en-NG')}\n`;
     message += `Time: ${new Date().toLocaleTimeString('en-NG')}\n\n`;
     message += `*CUSTOMER*\n`;
-    message += `Name: ${userName}\n`;
+    message += `Name: ${customer.accountName}\n`;
     message += `Email: ${customer.email}\n`;
     message += `Address: ${customer.address}\n`;
     message += `State: ${customer.state}\n`;
@@ -1286,73 +1275,18 @@ async function confirmTransfer() {
     });
     message += `\n*TOTAL: ₦${total.toLocaleString()}*\n`;
     
-    showToast('Order submitted! Opening WhatsApp...');
-    
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/2349129629049?text=${encodedMessage}`;
-    
-    // Open WhatsApp
-    const tempLink = document.createElement('a');
-    tempLink.href = whatsappUrl;
-    tempLink.target = '_blank';
-    tempLink.rel = 'noopener noreferrer';
-    tempLink.style.display = 'none';
-    document.body.appendChild(tempLink);
-    tempLink.click();
-    document.body.removeChild(tempLink);
-    
-    setTimeout(() => {
-        hideLoading();
-        // Redirect to orders page after WhatsApp
-        window.location.href = `orders.html?email=${encodeURIComponent(customer.email)}`;
-    }, 2000);
+    return message;
 }
 
-
-// ✅ WINDOW FOCUS HANDLER (iPhone fix)
+// Window focus handler
 window.addEventListener('focus', () => {
-    hideLoading(); // Always hide loading when page regains focus
-});
-
-// ✅ BEFORE UNLOAD PROTECTION (iPhone Safari fix)
-window.addEventListener('beforeunload', () => {
     hideLoading();
 });
 
-async function cancelPendingOrder(orderId) {
-    try {
-        await supabaseClient
-            .from('orders')
-            .delete()
-            .eq('id', orderId)
-            .eq('status', 'pending');
-        
-        localStorage.removeItem('pendingOrderId');
-        localStorage.removeItem('checkoutCart');
-        localStorage.removeItem('checkoutTotal');
-    } catch (error) {
-        console.error('Error canceling order:', error);
-    }
-}
-
-async function verifyOrderExists() {
-    const orderId = getOrderId();
-    if (!orderId) return;
-    
-    try {
-        const { data, error } = await supabaseClient
-            .from('orders')
-            .select('id, status')
-            .eq('id', orderId)
-            .single();
-        
-        if (error || !data) {
-            showToast('Order not found. Please try again.', true);
-        }
-    } catch (err) {
-        console.error('Error verifying order:', err);
-    }
-}
+// Before unload protection
+window.addEventListener('beforeunload', () => {
+    hideLoading();
+});
 </script>
 </body>
 </html>
