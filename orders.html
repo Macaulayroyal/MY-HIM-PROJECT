@@ -1463,43 +1463,66 @@
         </div>
     </div>
 
-    <script>
-   // Supabase Configuration
+  <script>
+// Supabase Configuration
 const SUPABASE_URL = 'https://ddrhpjiaotwtblnlqytw.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkcmhwamlhb3R3dGJsbmxxeXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NTI0MjMsImV4cCI6MjA4ODMyODQyM30.GNb6OTErsgNbb0PlEysXD7BtUhkjk0ldQCPbO_5EsKU';
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ============================================
-// EMAIL DETECTION - FIXED: Clear cache on new checkout
+// STATE VARIABLES - ADD THESE (were missing!)
+// ============================================
+let orders = [];
+let filteredOrders = [];
+let currentFilter = 'all';
+let ordersSubscription = null;
+
+// ============================================
+// EMAIL DETECTION - FIXED: Prioritize authenticated users over guests
 // ============================================
 const urlParams = new URLSearchParams(window.location.search);
 const emailFromUrl = urlParams.get('email');
 
-// CRITICAL FIX: If URL has email, always use it and update storage
-if (emailFromUrl) {
-    localStorage.setItem('guestTrackEmail', emailFromUrl);
-    localStorage.setItem('userEmail', emailFromUrl);
-}
-
-const emailFromStorage = localStorage.getItem('guestTrackEmail') || localStorage.getItem('userEmail');
+// Check if user is authenticated (has userEmail from auth, not guest)
+const authEmail = localStorage.getItem('userEmail');
+const guestEmail = localStorage.getItem('guestTrackEmail');
 const emailFromAdmin = localStorage.getItem('adminEmail');
 
-const userEmail = emailFromUrl || emailFromStorage || emailFromAdmin;
+// PRIORITY: 1. URL param, 2. Authenticated user, 3. Guest, 4. Admin
+// BUT: If auth exists, ignore guest unless URL explicitly overrides
+let userEmail;
 
-console.log('Email sources:', { emailFromUrl, emailFromStorage, emailFromAdmin });
-console.log('Using email:', userEmail);
+if (emailFromUrl) {
+    // URL param takes highest priority
+    userEmail = emailFromUrl;
+    // Update storage based on context
+    if (authEmail && emailFromUrl === authEmail) {
+        localStorage.setItem('userEmail', emailFromUrl);
+        localStorage.removeItem('guestTrackEmail'); // Clear guest if auth matches
+    } else {
+        localStorage.setItem('guestTrackEmail', emailFromUrl);
+    }
+} else if (authEmail && authEmail !== 'null' && authEmail !== '') {
+    // Authenticated user takes priority over guest
+    userEmail = authEmail;
+    localStorage.removeItem('guestTrackEmail'); // Clear old guest data
+} else if (guestEmail && guestEmail !== 'null' && guestEmail !== '') {
+    // Fall back to guest
+    userEmail = guestEmail;
+} else if (emailFromAdmin) {
+    userEmail = emailFromAdmin;
+} else {
+    userEmail = null;
+}
+
+console.log('Email sources:', { emailFromUrl, authEmail, guestEmail, emailFromAdmin });
+console.log('Using email:', userEmail, '| Is Authenticated:', !!authEmail);
 
 // Redirect if no email
 if (!userEmail) {
     window.location.href = 'profile.html';
 }
-
-// State
-let orders = [];
-let filteredOrders = [];
-let currentFilter = 'all';
-let ordersSubscription = null;
 
 // ============================================
 // INITIALIZATION
@@ -1533,7 +1556,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadOrders();
     setupRealtimeSubscriptions();
     setupScrollEffects();
-});// ============================================
+});
+
+// ============================================
 // CART & FAVORITES
 // ============================================
 function updateCartAndFavCounts() {
@@ -1579,106 +1604,105 @@ function setupScrollEffects() {
 // LOAD ORDERS - FIXED: Force fresh load
 // ============================================
 async function loadOrders() {
-  // Use your global userEmail (already fixed at top of file)
-  console.log("Loading orders for:", userEmail);
-  
-  if (!userEmail) {
-    showEmptyState();
-    return;
-  }
-
-  try {
-    const { data, error } = await supabaseClient
-      .from('orders')
-      .select('*')
-      .eq('customer_email', userEmail)  // ✅ snake_case matches table
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error("Supabase error:", error);
-      throw error;
+    console.log("Loading orders for:", userEmail);
+    
+    if (!userEmail) {
+        showEmptyState();
+        return;
     }
 
-    orders = data || [];
-    updateStats();
-    applyFilter();
-    renderOrders();
-  } catch (error) {
-    console.error("Error loading orders:", error);
-    showEmptyState();
-  }
+    try {
+        const { data, error } = await supabaseClient
+            .from('orders')
+            .select('*')
+            .eq('customer_email', userEmail)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error("Supabase error:", error);
+            throw error;
+        }
+
+        orders = data || [];
+        updateStats();
+        applyFilter();
+        renderOrders();
+    } catch (error) {
+        console.error("Error loading orders:", error);
+        showEmptyState();
+    }
 }
 
 // ============================================
 // STATS & FILTERING
 // ============================================
 function updateStats() {
-  const total = orders.length;
-  const active = orders.filter(o => {
-    const status = o.inventory_status || o.status;
-    return ['packaging', 'shipping', 'transferring', 'submitted', 'paid', 'processing'].includes(status);
-  }).length;
-  const delivered = orders.filter(o => {
-    const status = o.inventory_status || o.status;
-    return status === 'delivered';
-  }).length;
-  
-  const totalEl = document.getElementById('totalOrders');
-  const activeEl = document.getElementById('activeOrders');
-  const deliveredEl = document.getElementById('deliveredOrders');
-  const countAllEl = document.getElementById('countAll');
-  const countActiveEl = document.getElementById('countActive');
-  
-  if (totalEl) totalEl.textContent = total;
-  if (activeEl) activeEl.textContent = active;
-  if (deliveredEl) deliveredEl.textContent = delivered;
-  if (countAllEl) countAllEl.textContent = total;
-  if (countActiveEl) countActiveEl.textContent = active;
+    const total = orders.length;
+    const active = orders.filter(o => {
+        const status = o.inventory_status || o.status;
+        return ['packaging', 'shipping', 'transferring', 'submitted', 'paid', 'processing'].includes(status);
+    }).length;
+    const delivered = orders.filter(o => {
+        const status = o.inventory_status || o.status;
+        return status === 'delivered';
+    }).length;
+    
+    const totalEl = document.getElementById('totalOrders');
+    const activeEl = document.getElementById('activeOrders');
+    const deliveredEl = document.getElementById('deliveredOrders');
+    const countAllEl = document.getElementById('countAll');
+    const countActiveEl = document.getElementById('countActive');
+    
+    if (totalEl) totalEl.textContent = total;
+    if (activeEl) activeEl.textContent = active;
+    if (deliveredEl) deliveredEl.textContent = delivered;
+    if (countAllEl) countAllEl.textContent = total;
+    if (countActiveEl) countActiveEl.textContent = active;
 }
 
 function filterOrders(type) {
-  currentFilter = type;
-  
-  document.querySelectorAll('.filter-tab').forEach(tab => {
-    tab.classList.remove('active');
-  });
-  
-  const clickedTab = event?.target?.closest('.filter-tab');
-  if (clickedTab) clickedTab.classList.add('active');
-  
-  applyFilter();
+    currentFilter = type;
+    
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    const clickedTab = event?.target?.closest('.filter-tab');
+    if (clickedTab) clickedTab.classList.add('active');
+    
+    applyFilter();
 }
 
 function applyFilter() {
-  switch(currentFilter) {
-    case 'active':
-      filteredOrders = orders.filter(o => {
-        const status = o.inventory_status || o.status;
-        return ['packaging', 'shipping', 'transferring', 'submitted', 'paid', 'processing'].includes(status);
-      });
-      break;
-    case 'delivered':
-      filteredOrders = orders.filter(o => {
-        const status = o.inventory_status || o.status;
-        return status === 'delivered';
-      });
-      break;
-    case 'cancelled':
-      filteredOrders = orders.filter(o => {
-        const status = o.inventory_status || o.status;
-        return status === 'rejected';
-      });
-      break;
-    default:
-      filteredOrders = orders;
-  }
-  
-  const ordersCountEl = document.getElementById('ordersCount');
-  if (ordersCountEl) {
-    ordersCountEl.textContent = `${filteredOrders.length} order${filteredOrders.length !== 1 ? 's' : ''}`;
-  }
-  
-  renderOrders();
+    switch(currentFilter) {
+        case 'active':
+            filteredOrders = orders.filter(o => {
+                const status = o.inventory_status || o.status;
+                return ['packaging', 'shipping', 'transferring', 'submitted', 'paid', 'processing'].includes(status);
+            });
+            break;
+        case 'delivered':
+            filteredOrders = orders.filter(o => {
+                const status = o.inventory_status || o.status;
+                return status === 'delivered';
+            });
+            break;
+        case 'cancelled':
+            filteredOrders = orders.filter(o => {
+                const status = o.inventory_status || o.status;
+                return status === 'rejected';
+            });
+            break;
+        default:
+            filteredOrders = orders;
+    }
+    
+    const ordersCountEl = document.getElementById('ordersCount');
+    if (ordersCountEl) {
+        ordersCountEl.textContent = `${filteredOrders.length} order${filteredOrders.length !== 1 ? 's' : ''}`;
+    }
+    
+    renderOrders();
 }
 
 // ============================================
@@ -1797,7 +1821,7 @@ function createOrderCard(order, index) {
 function createProgressTracker(currentStatus) {
     const steps = [
         { key: 'packaging', label: 'Packaging', icon: 'fa-box' },
-                { key: 'shipping', label: 'Shipping', icon: 'fa-truck' },
+        { key: 'shipping', label: 'Shipping', icon: 'fa-truck' },
         { key: 'transferring', label: 'Transfer', icon: 'fa-exchange-alt' },
         { key: 'delivered', label: 'Delivered', icon: 'fa-check' }
     ];
@@ -1885,7 +1909,25 @@ function showEmptyState() {
 }
 
 // ============================================
-// MODAL
+// HELPER: Color to Hex mapping
+// ============================================
+function getColorHex(colorName) {
+    const colorMap = {
+        'Black': '#000000',
+        'White': '#ffffff',
+        'Navy': '#1a3a5c',
+        'Gray': '#4a4a4a',
+        'Brown': '#6F4D38',
+        'Tan': '#8B4513',
+        'Red': '#dc3545',
+        'Blue': '#007bff',
+        'Green': '#28a745'
+    };
+    return colorMap[colorName] || '#ccc';
+}
+
+// ============================================
+// MODAL - FIXED: Full order details with images, prices, colors
 // ============================================
 function viewOrderDetails(orderId) {
     const order = orders.find(o => o.id === orderId);
@@ -1894,11 +1936,45 @@ function viewOrderDetails(orderId) {
     const modalBody = document.getElementById('modalBody');
     if (!modalBody) return;
     
+    // Build items HTML with full details
+    const itemsHtml = order.items && order.items.length > 0 
+        ? order.items.map((item, index) => {
+            const itemTotal = parseFloat(item.price) * (item.quantity || 1);
+            const imageUrl = item.image || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60"><rect fill="%23f9f5f2" width="60" height="60"/><text fill="%236F4D38" x="30" y="38" font-size="24" text-anchor="middle">👕</text></svg>';
+            
+            return `
+                <div class="detail-row" style="align-items: flex-start; padding: 16px 0; border-bottom: 1px solid var(--border-color);">
+                    <div style="display: flex; gap: 16px; flex: 1;">
+                        <img src="${imageUrl}" 
+                             alt="${item.name}" 
+                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border-color);"
+                             onerror="this.src='data:image/svg+xml,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'60\\' height=\\'60\\'><rect fill=\\'%23f9f5f2\\' width=\\'60\\' height=\\'60\\'/><text fill=\\'%236F4D38\\' x=\\'30\\' y=\\'38\\' font-size=\\'24\\' text-anchor=\\'middle\\'>👕</text></svg>'">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px; color: var(--text-primary);">${item.name}</div>
+                            <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 4px;">
+                                ${item.color ? `<span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 14px; height: 14px; border-radius: 50%; background: ${getColorHex(item.color)}; border: 1px solid var(--border-color); display: inline-block;"></span> ${item.color}</span> • ` : ''}
+                                ${item.size ? `<span>Size: ${item.size}</span> • ` : ''}
+                                <span>Qty: ${item.quantity || 1}</span>
+                            </div>
+                            <div style="font-size: 14px; color: var(--text-secondary);">
+                                Unit Price: <strong style="color: var(--brand-color);">₦${parseFloat(item.price).toLocaleString()}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-weight: 700; font-size: 18px; color: var(--brand-color);">
+                        ₦${itemTotal.toLocaleString()}
+                    </div>
+                </div>
+            `;
+        }).join('')
+        : '<div class="detail-row"><div>No items found</div></div>';
+
     modalBody.innerHTML = `
         <div class="detail-section">
             <div class="detail-label">Order ID</div>
-            <div class="detail-value">#${order.id}</div>
+            <div class="detail-value" style="font-family: monospace; font-size: 18px;">#${order.id}</div>
         </div>
+        
         <div class="detail-section">
             <div class="detail-label">Status</div>
             <div class="detail-value">
@@ -1906,22 +1982,40 @@ function viewOrderDetails(orderId) {
                     ${getStatusText(order.inventory_status || order.status)}
                 </span>
             </div>
-        </div>
-        <div class="detail-section">
-            <div class="detail-label">Items</div>
-            ${order.items ? order.items.map(item => `
-                <div class="detail-row">
-                    <div>${item.name} x${item.quantity}</div>
-                    <div>₦${(parseFloat(item.price) * item.quantity).toLocaleString()}</div>
+            ${order.inventory_updated_at ? `
+                <div style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">
+                    Last updated: ${new Date(order.inventory_updated_at).toLocaleString('en-NG')}
                 </div>
-            `).join('') : 'No items'}
+            ` : ''}
         </div>
+        
         <div class="detail-section">
-            <div class="detail-label">Total</div>
-            <div class="detail-value" style="font-size: 24px; color: var(--brand-color);">
-                ₦${parseFloat(order.total_amount).toLocaleString()}
+            <div class="detail-label">Items (${order.items ? order.items.length : 0})</div>
+            ${itemsHtml}
+        </div>
+        
+        <div class="detail-section" style="background: var(--brand-lighter); padding: 20px; border-radius: var(--radius-sm); margin-top: 20px;">
+            <div class="detail-row" style="border-bottom: none; padding: 0;">
+                <div style="font-size: 14px; color: var(--text-secondary);">Subtotal</div>
+                <div style="font-weight: 600;">₦${parseFloat(order.total_amount).toLocaleString()}</div>
+            </div>
+            <div class="detail-row" style="border-bottom: none; padding: 12px 0 0 0; margin-top: 12px;">
+                <div style="font-size: 16px; font-weight: 700;">Total</div>
+                <div style="font-size: 24px; font-weight: 700; color: var(--brand-color);">
+                    ₦${parseFloat(order.total_amount).toLocaleString()}
+                </div>
             </div>
         </div>
+
+        ${order.customer_address ? `
+            <div class="detail-section">
+                <div class="detail-label">Shipping Address</div>
+                <div class="detail-value" style="font-size: 14px; line-height: 1.6;">
+                    ${order.customer_address}<br>
+                    ${order.customer_state || 'Lagos'}
+                </div>
+            </div>
+        ` : ''}
     `;
     
     const modal = document.getElementById('orderModal');
@@ -1939,11 +2033,6 @@ function closeModal() {
     }
 }
 
-
-
-
-// THEN your existing insert:
-
 // ============================================
 // REALTIME - FIXED: Subscribe to specific user orders
 // ============================================
@@ -1951,7 +2040,7 @@ function setupRealtimeSubscriptions() {
     if (!userEmail) return;
     
     ordersSubscription = supabaseClient
-        .channel('user-orders-channel')
+        .channel('user-orders-channel-' + userEmail.replace(/[@.]/g, '_'))
         .on('postgres_changes', {
             event: 'UPDATE',
             schema: 'public',
@@ -1980,7 +2069,9 @@ function setupRealtimeSubscriptions() {
             updateStats();
             applyFilter();
         })
-        .subscribe();
+        .subscribe((status) => {
+            console.log('Orders realtime status:', status);
+        });
 }
 
 // Cleanup

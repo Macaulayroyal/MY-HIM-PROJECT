@@ -942,46 +942,65 @@
     </div>
 
   <script>
-    // Supabase Configuration
+// Supabase Configuration
 const SUPABASE_URL = 'https://ddrhpjiaotwtblnlqytw.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkcmhwamlhb3R3dGJsbmxxeXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NTI0MjMsImV4cCI6MjA4ODMyODQyM30.GNb6OTErsgNbb0PlEysXD7BtUhkjk0ldQCPbO_5EsKU';
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ============================================
-// EMAIL DETECTION - FIXED: Clear cache on new URL param
+// STATE VARIABLES - ADD THESE (were missing!)
 // ============================================
+let notifications = [];
+let filteredNotifications = [];
+let currentFilter = 'all';
+let realtimeSubscription = null;
+
 // ============================================
 // EMAIL DETECTION - FIXED: Support both logged-in users and guests
 // ============================================
 const urlParams = new URLSearchParams(window.location.search);
 const emailFromUrl = urlParams.get('email');
 
-// CRITICAL FIX: If URL has email, always use it and update storage
-if (emailFromUrl) {
-    localStorage.setItem('guestTrackEmail', emailFromUrl);
-    localStorage.setItem('userEmail', emailFromUrl);
-}
-
-// Check all possible email sources
-const emailFromStorage = localStorage.getItem('guestTrackEmail') || localStorage.getItem('userEmail');
+// Check authentication state
+const authEmail = localStorage.getItem('userEmail');
+const guestEmail = localStorage.getItem('guestTrackEmail');
 const emailFromAdmin = localStorage.getItem('adminEmail');
 
-const userEmail = emailFromUrl || emailFromStorage || emailFromAdmin;
+// Determine user email with proper priority
+let userEmail = null;
+let isAuthenticated = false;
 
-console.log('Email sources:', { emailFromUrl, emailFromStorage, emailFromAdmin });
-console.log('Using email:', userEmail);
-
-// FIXED: Allow guests to view notifications if they have email from checkout
-if (!userEmail) {
+if (emailFromUrl) {
+    // URL param takes priority
+    userEmail = emailFromUrl;
+    // Store appropriately based on context
+    if (authEmail && emailFromUrl === authEmail) {
+        localStorage.setItem('userEmail', emailFromUrl);
+        localStorage.removeItem('guestTrackEmail');
+        isAuthenticated = true;
+    } else {
+        localStorage.setItem('guestTrackEmail', emailFromUrl);
+    }
+} else if (authEmail && authEmail !== 'null' && authEmail !== '') {
+    // Authenticated user
+    userEmail = authEmail;
+    isAuthenticated = true;
+    // Clean up guest if exists
+    if (guestEmail) localStorage.removeItem('guestTrackEmail');
+} else if (guestEmail && guestEmail !== 'null' && guestEmail !== '') {
+    // Guest user
+    userEmail = guestEmail;
+} else if (emailFromAdmin) {
+    userEmail = emailFromAdmin;
+} else {
+    // No email found - redirect to profile
     window.location.href = 'profile.html';
 }
 
-// State
-let notifications = [];
-let filteredNotifications = [];
-let currentFilter = 'all';
-let realtimeSubscription = null;
+console.log('Email sources:', { emailFromUrl, authEmail, guestEmail, emailFromAdmin });
+console.log('Using email:', userEmail, '| Is Authenticated:', isAuthenticated);
+
 // ============================================
 // INITIALIZATION
 // ============================================
@@ -1049,7 +1068,9 @@ async function loadNotifications() {
         console.error('Error loading notifications:', error);
         showEmptyState();
     }
-}// ============================================
+}
+
+// ============================================
 // COUNTS & FILTERING
 // ============================================
 function updateCounts() {
@@ -1267,23 +1288,26 @@ function toggleSelectionMode() {
 }
 
 // ============================================
-// REALTIME - FIXED: Subscribe to specific user notifications
+// REALTIME - FIXED: Subscribe to specific user notifications (ONLY ONE FUNCTION!)
 // ============================================
 function setupRealtimeSubscription() {
     if (!userEmail) return;
     
+    console.log('Setting up realtime for:', userEmail);
+    
     realtimeSubscription = supabaseClient
-        .channel('notifications-channel')
+        .channel('notifications-channel-' + userEmail.replace(/[@.]/g, '_'))
         .on('postgres_changes', {
             event: 'INSERT',
             schema: 'public',
             table: 'notifications',
             filter: `customer_email=eq.${userEmail}`
         }, (payload) => {
-            console.log('New notification:', payload);
+            console.log('New notification received:', payload);
             notifications.unshift(payload.new);
             updateCounts();
             applyFilter();
+            showToast('New notification received!', false);
         })
         .on('postgres_changes', {
             event: 'UPDATE',
@@ -1299,7 +1323,42 @@ function setupRealtimeSubscription() {
                 applyFilter();
             }
         })
-        .subscribe();
+        .subscribe((status) => {
+            console.log('Realtime subscription status:', status);
+        });
+}
+
+// ============================================
+// TOAST NOTIFICATION - ADD THIS (was missing!)
+// ============================================
+function showToast(message, isError = false) {
+    const toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${isError ? 'error' : 'success'}`;
+    toast.innerHTML = `
+        <div class="toast-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                ${isError 
+                    ? '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>'
+                    : '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>'
+                }
+            </svg>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">${isError ? 'Error' : 'Success'}</div>
+            <div class="toast-message">${message}</div>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        toast.style.animation = 'toastSlideOut 0.3s ease forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
 
 // Cleanup
