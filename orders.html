@@ -1579,108 +1579,106 @@ function setupScrollEffects() {
 // LOAD ORDERS - FIXED: Force fresh load
 // ============================================
 async function loadOrders() {
-    try {
-        console.log('Loading orders for:', userEmail);
-        
-        if (!userEmail) {
-            showEmptyState();
-            return;
-        }
-        
-        // CRITICAL FIX: Always fetch fresh data from server, no caching
-        const { data, error } = await supabaseClient
-            .from('orders')
-            .select('*')
-            .eq('customer_email', userEmail)
-            .order('created_at', { ascending: false });
-        
-        if (error) {
-            console.error('Supabase error:', error);
-            throw error;
-        }
-        
-        console.log('Orders loaded:', data);
-        
-        orders = data || [];
-        updateStats();
-        applyFilter();
-        
-    } catch (error) {
-        console.error('Error loading orders:', error);
-        showEmptyState();
+  // Use your global userEmail (already fixed at top of file)
+  console.log("Loading orders for:", userEmail);
+  
+  if (!userEmail) {
+    showEmptyState();
+    return;
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('orders')
+      .select('*')
+      .eq('customer_email', userEmail)  // ✅ snake_case matches table
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error("Supabase error:", error);
+      throw error;
     }
+
+    orders = data || [];
+    updateStats();
+    applyFilter();
+    renderOrders();
+  } catch (error) {
+    console.error("Error loading orders:", error);
+    showEmptyState();
+  }
 }
 
 // ============================================
 // STATS & FILTERING
 // ============================================
 function updateStats() {
-    const total = orders.length;
-    const active = orders.filter(o => {
-        const status = o.inventory_status || o.status;
-        return ['packaging', 'shipping', 'transferring', 'submitted', 'paid', 'processing'].includes(status);
-    }).length;
-    const delivered = orders.filter(o => {
-        const status = o.inventory_status || o.status;
-        return status === 'delivered';
-    }).length;
-    
-    const totalEl = document.getElementById('totalOrders');
-    const activeEl = document.getElementById('activeOrders');
-    const deliveredEl = document.getElementById('deliveredOrders');
-    const countAllEl = document.getElementById('countAll');
-    const countActiveEl = document.getElementById('countActive');
-    
-    if (totalEl) totalEl.textContent = total;
-    if (activeEl) activeEl.textContent = active;
-    if (deliveredEl) deliveredEl.textContent = delivered;
-    if (countAllEl) countAllEl.textContent = total;
-    if (countActiveEl) countActiveEl.textContent = active;
+  const total = orders.length;
+  const active = orders.filter(o => {
+    const status = o.inventory_status || o.status;
+    return ['packaging', 'shipping', 'transferring', 'submitted', 'paid', 'processing'].includes(status);
+  }).length;
+  const delivered = orders.filter(o => {
+    const status = o.inventory_status || o.status;
+    return status === 'delivered';
+  }).length;
+  
+  const totalEl = document.getElementById('totalOrders');
+  const activeEl = document.getElementById('activeOrders');
+  const deliveredEl = document.getElementById('deliveredOrders');
+  const countAllEl = document.getElementById('countAll');
+  const countActiveEl = document.getElementById('countActive');
+  
+  if (totalEl) totalEl.textContent = total;
+  if (activeEl) activeEl.textContent = active;
+  if (deliveredEl) deliveredEl.textContent = delivered;
+  if (countAllEl) countAllEl.textContent = total;
+  if (countActiveEl) countActiveEl.textContent = active;
 }
 
 function filterOrders(type) {
-    currentFilter = type;
-    
-    document.querySelectorAll('.filter-tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    
-    const clickedTab = event?.target?.closest('.filter-tab');
-    if (clickedTab) clickedTab.classList.add('active');
-    
-    applyFilter();
+  currentFilter = type;
+  
+  document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  const clickedTab = event?.target?.closest('.filter-tab');
+  if (clickedTab) clickedTab.classList.add('active');
+  
+  applyFilter();
 }
 
 function applyFilter() {
-    switch(currentFilter) {
-        case 'active':
-            filteredOrders = orders.filter(o => {
-                const status = o.inventory_status || o.status;
-                return ['packaging', 'shipping', 'transferring', 'submitted', 'paid', 'processing'].includes(status);
-            });
-            break;
-        case 'delivered':
-            filteredOrders = orders.filter(o => {
-                const status = o.inventory_status || o.status;
-                return status === 'delivered';
-            });
-            break;
-        case 'cancelled':
-            filteredOrders = orders.filter(o => {
-                const status = o.inventory_status || o.status;
-                return status === 'rejected';
-            });
-            break;
-        default:
-            filteredOrders = orders;
-    }
-    
-    const ordersCountEl = document.getElementById('ordersCount');
-    if (ordersCountEl) {
-        ordersCountEl.textContent = `${filteredOrders.length} order${filteredOrders.length !== 1 ? 's' : ''}`;
-    }
-    
-    renderOrders();
+  switch(currentFilter) {
+    case 'active':
+      filteredOrders = orders.filter(o => {
+        const status = o.inventory_status || o.status;
+        return ['packaging', 'shipping', 'transferring', 'submitted', 'paid', 'processing'].includes(status);
+      });
+      break;
+    case 'delivered':
+      filteredOrders = orders.filter(o => {
+        const status = o.inventory_status || o.status;
+        return status === 'delivered';
+      });
+      break;
+    case 'cancelled':
+      filteredOrders = orders.filter(o => {
+        const status = o.inventory_status || o.status;
+        return status === 'rejected';
+      });
+      break;
+    default:
+      filteredOrders = orders;
+  }
+  
+  const ordersCountEl = document.getElementById('ordersCount');
+  if (ordersCountEl) {
+    ordersCountEl.textContent = `${filteredOrders.length} order${filteredOrders.length !== 1 ? 's' : ''}`;
+  }
+  
+  renderOrders();
 }
 
 // ============================================
