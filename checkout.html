@@ -980,7 +980,6 @@
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   // ---------- CART / TOTAL ----------
-
   function getCheckoutTotal() {
     const urlParams = new URLSearchParams(window.location.search);
     const urlTotal = urlParams.get("total");
@@ -1006,7 +1005,6 @@
   }
 
   // ---------- LOADING / TOAST ----------
-
   function showLoading(show = true) {
     let overlay = document.getElementById("checkoutLoading");
     if (!overlay) {
@@ -1046,7 +1044,6 @@
   }
 
   // ---------- AUTH / EMAIL LOGIC ----------
-
   function isLoggedInUser() {
     const userEmail = localStorage.getItem("userEmail");
     const guestEmail = localStorage.getItem("guestTrackEmail");
@@ -1082,7 +1079,6 @@
   }
 
   // ---------- FORM FIELD HELPERS ----------
-
   function getFieldValues() {
     const isLoggedIn = isLoggedInUser();
     const storedEmail = getUserEmail();
@@ -1161,7 +1157,6 @@
   }
 
   // ---------- COPY TO CLIPBOARD ----------
-
   function copyToClipboard(text, btn) {
     navigator.clipboard
       .writeText(text)
@@ -1189,7 +1184,6 @@
   }
 
   // ---------- INIT DISPLAY ----------
-
   document.addEventListener("DOMContentLoaded", () => {
     const total = getCheckoutTotal();
     const formattedNumber = formatAmount(total);
@@ -1220,7 +1214,6 @@
   }
 
   // ---------- MAIN: CONFIRM TRANSFER ----------
-
   async function confirmTransfer() {
     if (!validateCheckoutFields()) return;
 
@@ -1264,6 +1257,11 @@
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
+
+      // ✅ CRITICAL: Set session email for realtime filtering
+      await supabaseClient.rpc('set_current_user_email', { 
+        p_email: customer.email || getUserEmail() 
+      });
 
       const { data: newOrder, error } = await supabaseClient
         .from("orders")
