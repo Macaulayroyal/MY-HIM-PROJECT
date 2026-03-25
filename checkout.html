@@ -1041,10 +1041,55 @@ function showToast(message, isError = false) {
     }, 3000);
 }
 
+// Check if user is logged in (has email in localStorage from signup/login)
+function isLoggedInUser() {
+    const userEmail = localStorage.getItem('userEmail');
+    const guestEmail = localStorage.getItem('guestTrackEmail');
+    // If userEmail exists and it's not a guest checkout, they're logged in
+    return userEmail && !guestEmail;
+}
+
+function getUserEmail() {
+    return localStorage.getItem('userEmail') || localStorage.getItem('guestTrackEmail') || '';
+}
+
+// Hide email fields for logged-in users
+function setupEmailFieldVisibility() {
+    const isLoggedIn = isLoggedInUser();
+    const userEmail = getUserEmail();
+    
+    // Mobile email field
+    const emailFieldMobile = document.getElementById('customerEmail');
+    const emailRowMobile = emailFieldMobile?.closest('.field-row');
+    
+    // Desktop email field  
+    const emailFieldDesk = document.getElementById('customerEmailDesk');
+    const emailRowDesk = emailFieldDesk?.closest('.field-row');
+    
+    if (isLoggedIn && userEmail) {
+        // Hide email fields for logged-in users
+        if (emailRowMobile) {
+            emailRowMobile.style.display = 'none';
+            emailFieldMobile.value = userEmail;
+        }
+        if (emailRowDesk) {
+            emailRowDesk.style.display = 'none';
+            emailFieldDesk.value = userEmail;
+        }
+    } else {
+        // Show email fields for guests (and pre-fill if available)
+        if (emailFieldMobile && userEmail) emailFieldMobile.value = userEmail;
+        if (emailFieldDesk && userEmail) emailFieldDesk.value = userEmail;
+    }
+}
+
 function getFieldValues() {
+    const isLoggedIn = isLoggedInUser();
+    const storedEmail = getUserEmail();
+
     const mobile = {
         address: document.getElementById('customerAddress'),
-        email: document.getElementById('customerEmail'),
+        email: isLoggedIn ? { value: storedEmail } : document.getElementById('customerEmail'),
         state: document.getElementById('customerState'),
         phone: document.getElementById('customerPhone'),
         bankName: document.getElementById('customerBankName'),
@@ -1053,7 +1098,7 @@ function getFieldValues() {
 
     const desktop = {
         address: document.getElementById('customerAddressDesk'),
-        email: document.getElementById('customerEmailDesk'),
+        email: isLoggedIn ? { value: storedEmail } : document.getElementById('customerEmailDesk'),
         state: document.getElementById('customerStateDesk'),
         phone: document.getElementById('customerPhoneDesk'),
         bankName: document.getElementById('customerBankNameDesk'),
@@ -1065,7 +1110,7 @@ function getFieldValues() {
 
     return {
         address: (fields.address?.value || '').trim(),
-        email: (fields.email?.value || '').trim().toLowerCase(), // CRITICAL: lowercase email
+        email: (fields.email?.value || '').trim().toLowerCase(),
         state: (fields.state?.value || 'Lagos').trim(),
         phone: (fields.phone?.value || '').trim(),
         bankName: (fields.bankName?.value || '').trim(),
@@ -1075,6 +1120,7 @@ function getFieldValues() {
 }
 
 function validateCheckoutFields() {
+    const isLoggedIn = isLoggedInUser();
     const data = getFieldValues();
 
     if (!data.address) {
@@ -1083,17 +1129,20 @@ function validateCheckoutFields() {
         return false;
     }
 
-    if (!data.email) {
+    // Only validate email if not logged in
+    if (!isLoggedIn && !data.email) {
         showToast('Please enter your email.', true);
         data.fields.email?.focus();
         return false;
     }
 
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
-    if (!emailOk) {
-        showToast('Please enter a valid email address.', true);
-        data.fields.email?.focus();
-        return false;
+    if (!isLoggedIn && data.email) {
+        const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
+        if (!emailOk) {
+            showToast('Please enter a valid email address.', true);
+            data.fields.email?.focus();
+            return false;
+        }
     }
 
     if (!data.bankName) {
@@ -1144,6 +1193,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const desktopNumber = document.querySelector('#modernAmountDisplay .number');
     if (desktopNumber) desktopNumber.textContent = formattedNumber;
 
+    // Setup email field visibility based on login status
+    setupEmailFieldVisibility();
+
     const modernContainer = document.querySelector('.modern-container');
     if (window.innerWidth >= 1024) {
         modernContainer.style.display = 'grid';
@@ -1177,17 +1229,23 @@ async function confirmTransfer() {
         return;
     }
     
+    // Disable button to prevent double submission
+    const btn = document.querySelector('.confirm-btn, .modern-confirm-btn');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    }
+    
     showLoading(true);
     
     try {
-        // CRITICAL FIX: Create order WITH email, don't update existing order
         const orderId = 'ORD-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
         
         const { data: newOrder, error } = await supabaseClient
             .from('orders')
             .insert({
                 id: orderId,
-                customer_email: customer.email,  // CRITICAL: Save email
+                customer_email: customer.email,
                 customer_name: customer.accountName || 'Guest',
                 customer_address: customer.address,
                 customer_state: customer.state,
@@ -1196,7 +1254,7 @@ async function confirmTransfer() {
                 customer_account_name: customer.accountName,
                 items: cart,
                 total_amount: total,
-                status: 'submitted',  // Direct to submitted, not pending
+                status: 'submitted',
                 payment_method: 'Bank Transfer',
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
@@ -1207,13 +1265,18 @@ async function confirmTransfer() {
         if (error) {
             console.error('Order creation error:', error);
             showToast('Failed to create order. Please try again.', true);
+            // Re-enable button
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fab fa-whatsapp"></i> I Have Made This Transfer';
+            }
             hideLoading();
             return;
         }
         
-        console.log('Order created:', newOrder);
+        console.log('Order created successfully:', newOrder);
         
-        // CRITICAL: Save email to localStorage for tracking
+        // Save email to localStorage for tracking
         localStorage.setItem('guestTrackEmail', customer.email);
         localStorage.setItem('userEmail', customer.email);
         
@@ -1222,36 +1285,33 @@ async function confirmTransfer() {
         const encodedMessage = encodeURIComponent(message);
         const whatsappUrl = `https://wa.me/2349129629049?text=${encodedMessage}`;
         
-        // Open WhatsApp
-        const tempLink = document.createElement('a');
-        tempLink.href = whatsappUrl;
-        tempLink.target = '_blank';
-        tempLink.rel = 'noopener noreferrer';
-        tempLink.style.display = 'none';
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
-        
-        // Clear cart
+        // Clear cart BEFORE redirecting
         localStorage.removeItem('cart');
         localStorage.removeItem('checkoutCart');
         localStorage.removeItem('pendingOrderId');
         
         showToast('Order submitted! Opening WhatsApp...');
         
-        // Redirect to orders page with email
+        // Use window.open for WhatsApp to avoid blocking
+        const whatsappWindow = window.open(whatsappUrl, '_blank');
+        
+        // Redirect to orders page after a short delay
         setTimeout(() => {
             hideLoading();
             window.location.href = `orders.html?email=${encodeURIComponent(customer.email)}`;
-        }, 2000);
+        }, 1500);
         
     } catch (error) {
         console.error('Error:', error);
         showToast('An error occurred. Please try again.', true);
+        // Re-enable button
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fab fa-whatsapp"></i> I Have Made This Transfer';
+        }
         hideLoading();
     }
 }
-
 function buildWhatsAppMessage(orderId, customer, cart, total) {
     let message = `╭─────────────────────────────╮\n`;
     message += `│     *HIM.CLOTHIERS ORDER*     │\n`;
