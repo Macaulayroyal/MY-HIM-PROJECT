@@ -1219,6 +1219,17 @@
         console.log('Order already processing...');
         return;
     }
+
+    if (!validateCheckoutFields()) {
+    window.orderProcessing = false;  // ✅ ADD THIS
+    return;
+  }
+
+  if (!cart || cart.length === 0 || total <= 0) {
+    window.orderProcessing = false;  // ✅ ADD THIS  
+    showToast("Cart empty", true);
+    return;
+  }
     window.orderProcessing = true;
     
     if (!validateCheckoutFields()) {
