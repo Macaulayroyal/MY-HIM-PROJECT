@@ -972,416 +972,412 @@
         <span id="toastMessage">Copied to clipboard!</span>
     </div>
 
-  <script>
-const SUPABASE_URL = 'https://ddrhpjiaotwtblnlqytw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkcmhwamlhb3R3dGJsbmxxeXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NTI0MjMsImV4cCI6MjA4ODMyODQyM30.GNb6OTErsgNbb0PlEysXD7BtUhkjk0ldQCPbO_5EsKU';
+<script>
+  const SUPABASE_URL = "https://ddrhpjiaotwtblnlqytw.supabase.co";
+  const SUPABASE_ANON_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkcmhwamlhb3R3dGJsbmxxeXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NTI0MjMsImV4cCI6MjA4ODMyODQyM30.GNb6OTErsgNbb0PlEysXD7BtUhkjk0ldQCPbO5EsKU";
 
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function getCheckoutTotal() {
+  // ---------- CART / TOTAL ----------
+
+  function getCheckoutTotal() {
     const urlParams = new URLSearchParams(window.location.search);
-    const urlTotal = urlParams.get('total');
-    
+    const urlTotal = urlParams.get("total");
     if (urlTotal) {
-        const parsed = parseFloat(urlTotal);
-        if (!isNaN(parsed) && parsed > 0) return parsed;
+      const parsed = parseFloat(urlTotal);
+      if (!isNaN(parsed) && parsed > 0) return parsed;
     }
-    
-    const cart = JSON.parse(localStorage.getItem('checkoutCart') || localStorage.getItem('cart') || '[]');
-    return cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
-}
 
-function formatAmount(amount) {
-    return Math.round(amount).toLocaleString('en-NG');
-}
+    const cart =
+      JSON.parse(localStorage.getItem("checkoutCart")) ||
+      JSON.parse(localStorage.getItem("cart")) ||
+      [];
+    if (!cart || cart.length === 0) return 0;
 
-function showLoading(show) {
-    let overlay = document.getElementById('checkoutLoading');
+    return cart.reduce(
+      (sum, item) => sum + parseFloat(item.price || 0) * (item.quantity || 1),
+      0
+    );
+  }
+
+  function formatAmount(amount) {
+    return Math.round(amount).toLocaleString("en-NG");
+  }
+
+  // ---------- LOADING / TOAST ----------
+
+  function showLoading(show = true) {
+    let overlay = document.getElementById("checkoutLoading");
     if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'checkoutLoading';
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255,255,255,0.95);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            flex-direction: column;
-            gap: 16px;
-        `;
-        overlay.innerHTML = `
-            <div style="width: 40px; height: 40px; border: 3px solid #e8e0d9; 
-                        border-top-color: #6F4D38; border-radius: 50%; 
-                        animation: spin 1s linear infinite;"></div>
-            <p style="color: #6F4D38; font-weight: 500;">Processing Order...</p>
-        `;
-        document.body.appendChild(overlay);
+      overlay = document.createElement("div");
+      overlay.id = "checkoutLoading";
+      overlay.style.cssText =
+        "position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.95);display:none;align-items:center;justify-content:center;z-index:10000;flex-direction:column;gap:16px;";
+      overlay.innerHTML = `
+        <div style="width:40px;height:40px;border:3px solid #e8e0d9;border-top-color:#6F4D38;border-radius:50%;animation:spin 1s linear infinite;"></div>
+        <p style="color:#6F4D38;font-weight:500;">Processing Order...</p>
+      `;
+      document.body.appendChild(overlay);
+      const style = document.createElement("style");
+      style.innerHTML = `
+        @keyframes spin { to { transform: rotate(360deg); } }
+      `;
+      document.head.appendChild(style);
     }
-    
-    overlay.style.display = show ? 'flex' : 'none';
-    document.body.style.overflow = show ? 'hidden' : '';
-}
+    overlay.style.display = show ? "flex" : "none";
+    document.body.style.overflow = show ? "hidden" : "";
+  }
 
-function hideLoading() {
+  function hideLoading() {
     showLoading(false);
-    document.body.style.overflow = '';
-}
+  }
 
-function showToast(message, isError = false) {
-    const toast = document.getElementById('toast');
-    document.getElementById('toastMessage').textContent = message;
-    toast.classList.remove('error');
-    if (isError) toast.classList.add('error');
-    toast.classList.add('show');
-    
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
-}
+  function showToast(message, isError = false) {
+    const toast = document.getElementById("toast");
+    if (!toast) return;
+    const msgSpan = document.getElementById("toastMessage");
+    if (msgSpan) msgSpan.textContent = message;
 
-// Check if user is logged in (has email in localStorage from signup/login)
-function isLoggedInUser() {
-    const userEmail = localStorage.getItem('userEmail');
-    const guestEmail = localStorage.getItem('guestTrackEmail');
-    // If userEmail exists and it's not a guest checkout, they're logged in
-    return userEmail && !guestEmail;
-}
+    toast.classList.remove("error");
+    if (isError) toast.classList.add("error");
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3000);
+  }
 
-function getUserEmail() {
-    return localStorage.getItem('userEmail') || localStorage.getItem('guestTrackEmail') || '';
-}
+  // ---------- AUTH / EMAIL LOGIC ----------
 
-// Hide email fields for logged-in users
-function setupEmailFieldVisibility() {
+  function isLoggedInUser() {
+    const userEmail = localStorage.getItem("userEmail");
+    const guestEmail = localStorage.getItem("guestTrackEmail");
+    return !!(userEmail && !guestEmail);
+  }
+
+  function getUserEmail() {
+    return (
+      localStorage.getItem("userEmail") || localStorage.getItem("guestTrackEmail")
+    );
+  }
+
+  function setupEmailFieldVisibility() {
     const isLoggedIn = isLoggedInUser();
     const userEmail = getUserEmail();
-    
-    // Mobile email field
-    const emailFieldMobile = document.getElementById('customerEmail');
-    const emailRowMobile = emailFieldMobile?.closest('.field-row');
-    
-    // Desktop email field  
-    const emailFieldDesk = document.getElementById('customerEmailDesk');
-    const emailRowDesk = emailFieldDesk?.closest('.field-row');
-    
-    if (isLoggedIn && userEmail) {
-        // Hide email fields for logged-in users
-        if (emailRowMobile) {
-            emailRowMobile.style.display = 'none';
-            emailFieldMobile.value = userEmail;
-        }
-        if (emailRowDesk) {
-            emailRowDesk.style.display = 'none';
-            emailFieldDesk.value = userEmail;
-        }
-    } else {
-        // Show email fields for guests (and pre-fill if available)
-        if (emailFieldMobile && userEmail) emailFieldMobile.value = userEmail;
-        if (emailFieldDesk && userEmail) emailFieldDesk.value = userEmail;
-    }
-}
 
-function getFieldValues() {
+    const emailFieldMobile = document.getElementById("customerEmail");
+    const emailRowMobile = emailFieldMobile?.closest(".field-row");
+
+    const emailFieldDesk = document.getElementById("customerEmailDesk");
+    const emailRowDesk = emailFieldDesk?.closest(".field-row");
+
+    if (isLoggedIn && userEmail) {
+      if (emailRowMobile) emailRowMobile.style.display = "none";
+      if (emailFieldMobile) emailFieldMobile.value = userEmail;
+
+      if (emailRowDesk) emailRowDesk.style.display = "none";
+      if (emailFieldDesk) emailFieldDesk.value = userEmail;
+    } else {
+      if (emailFieldMobile && userEmail) emailFieldMobile.value = userEmail;
+      if (emailFieldDesk && userEmail) emailFieldDesk.value = userEmail;
+    }
+  }
+
+  // ---------- FORM FIELD HELPERS ----------
+
+  function getFieldValues() {
     const isLoggedIn = isLoggedInUser();
     const storedEmail = getUserEmail();
 
     const mobile = {
-        address: document.getElementById('customerAddress'),
-        email: isLoggedIn ? { value: storedEmail } : document.getElementById('customerEmail'),
-        state: document.getElementById('customerState'),
-        phone: document.getElementById('customerPhone'),
-        bankName: document.getElementById('customerBankName'),
-        accountName: document.getElementById('customerBankAccountName'),
+      address: document.getElementById("customerAddress"),
+      email: isLoggedIn ? { value: storedEmail } : document.getElementById("customerEmail"),
+      state: document.getElementById("customerState"),
+      phone: document.getElementById("customerPhone"),
+      bankName: document.getElementById("customerBankName"),
+      accountName: document.getElementById("customerBankAccountName"),
     };
 
     const desktop = {
-        address: document.getElementById('customerAddressDesk'),
-        email: isLoggedIn ? { value: storedEmail } : document.getElementById('customerEmailDesk'),
-        state: document.getElementById('customerStateDesk'),
-        phone: document.getElementById('customerPhoneDesk'),
-        bankName: document.getElementById('customerBankNameDesk'),
-        accountName: document.getElementById('customerBankAccountNameDesk'),
+      address: document.getElementById("customerAddressDesk"),
+      email: isLoggedIn
+        ? { value: storedEmail }
+        : document.getElementById("customerEmailDesk"),
+      state: document.getElementById("customerStateDesk"),
+      phone: document.getElementById("customerPhoneDesk"),
+      bankName: document.getElementById("customerBankNameDesk"),
+      accountName: document.getElementById("customerBankAccountNameDesk"),
     };
 
     const useDesktop = window.innerWidth >= 1024;
     const fields = useDesktop ? desktop : mobile;
 
     return {
-        address: (fields.address?.value || '').trim(),
-        email: (fields.email?.value || '').trim().toLowerCase(),
-        state: (fields.state?.value || 'Lagos').trim(),
-        phone: (fields.phone?.value || '').trim(),
-        bankName: (fields.bankName?.value || '').trim(),
-        accountName: (fields.accountName?.value || '').trim(),
-        fields
+      address: fields.address?.value?.trim() || "",
+      email: (fields.email?.value || "").trim().toLowerCase(),
+      state: (fields.state?.value || "Lagos").trim(),
+      phone: fields.phone?.value?.trim() || "",
+      bankName: fields.bankName?.value?.trim() || "",
+      accountName: fields.accountName?.value?.trim() || "",
+      fields,
     };
-}
+  }
 
-function validateCheckoutFields() {
+  function validateCheckoutFields() {
     const isLoggedIn = isLoggedInUser();
     const data = getFieldValues();
 
     if (!data.address) {
-        showToast('Please enter your address.', true);
-        data.fields.address?.focus();
-        return false;
+      showToast("Please enter your address.", true);
+      data.fields.address?.focus?.();
+      return false;
     }
 
-    // Only validate email if not logged in
-    if (!isLoggedIn && !data.email) {
-        showToast('Please enter your email.', true);
-        data.fields.email?.focus();
+    if (!isLoggedIn) {
+      if (!data.email) {
+        showToast("Please enter your email.", true);
+        data.fields.email?.focus?.();
         return false;
-    }
-
-    if (!isLoggedIn && data.email) {
-        const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
-        if (!emailOk) {
-            showToast('Please enter a valid email address.', true);
-            data.fields.email?.focus();
-            return false;
-        }
+      }
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
+      if (!emailOk) {
+        showToast("Please enter a valid email address.", true);
+        data.fields.email?.focus?.();
+        return false;
+      }
     }
 
     if (!data.bankName) {
-        showToast('Please enter your bank name.', true);
-        data.fields.bankName?.focus();
-        return false;
+      showToast("Please enter your bank name.", true);
+      data.fields.bankName?.focus?.();
+      return false;
     }
 
     if (!data.accountName) {
-        showToast('Please enter the name of bank / account holder.', true);
-        data.fields.accountName?.focus();
-        return false;
+      showToast("Please enter the name of bank account holder.", true);
+      data.fields.accountName?.focus?.();
+      return false;
     }
 
     return true;
-}
+  }
 
-function copyToClipboard(text, btn) {
-    navigator.clipboard.writeText(text).then(() => {
-        btn.classList.add('copied');
-        const icon = btn.querySelector('i');
-        if (icon) icon.className = 'fas fa-check';
-        
-        showToast('Account number copied!');
-        
-        setTimeout(() => {
-            btn.classList.remove('copied');
-            if (icon) icon.className = 'far fa-copy';
-        }, 2000);
-    }).catch(() => {
-        const textArea = document.createElement('textarea');
+  // ---------- COPY TO CLIPBOARD ----------
+
+  function copyToClipboard(text, btn) {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        if (btn) {
+          btn.classList.add("copied");
+          const icon = btn.querySelector("i");
+          if (icon) icon.className = "fas fa-check";
+          setTimeout(() => {
+            btn.classList.remove("copied");
+            if (icon) icon.className = "far fa-copy";
+          }, 2000);
+        }
+        showToast("Account number copied!");
+      })
+      .catch(() => {
+        const textArea = document.createElement("textarea");
         textArea.value = text;
         document.body.appendChild(textArea);
         textArea.select();
-        document.execCommand('copy');
+        document.execCommand("copy");
         document.body.removeChild(textArea);
-        showToast('Account number copied!');
-    });
-}
+        showToast("Account number copied!");
+      });
+  }
 
-document.addEventListener('DOMContentLoaded', () => {
+  // ---------- INIT DISPLAY ----------
+
+  document.addEventListener("DOMContentLoaded", () => {
     const total = getCheckoutTotal();
     const formattedNumber = formatAmount(total);
-    
-    const mobileNumber = document.querySelector('#amountDisplay .number');
+
+    const mobileNumber = document.querySelector("#amountDisplay .number");
     if (mobileNumber) mobileNumber.textContent = formattedNumber;
-    
-    const desktopNumber = document.querySelector('#modernAmountDisplay .number');
+
+    const desktopNumber = document.querySelector("#modernAmountDisplay .number");
     if (desktopNumber) desktopNumber.textContent = formattedNumber;
 
-    // Setup email field visibility based on login status
     setupEmailFieldVisibility();
 
-    const modernContainer = document.querySelector('.modern-container');
-    if (window.innerWidth >= 1024) {
-        modernContainer.style.display = 'grid';
-    } else {
-        modernContainer.style.display = 'none';
+    const modernContainer = document.querySelector(".modern-container");
+    if (modernContainer) {
+      modernContainer.style.display = window.innerWidth >= 1024 ? "grid" : "none";
     }
-});
+  });
 
-window.addEventListener('resize', () => {
-    const modernContainer = document.querySelector('.modern-container');
-    if (window.innerWidth >= 1024) {
-        modernContainer.style.display = 'grid';
-    } else {
-        modernContainer.style.display = 'none';
+  window.addEventListener("resize", () => {
+    const modernContainer = document.querySelector(".modern-container");
+    if (modernContainer) {
+      modernContainer.style.display = window.innerWidth >= 1024 ? "grid" : "none";
     }
-});
+  });
 
-function goBack() {
-    window.location.href = 'HIM-coursepage.html';
-}
+  function goBack() {
+    window.location.href = "HIM-coursepage.html";
+  }
 
-// FIXED: Proper error handling and WhatsApp redirect
-// FIXED: Proper error handling and WhatsApp redirect - MATCHES YOUR SCHEMA
-async function confirmTransfer() {
+  // ---------- MAIN: CONFIRM TRANSFER ----------
+
+  async function confirmTransfer() {
     if (!validateCheckoutFields()) return;
 
     const total = getCheckoutTotal();
-    const cart = JSON.parse(localStorage.getItem('checkoutCart') || localStorage.getItem('cart') || '[]');
-    const customer = getFieldValues();
-    
-    if (cart.length === 0 || total === 0) {
-        showToast('Your cart is empty. Please add items first.', true);
-        return;
-    }
-    
-    // Disable button to prevent double submission
-    const btn = document.querySelector('.confirm-btn, .modern-confirm-btn');
-    if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-    }
-    
-    showLoading(true);
-    
-    try {
-        const orderId = 'ORD-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-        
-        console.log('Creating order with data:', {
-            id: orderId,
-            customer_email: customer.email,
-            total_amount: total,
-            items_count: cart.length
-        });
-        
-        // ============================================
-        // CRITICAL FIX: Match your actual database schema
-        // Your dashboard uses customer_name, NOT customer_account_name
-        // ============================================
-        
-        const orderData = {
-            id: orderId,
-            customer_email: customer.email,
-            customer_name: customer.accountName || 'Guest',  // FIXED: Use customer_name (not customer_account_name)
-            customer_address: customer.address,
-            customer_state: customer.state,
-            customer_phone: customer.phone || null,
-            customer_bank_name: customer.bankName,
-            // REMOVED: customer_account_name - this column doesn't exist!
-            items: cart,
-            total_amount: total,
-            status: 'submitted',
-            payment_method: 'Bank Transfer',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-        };
-        
-        console.log('Inserting order data:', orderData);
-        
-        const { data: newOrder, error } = await supabaseClient
-            .from('orders')
-            .insert(orderData)
-            .select();
-        
-        // FIXED: Proper error checking - check both error AND data
-        if (error) {
-            console.error('Supabase error details:', error);
-            throw new Error(error.message || 'Database error occurred');
-        }
-        
-        if (!newOrder || newOrder.length === 0) {
-            console.error('No data returned from insert');
-            throw new Error('Order creation failed - no data returned');
-        }
-        
-        console.log('Order created successfully:', newOrder);
-        
-        // Save email to localStorage for tracking
-        localStorage.setItem('guestTrackEmail', customer.email);
-        localStorage.setItem('userEmail', customer.email);
-        
-        // Build WhatsApp message
-        const message = buildWhatsAppMessage(orderId, customer, cart, total);
-        const encodedMessage = encodeURIComponent(message);
-        const whatsappUrl = `https://wa.me/2349129629049?text=${encodedMessage}`;
-        
-        // Clear cart BEFORE redirecting
-        localStorage.removeItem('cart');
-        localStorage.removeItem('checkoutCart');
-        localStorage.removeItem('pendingOrderId');
-        
-        showToast('Order submitted! Opening WhatsApp...');
-        
-        // FIXED: Better WhatsApp handling with multiple fallback methods
-        let whatsappOpened = false;
-        
-        // Method 1: Try window.open
-        try {
-            const newWindow = window.open(whatsappUrl, '_blank');
-            if (newWindow && !newWindow.closed) {
-                whatsappOpened = true;
-            }
-        } catch (e) {
-            console.log('window.open failed:', e);
-        }
-        
-        // Method 2: Use location.href as fallback (works on mobile)
-        if (!whatsappOpened) {
-            setTimeout(() => {
-                window.location.href = whatsappUrl;
-            }, 500);
-        }
-        
-        // Redirect to orders page after delay
-        setTimeout(() => {
-            hideLoading();
-            window.location.href = `orders.html?email=${encodeURIComponent(customer.email)}`;
-        }, 3000);
-        
-    } catch (error) {
-        console.error('Order creation error:', error);
-        showToast('Failed to create order: ' + error.message, true);
-        
-        // Re-enable button
-        if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fab fa-whatsapp"></i> I Have Made This Transfer';
-        }
-        hideLoading();
-    }
-}
+    const cart =
+      JSON.parse(localStorage.getItem("checkoutCart")) ||
+      JSON.parse(localStorage.getItem("cart")) ||
+      [];
 
-function buildWhatsAppMessage(orderId, customer, cart, total) {
-    let message = `╭─────────────────────────────╮\n`;
-    message += `│     *HIM.CLOTHIERS ORDER*     │\n`;
-    message += `╰─────────────────────────────╯\n\n`;
-    message += `*ORDER DETAILS*\n`;
+    const customer = getFieldValues();
+
+    if (!cart || cart.length === 0 || total <= 0) {
+      showToast("Your cart is empty. Please add items first.", true);
+      return;
+    }
+
+    const btn =
+      document.querySelector(".confirm-btn") ||
+      document.querySelector(".modern-confirm-btn");
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML =
+        '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    }
+
+    showLoading(true);
+
+    try {
+      // Let DB generate UUID id; DO NOT send custom string as id
+      const orderData = {
+        customeremail: customer.email || getUserEmail(),
+        customername: customer.accountName || "Guest",
+        customeraddress: customer.address,
+        customerstate: customer.state,
+        customerphone: customer.phone || null,
+        customerbankname: customer.bankName,
+        items: cart,
+        totalamount: total,
+        status: "submitted",
+        paymentmethod: "Bank Transfer",
+        createdat: new Date().toISOString(),
+        updatedat: new Date().toISOString(),
+      };
+
+      const { data: newOrder, error } = await supabaseClient
+        .from("orders")
+        .insert(orderData)
+        .select();
+
+      if (error) {
+        console.error("Supabase error details:", error);
+        throw new Error(error.message || "Database error occurred");
+      }
+
+      if (!newOrder || newOrder.length === 0) {
+        console.error("No data returned from insert");
+        throw new Error("Order creation failed - no data returned");
+      }
+
+      const createdOrder = newOrder[0];
+      const orderId = createdOrder.id; // UUID from DB
+
+      // Track email for guests
+      const finalEmail = customer.email || getUserEmail();
+      if (finalEmail) {
+        localStorage.setItem("guestTrackEmail", finalEmail);
+        localStorage.setItem("userEmail", finalEmail);
+      }
+
+      const message = buildWhatsAppMessage(orderId, customer, cart, total);
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl =
+        `https://wa.me/2349129629049?text=${encodedMessage}`;
+
+      // Clear cart BEFORE redirect
+      localStorage.removeItem("cart");
+      localStorage.removeItem("checkoutCart");
+      localStorage.removeItem("pendingOrderId");
+
+      showToast("Order submitted! Opening WhatsApp...");
+
+      let whatsappOpened = false;
+
+      // Method 1: window.open
+      try {
+        const newWindow = window.open(whatsappUrl, "_blank");
+        if (newWindow && !newWindow.closed) {
+          whatsappOpened = true;
+        }
+      } catch (e) {
+        console.log("window.open failed:", e);
+      }
+
+      // Method 2: location.href fallback
+      if (!whatsappOpened) {
+        setTimeout(() => {
+          window.location.href = whatsappUrl;
+        }, 500);
+      }
+
+      // Redirect to orders page after brief delay
+      setTimeout(() => {
+        hideLoading();
+        if (finalEmail) {
+          window.location.href =
+            "orders.html?email=" + encodeURIComponent(finalEmail);
+        } else {
+          window.location.href = "orders.html";
+        }
+      }, 3000);
+    } catch (error) {
+      console.error("Order creation error:", error);
+      showToast("Failed to create order: " + error.message, true);
+      hideLoading();
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML =
+          '<i class="fab fa-whatsapp"></i> I Have Made This Transfer';
+      }
+    }
+  }
+
+  function buildWhatsAppMessage(orderId, customer, cart, total) {
+    let message = "HIM.CLOTHIERS ORDER\n\n";
+
+    message += "ORDER DETAILS\n";
     message += `Order ID: ${orderId}\n`;
-    message += `Date: ${new Date().toLocaleDateString('en-NG')}\n`;
-    message += `Time: ${new Date().toLocaleTimeString('en-NG')}\n\n`;
-    message += `*CUSTOMER*\n`;
-    message += `Name: ${customer.accountName}\n`;
-    message += `Email: ${customer.email}\n`;
+    message += `Date: ${new Date().toLocaleDateString("en-NG")}\n`;
+    message += `Time: ${new Date().toLocaleTimeString("en-NG")}\n\n`;
+
+    message += "CUSTOMER\n";
+    message += `Name: ${customer.accountName || "Guest"}\n`;
+    message += `Email: ${customer.email || getUserEmail() || "N/A"}\n`;
     message += `Address: ${customer.address}\n`;
     message += `State: ${customer.state}\n`;
     if (customer.phone) message += `Phone: ${customer.phone}\n`;
     message += `Bank: ${customer.bankName}\n`;
     message += `Account Name: ${customer.accountName}\n\n`;
-    message += `*ITEMS*\n`;
+
+    message += "ITEMS\n";
     cart.forEach((item, index) => {
-        message += `\n${index + 1}. *${item.name}*\n`;
-        message += `   ₦${parseFloat(item.price).toLocaleString()} x ${item.quantity}\n`;
+      message += `${index + 1}. ${item.name}\n`;
+      message += `${parseFloat(item.price || 0).toLocaleString(
+        "en-NG"
+      )} x ${item.quantity || 1}\n`;
     });
-    message += `\n*TOTAL: ₦${total.toLocaleString()}*\n`;
-    
+
+    message += `\nTOTAL: ${parseFloat(total).toLocaleString("en-NG")} NGN\n`;
+
     return message;
-}
+  }
 
-// Window focus handler
-window.addEventListener('focus', () => {
-    hideLoading();
-});
+  // Close loader if user comes back
+  window.addEventListener("focus", hideLoading);
 
-// Before unload protection
-window.addEventListener('beforeunload', () => {
-    hideLoading();
-});
+  // Safety: hide loader on unload
+  window.addEventListener("beforeunload", hideLoading);
 </script>
 </body>
 </html>
