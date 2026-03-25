@@ -1251,18 +1251,18 @@
     try {
       // Let DB generate UUID id; DO NOT send custom string as id
       const orderData = {
-        customeremail: customer.email || getUserEmail(),
-        customername: customer.accountName || "Guest",
-        customeraddress: customer.address,
-        customerstate: customer.state,
-        customerphone: customer.phone || null,
-        customerbankname: customer.bankName,
+        customer_email: customer.email || getUserEmail(),
+        customer_name: customer.accountName || "Guest",
+        customer_address: customer.address,
+        customer_state: customer.state,
+        customer_phone: customer.phone || null,
+        customer_bank_name: customer.bankName,
         items: cart,
-        totalamount: total,
+        total_amount: total,
         status: "submitted",
-        paymentmethod: "Bank Transfer",
-        createdat: new Date().toISOString(),
-        updatedat: new Date().toISOString(),
+        payment_method: "Bank Transfer",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       };
 
       const { data: newOrder, error } = await supabaseClient
