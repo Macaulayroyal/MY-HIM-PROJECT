@@ -1215,154 +1215,122 @@
 
   // ---------- MAIN: CONFIRM TRANSFER ----------
   async function confirmTransfer() {
-    if (window.orderProcessing) {
-        console.log('Order already processing...');
-        return;
-    }
-
-    if (!validateCheckoutFields()) {
-    window.orderProcessing = false;  // ✅ ADD THIS
+  if (window.orderProcessing) {
+    console.log('Order already processing...');
     return;
   }
-
+  
+  // 🔥 VALIDATE FIRST - Before setting flag
+  if (!validateCheckoutFields()) return;
+  
+  const total = getCheckoutTotal();
+  const cart = JSON.parse(localStorage.getItem("checkoutCart")) || 
+               JSON.parse(localStorage.getItem("cart")) || [];
+  
   if (!cart || cart.length === 0 || total <= 0) {
-    window.orderProcessing = false;  // ✅ ADD THIS  
-    showToast("Cart empty", true);
+    showToast("Your cart is empty. Please add items first.", true);
     return;
   }
-    window.orderProcessing = true;
-    
-    if (!validateCheckoutFields()) {
-        window.orderProcessing = false;
-        return;
-    }
-
-    const total = getCheckoutTotal();
-    const cart =
-        JSON.parse(localStorage.getItem("checkoutCart")) ||
-        JSON.parse(localStorage.getItem("cart")) ||
-        [];
-
+  
+  // 🔥 NOW set flag AFTER validation
+  window.orderProcessing = true;
+  
+  const btn = document.querySelector(".confirm-btn") || 
+              document.querySelector(".modern-confirm-btn");
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+  }
+  
+  showLoading(true);
+  
+  try {
     const customer = getFieldValues();
+    const orderData = {
+      customer_email: customer.email || getUserEmail(),
+      customer_name: customer.accountName || "Guest",
+      customer_address: customer.address,
+      customer_state: customer.state,
+      customer_phone: customer.phone || null,
+      customer_bank_name: customer.bankName,
+      items: cart,
+      total_amount: total,
+      status: "submitted",
+      payment_method: "Bank Transfer",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
 
-    if (!cart || cart.length === 0 || total <= 0) {
-        showToast("Your cart is empty. Please add items first.", true);
-        window.orderProcessing = false;
-        return;
+    // 🔥 REMOVE THIS RPC - It's breaking realtime
+    // await supabaseClient.rpc('set_current_user_email', { p_email: customer.email || getUserEmail() });
+
+    const { data: newOrder, error } = await supabaseClient
+      .from("orders")
+      .insert(orderData)
+      .select();
+
+    if (error) throw new Error(error.message || "Database error");
+    if (!newOrder || newOrder.length === 0) throw new Error("Order creation failed");
+
+    const createdOrder = newOrder[0];
+    const orderId = createdOrder.id;
+    
+    // Track email
+    const finalEmail = customer.email || getUserEmail();
+    if (finalEmail) {
+      localStorage.setItem("guestTrackEmail", finalEmail);
+      localStorage.setItem("userEmail", finalEmail);
     }
 
-    const btn =
-        document.querySelector(".confirm-btn") ||
-        document.querySelector(".modern-confirm-btn");
-    if (btn) {
-        btn.disabled = true;
-        btn.innerHTML =
-            '<i class="fas fa-spinner fa-spin"></i> Processing...';
-    }
+    // 🔥 WHATSAPP - This WILL work now
+    const message = buildWhatsAppMessage(orderId, customer, cart, total);
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/2349129629049?text=${encodedMessage}`;
 
-    showLoading(true);
+    // Clear cart
+    localStorage.removeItem("cart");
+    localStorage.removeItem("checkoutCart");
+    localStorage.removeItem("pendingOrderId");
 
+    showToast("Order submitted! Opening WhatsApp...");
+
+    // WhatsApp - Multiple fallbacks
+    let whatsappOpened = false;
     try {
-        // Let DB generate UUID id; DO NOT send custom string as id
-        const orderData = {
-            customer_email: customer.email || getUserEmail(),
-            customer_name: customer.accountName || "Guest",
-            customer_address: customer.address,
-            customer_state: customer.state,
-            customer_phone: customer.phone || null,
-            customer_bank_name: customer.bankName,
-            items: cart,
-            total_amount: total,
-            status: "submitted",
-            payment_method: "Bank Transfer",
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-        };
-
-        // ✅ CRITICAL: Set session email for realtime filtering
-        await supabaseClient.rpc('set_current_user_email', { 
-            p_email: customer.email || getUserEmail() 
-        });
-
-        const { data: newOrder, error } = await supabaseClient
-            .from("orders")
-            .insert(orderData)
-            .select();
-
-        if (error) {
-            console.error("Supabase error details:", error);
-            throw new Error(error.message || "Database error occurred");
-        }
-
-        if (!newOrder || newOrder.length === 0) {
-            console.error("No data returned from insert");
-            throw new Error("Order creation failed - no data returned");
-        }
-
-        const createdOrder = newOrder[0];
-        const orderId = createdOrder.id; // UUID from DB
-
-        // Track email for guests
-        const finalEmail = customer.email || getUserEmail();
-        if (finalEmail) {
-            localStorage.setItem("guestTrackEmail", finalEmail);
-            localStorage.setItem("userEmail", finalEmail);
-        }
-
-        const message = buildWhatsAppMessage(orderId, customer, cart, total);
-        const encodedMessage = encodeURIComponent(message);
-        const whatsappUrl =
-            `https://wa.me/2349129629049?text=${encodedMessage}`;
-
-        // Clear cart BEFORE redirect
-        localStorage.removeItem("cart");
-        localStorage.removeItem("checkoutCart");
-        localStorage.removeItem("pendingOrderId");
-
-        showToast("Order submitted! Opening WhatsApp...");
-
-        let whatsappOpened = false;
-
-        // Method 1: window.open
-        try {
-            const newWindow = window.open(whatsappUrl, "_blank");
-            if (newWindow && !newWindow.closed) {
-                whatsappOpened = true;
-            }
-        } catch (e) {
-            console.log("window.open failed:", e);
-        }
-
-        // Method 2: location.href fallback
-        if (!whatsappOpened) {
-            setTimeout(() => {
-                window.location.href = whatsappUrl;
-            }, 500);
-        }
-
-        // Redirect to orders page after brief delay
-        setTimeout(() => {
-            hideLoading();
-            if (finalEmail) {
-                window.location.href =
-                    "orders.html?email=" + encodeURIComponent(finalEmail);
-            } else {
-                window.location.href = "orders.html";
-            }
-        }, 3000);
-        
-    } catch (error) {
-        console.error("Order creation error:", error);
-        showToast("Failed to create order: " + error.message, true);
-        hideLoading();
-        if (btn) {
-            btn.disabled = false;
-            btn.innerHTML =
-                '<i class="fab fa-whatsapp"></i> I Have Made This Transfer';
-        }
-    } finally {
-        window.orderProcessing = false;  // ✅ CRITICAL CLEANUP
+      const newWindow = window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+      if (newWindow) whatsappOpened = true;
+    } catch (e) {
+      console.log("window.open blocked:", e);
     }
+
+    if (!whatsappOpened) {
+      setTimeout(() => {
+        window.location.href = whatsappUrl;
+      }, 1000);
+      return;  // Don't redirect to orders if WhatsApp opened
+    }
+
+    // Redirect to orders
+    setTimeout(() => {
+      hideLoading();
+      if (finalEmail) {
+        window.location.href = "orders.html?email=" + encodeURIComponent(finalEmail);
+      } else {
+        window.location.href = "orders.html";
+      }
+    }, 3000);
+    
+  } catch (error) {
+    console.error("Order error:", error);
+    showToast("Failed: " + error.message, true);
+    hideLoading();
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fab fa-whatsapp"></i> I Have Made This Transfer';
+    }
+  } finally {
+    window.orderProcessing = false;
+  }
 }
   function buildWhatsAppMessage(orderId, customer, cart, total) {
     let message = "HIM.CLOTHIERS ORDER\n\n";
