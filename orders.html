@@ -1939,6 +1939,14 @@ function closeModal() {
     }
 }
 
+
+// In confirmTransfer(), BEFORE the supabase insert:
+await supabaseClient.rpc('set_current_user_email', { p_email: customer.email || getUserEmail() });
+
+// THEN your existing insert:
+const { data: newOrder, error } = await supabaseClient
+  .from('orders')
+  .insert(orderData)
 // ============================================
 // REALTIME - FIXED: Subscribe to specific user orders
 // ============================================
