@@ -1763,6 +1763,7 @@ function handleMenuClick(menuType) {
 
     if (menuType === 'notifications') {
         if (isGuest) {
+            pendingGuestAction = 'notifications'; // FIXED: Set the action
             openGuestModal('notifications');
         } else {
             window.location.href = 'notifications.html';
@@ -1772,6 +1773,7 @@ function handleMenuClick(menuType) {
 
     if (menuType === 'orders') {
         if (isGuest) {
+            pendingGuestAction = 'orders'; // FIXED: Set the action
             openGuestModal('orders');
         } else {
             window.location.href = 'orders.html';
@@ -1844,28 +1846,36 @@ async function submitGuestEmail() {
     }
 
     try {
-        // Check if this email has any orders
-        const { data, error } = await supabaseClient
-            .from('orders')
-            .select('id, customer_email')
-            .eq('customer_email', email)
-            .limit(1);
+        // Check if this email has any orders OR notifications
+        const [ordersCheck, notifsCheck] = await Promise.all([
+            supabaseClient
+                .from('orders')
+                .select('id')
+                .eq('customer_email', email)
+                .limit(1),
+            supabaseClient
+                .from('notifications')
+                .select('id')
+                .eq('user_email', email)
+                .limit(1)
+        ]);
 
-        if (error) throw error;
+        const hasOrders = ordersCheck.data && ordersCheck.data.length > 0;
+        const hasNotifications = notifsCheck.data && notifsCheck.data.length > 0;
 
-        if (!data || data.length === 0) {
-            // Show warning - no orders found
+        if (!hasOrders && !hasNotifications) {
+            // Show warning - no data found
             const warning = document.getElementById('guestModalWarning');
             const form = document.getElementById('guestModalForm');
             warning.style.display = 'block';
             form.style.display = 'none';
-            warning.textContent = 'No orders found for this email. Please check out first.';
+            warning.textContent = 'No orders or notifications found for this email. Please complete a checkout first.';
             return;
         }
 
         // SUCCESS - Save email and redirect
         localStorage.setItem('guestTrackEmail', email);
-        localStorage.setItem('userEmail', email);  // For compatibility
+        localStorage.setItem('userEmail', email);
         
         closeGuestModal();
 
@@ -1877,7 +1887,11 @@ async function submitGuestEmail() {
         
     } catch (err) {
         console.error('Error checking email:', err);
-        showGuestModalWarning();
+        const warning = document.getElementById('guestModalWarning');
+        const form = document.getElementById('guestModalForm');
+        warning.style.display = 'block';
+        form.style.display = 'none';
+        warning.textContent = 'Error checking email. Please try again.';
     }
 }
     function clearNotificationBadge() {

@@ -951,6 +951,9 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // ============================================
 // EMAIL DETECTION - FIXED: Clear cache on new URL param
 // ============================================
+// ============================================
+// EMAIL DETECTION - FIXED: Support both logged-in users and guests
+// ============================================
 const urlParams = new URLSearchParams(window.location.search);
 const emailFromUrl = urlParams.get('email');
 
@@ -960,13 +963,16 @@ if (emailFromUrl) {
     localStorage.setItem('userEmail', emailFromUrl);
 }
 
+// Check all possible email sources
 const emailFromStorage = localStorage.getItem('guestTrackEmail') || localStorage.getItem('userEmail');
 const emailFromAdmin = localStorage.getItem('adminEmail');
 
 const userEmail = emailFromUrl || emailFromStorage || emailFromAdmin;
 
+console.log('Email sources:', { emailFromUrl, emailFromStorage, emailFromAdmin });
 console.log('Using email:', userEmail);
 
+// FIXED: Allow guests to view notifications if they have email from checkout
 if (!userEmail) {
     window.location.href = 'profile.html';
 }
@@ -976,7 +982,6 @@ let notifications = [];
 let filteredNotifications = [];
 let currentFilter = 'all';
 let realtimeSubscription = null;
-
 // ============================================
 // INITIALIZATION
 // ============================================
@@ -1044,9 +1049,7 @@ async function loadNotifications() {
         console.error('Error loading notifications:', error);
         showEmptyState();
     }
-}
-
-// ============================================
+}// ============================================
 // COUNTS & FILTERING
 // ============================================
 function updateCounts() {

@@ -1514,27 +1514,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     const nameEl = document.getElementById('userName');
     if (nameEl) nameEl.textContent = localStorage.getItem('userName') || 'Guest';
     
-    // Load profile image
-    const profileImage = localStorage.getItem('userProfileImage');
+    // FIXED: Load profile image - check multiple possible storage keys
     const profileIconSpace = document.getElementById('profileIconSpace');
-    if (profileImage && profileIconSpace) {
-        profileIconSpace.innerHTML = `<img src="${profileImage}" alt="Profile" onerror="this.innerHTML='<i class=\\'fa-solid fa-user\\'></i>'">`;
+    if (profileIconSpace) {
+        // Check all possible image sources
+        const profileImage = localStorage.getItem('userProfileImage') || 
+                            localStorage.getItem('userAvatarUrl') || 
+                            localStorage.getItem('pendingAvatarUrl');
+        
+        if (profileImage && profileImage !== 'null' && profileImage !== '') {
+            profileIconSpace.innerHTML = `<img src="${profileImage}" alt="Profile" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-user\\'></i>'">`;
+        } else {
+            profileIconSpace.innerHTML = '<i class="fa-solid fa-user"></i>';
+        }
     }
     
     updateCartAndFavCounts();
     await loadOrders();
     setupRealtimeSubscriptions();
     setupScrollEffects();
-});
-
-// ============================================
-// NAVIGATION FUNCTIONS
-// ============================================
-function goBack() {
-    window.location.href = 'profile.html';
-}
-
-// ============================================
+});// ============================================
 // CART & FAVORITES
 // ============================================
 function updateCartAndFavCounts() {
