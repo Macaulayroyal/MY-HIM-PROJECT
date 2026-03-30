@@ -1246,22 +1246,21 @@
   showLoading(true);
   
   try {
-    const orderData = {
-  customer_email: customer.email || getUserEmail(),
-  customer_name: customer.accountName || "Guest",
-  customer_address: customer.address,
-  customer_state: customer.state,
-  customer_phone: customer.phone || null,
-  customer_bank_name: customer.bankName,
-  items: cart,
-  total_amount: total,
-  status: "submitted",  // ← Force this status only
-  payment_method: "Bank Transfer",
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  source: "checkout_direct"  // ← Track creator
-};;
-
+   const orderData = {
+    customer_email: customer.email || getUserEmail(),  // This email MUST be set
+    customer_name: customer.accountName || "Guest",
+    customer_address: customer.address,
+    customer_state: customer.state,
+    customer_phone: customer.phone || null,
+    customer_bank_name: customer.bankName,
+    items: cart,
+    total_amount: total,
+    status: "submitted",  // NOT "payment_submitted"
+    payment_method: "Bank Transfer",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    source: "checkout_direct"
+};
     const { data: newOrder, error } = await supabaseClient
       .from("orders")
       .insert(orderData)
