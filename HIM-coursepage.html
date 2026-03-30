@@ -2351,9 +2351,21 @@ let selectedSize = null;
 let selectedColor = null;
 
 // Initialize
+// Initialize
 window.addEventListener('load', async () => {
-    await initializeUserData();
-    await loadProductsFromSupabase();
+    try {
+        // Try to init user data, but don't let it block products
+        await initializeUserData();
+    } catch (e) {
+        console.error('User init error:', e);
+    }
+    
+    // ALWAYS load products regardless of user auth state
+    try {
+        await loadProductsFromSupabase();
+    } catch (e) {
+        console.error('Products load error:', e);
+    }
     
     setTimeout(() => {
         document.getElementById('loaderOverlay').classList.add('hidden');
