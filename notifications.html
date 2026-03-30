@@ -1045,22 +1045,21 @@ async function loadNotifications() {
             return;
         }
         
-        // CRITICAL FIX: Always fetch fresh data from server
+        // RLS automatically filters - we just fetch all
         const { data, error } = await supabaseClient
             .from('notifications')
             .select('*')
-            .eq('customer_email', userEmail)
-            .order('created_at', { ascending: false })
-            .limit(50);
+            .eq('customer_email', userEmail)  // Helps RLS, doesn't bypass
+            .order('created_at', { ascending: false });
         
         if (error) {
             console.error('Supabase error:', error);
             throw error;
         }
         
-        console.log('Notifications loaded:', data);
-        
+        console.log('Notifications loaded:', data?.length || 0);
         notifications = data || [];
+        
         updateCounts();
         applyFilter();
         
@@ -1069,7 +1068,6 @@ async function loadNotifications() {
         showEmptyState();
     }
 }
-
 // ============================================
 // COUNTS & FILTERING
 // ============================================

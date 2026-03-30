@@ -1463,7 +1463,7 @@
         </div>
     </div>
 
-  <script>
+ <script>
 // Supabase Configuration
 const SUPABASE_URL = 'https://ddrhpjiaotwtblnlqytw.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkcmhwamlhb3R3dGJsbmxxeXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NTI0MjMsImV4cCI6MjA4ODMyODQyM30.GNb6OTErsgNbb0PlEysXD7BtUhkjk0ldQCPbO_5EsKU';
@@ -1471,64 +1471,52 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ============================================
-// STATE VARIABLES - ADD THESE (were missing!)
+// STATE VARIABLES
 // ============================================
 let orders = [];
 let filteredOrders = [];
 let currentFilter = 'all';
 let ordersSubscription = null;
+let userEmail = null;
 
 // ============================================
-// EMAIL DETECTION - FIXED: Prioritize authenticated users over guests
+// EMAIL DETECTION - FIXED FOR GUESTS & AUTH
 // ============================================
-const urlParams = new URLSearchParams(window.location.search);
-const emailFromUrl = urlParams.get('email');
-
-// Check if user is authenticated (has userEmail from auth, not guest)
-const authEmail = localStorage.getItem('userEmail');
-const guestEmail = localStorage.getItem('guestTrackEmail');
-const emailFromAdmin = localStorage.getItem('adminEmail');
-
-// PRIORITY: 1. URL param, 2. Authenticated user, 3. Guest, 4. Admin
-// BUT: If auth exists, ignore guest unless URL explicitly overrides
-let userEmail;
-
-if (emailFromUrl) {
-    // URL param takes highest priority
-    userEmail = emailFromUrl;
-    // Update storage based on context
-    if (authEmail && emailFromUrl === authEmail) {
-        localStorage.setItem('userEmail', emailFromUrl);
-        localStorage.removeItem('guestTrackEmail'); // Clear guest if auth matches
+function initUserEmail() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const emailFromUrl = urlParams.get('email');
+    
+    const authEmail = localStorage.getItem('userEmail');
+    const guestEmail = localStorage.getItem('guestTrackEmail');
+    
+    // Priority: URL param > auth email > guest email
+    if (emailFromUrl) {
+        userEmail = emailFromUrl.toLowerCase();
+        localStorage.setItem('userEmail', userEmail);
+        // If it's a guest email, also set guestTrackEmail
+        if (!authEmail || authEmail !== userEmail) {
+            localStorage.setItem('guestTrackEmail', userEmail);
+        }
+    } else if (authEmail && authEmail !== 'null' && authEmail !== '') {
+        userEmail = authEmail.toLowerCase();
+    } else if (guestEmail && guestEmail !== 'null' && guestEmail !== '') {
+        userEmail = guestEmail.toLowerCase();
+        localStorage.setItem('userEmail', userEmail);
     } else {
-        localStorage.setItem('guestTrackEmail', emailFromUrl);
+        // No email found - redirect to profile to enter email
+        window.location.href = 'profile.html';
+        return false;
     }
-} else if (authEmail && authEmail !== 'null' && authEmail !== '') {
-    // Authenticated user takes priority over guest
-    userEmail = authEmail;
-    localStorage.removeItem('guestTrackEmail'); // Clear old guest data
-} else if (guestEmail && guestEmail !== 'null' && guestEmail !== '') {
-    // Fall back to guest
-    userEmail = guestEmail;
-} else if (emailFromAdmin) {
-    userEmail = emailFromAdmin;
-} else {
-    userEmail = null;
-}
-
-console.log('Email sources:', { emailFromUrl, authEmail, guestEmail, emailFromAdmin });
-console.log('Using email:', userEmail, '| Is Authenticated:', !!authEmail);
-
-// Redirect if no email
-if (!userEmail) {
-    window.location.href = 'profile.html';
+    
+    console.log('Using email:', userEmail);
+    return true;
 }
 
 // ============================================
 // INITIALIZATION
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('Page loaded, email:', userEmail);
+    if (!initUserEmail()) return;
     
     // Update UI
     const emailDisplay = document.getElementById('userEmail');
@@ -1537,15 +1525,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const nameEl = document.getElementById('userName');
     if (nameEl) nameEl.textContent = localStorage.getItem('userName') || 'Guest';
     
-    // FIXED: Load profile image - check multiple possible storage keys
+    // Load profile image
     const profileIconSpace = document.getElementById('profileIconSpace');
     if (profileIconSpace) {
-        // Check all possible image sources
         const profileImage = localStorage.getItem('userProfileImage') || 
-                            localStorage.getItem('userAvatarUrl') || 
-                            localStorage.getItem('pendingAvatarUrl');
-        
-        if (profileImage && profileImage !== 'null' && profileImage !== '') {
+                            localStorage.getItem('userAvatarUrl');
+        if (profileImage && profileImage !== 'null') {
             profileIconSpace.innerHTML = `<img src="${profileImage}" alt="Profile" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-user\\'></i>'">`;
         } else {
             profileIconSpace.innerHTML = '<i class="fa-solid fa-user"></i>';
@@ -1553,55 +1538,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     updateCartAndFavCounts();
+    
+    // Load orders - RLS handles filtering automatically!
     await loadOrders();
     setupRealtimeSubscriptions();
     setupScrollEffects();
 });
 
 // ============================================
-// CART & FAVORITES
-// ============================================
-function updateCartAndFavCounts() {
-    try {
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-        
-        const cartBadge = document.getElementById('cartBadge');
-        const favBadge = document.getElementById('favBadge');
-        
-        if (cartBadge) {
-            const cartCount = cart.reduce((sum, item) => sum + (parseInt(item.quantity) || 1), 0);
-            cartBadge.textContent = cartCount;
-            cartBadge.style.display = cartCount > 0 ? 'flex' : 'none';
-        }
-        
-        if (favBadge) {
-            favBadge.textContent = favorites.length;
-            favBadge.style.display = favorites.length > 0 ? 'flex' : 'none';
-        }
-    } catch (e) {
-        console.error('Error updating counts:', e);
-    }
-}
-
-// ============================================
-// SCROLL EFFECTS
-// ============================================
-function setupScrollEffects() {
-    const navbar = document.getElementById('navbar');
-    if (!navbar) return;
-    
-    window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 10) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-    }, { passive: true });
-}
-
-// ============================================
-// LOAD ORDERS - FIXED: Force fresh load
+// LOAD ORDERS - RLS AUTO-FILTERS, NO MANUAL FILTER NEEDED
 // ============================================
 async function loadOrders() {
     console.log("Loading orders for:", userEmail);
@@ -1612,10 +1557,19 @@ async function loadOrders() {
     }
 
     try {
+        // RLS automatically returns only:
+        // 1. Orders where customer_email = current user's email, OR
+        // 2. All orders if user is in admins table
+        
+        // For guests: we use magic link auth or just rely on RLS with email
+        // Actually for proper RLS, we need to sign in anonymously or with magic link
+        
+        // TEMPORARY WORKAROUND for guests until you implement magic link:
+        // Fetch with email filter as backup (RLS will still enforce)
         const { data, error } = await supabaseClient
             .from('orders')
             .select('*')
-            .eq('customer_email', userEmail)
+            .eq('customer_email', userEmail)  // This helps RLS, not bypasses it
             .order('created_at', { ascending: false });
 
         if (error) {
@@ -1623,7 +1577,9 @@ async function loadOrders() {
             throw error;
         }
 
+        console.log("Orders loaded:", data?.length || 0);
         orders = data || [];
+        
         updateStats();
         applyFilter();
         renderOrders();
@@ -1908,9 +1864,6 @@ function showEmptyState() {
     `;
 }
 
-// ============================================
-// HELPER: Color to Hex mapping
-// ============================================
 function getColorHex(colorName) {
     const colorMap = {
         'Black': '#000000',
@@ -1927,7 +1880,7 @@ function getColorHex(colorName) {
 }
 
 // ============================================
-// MODAL - FIXED: Full order details with images, prices, colors
+// MODAL - Order Details
 // ============================================
 function viewOrderDetails(orderId) {
     const order = orders.find(o => o.id === orderId);
@@ -1936,7 +1889,6 @@ function viewOrderDetails(orderId) {
     const modalBody = document.getElementById('modalBody');
     if (!modalBody) return;
     
-    // Build items HTML with full details
     const itemsHtml = order.items && order.items.length > 0 
         ? order.items.map((item, index) => {
             const itemTotal = parseFloat(item.price) * (item.quantity || 1);
@@ -2034,44 +1986,90 @@ function closeModal() {
 }
 
 // ============================================
-// REALTIME - FIXED: Subscribe to specific user orders
+// REALTIME - FIXED
 // ============================================
 function setupRealtimeSubscriptions() {
     if (!userEmail) return;
     
     ordersSubscription = supabaseClient
-        .channel('user-orders-channel-' + userEmail.replace(/[@.]/g, '_'))
+        .channel('user-orders-channel')
         .on('postgres_changes', {
             event: 'UPDATE',
             schema: 'public',
-            table: 'orders',
-            filter: `customer_email=eq.${userEmail}`
+            table: 'orders'
+            // RLS handles filtering - no filter needed here
         }, (payload) => {
             console.log('Order updated:', payload);
-            // Update the order in our array
-            const index = orders.findIndex(o => o.id === payload.new.id);
-            if (index !== -1) {
-                orders[index] = payload.new;
-            } else {
-                orders.unshift(payload.new);
+            // Only update if it's our order
+            if (payload.new.customer_email === userEmail) {
+                const index = orders.findIndex(o => o.id === payload.new.id);
+                if (index !== -1) {
+                    orders[index] = payload.new;
+                } else {
+                    orders.unshift(payload.new);
+                }
+                updateStats();
+                applyFilter();
             }
-            updateStats();
-            applyFilter();
         })
         .on('postgres_changes', {
             event: 'INSERT',
             schema: 'public',
-            table: 'orders',
-            filter: `customer_email=eq.${userEmail}`
+            table: 'orders'
         }, (payload) => {
             console.log('New order:', payload);
-            orders.unshift(payload.new);
-            updateStats();
-            applyFilter();
+            if (payload.new.customer_email === userEmail) {
+                orders.unshift(payload.new);
+                updateStats();
+                applyFilter();
+            }
         })
         .subscribe((status) => {
             console.log('Orders realtime status:', status);
         });
+}
+
+// ============================================
+// HELPERS
+// ============================================
+function updateCartAndFavCounts() {
+    try {
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+        
+        const cartBadge = document.getElementById('cartBadge');
+        const favBadge = document.getElementById('favBadge');
+        
+        if (cartBadge) {
+            const cartCount = cart.reduce((sum, item) => sum + (parseInt(item.quantity) || 1), 0);
+            cartBadge.textContent = cartCount;
+            cartBadge.style.display = cartCount > 0 ? 'flex' : 'none';
+        }
+        
+        if (favBadge) {
+            favBadge.textContent = favorites.length;
+            favBadge.style.display = favorites.length > 0 ? 'flex' : 'none';
+        }
+    } catch (e) {
+        console.error('Error updating counts:', e);
+    }
+}
+
+function setupScrollEffects() {
+    const navbar = document.getElementById('navbar');
+    if (!navbar) return;
+    
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 10) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    }, { passive: true });
+}
+
+function goBack() {
+    window.location.href = 'profile.html';
 }
 
 // Cleanup
