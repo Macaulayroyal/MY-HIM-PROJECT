@@ -2373,6 +2373,7 @@ window.addEventListener('load', async () => {
 });
 
 // Load Products from Supabase
+// Load Products from Supabase
 async function loadProductsFromSupabase() {
     showSyncStatus('syncing');
     
@@ -2380,7 +2381,7 @@ async function loadProductsFromSupabase() {
         const { data, error } = await supabaseClient
             .from('products')
             .select('*')
-            .eq('is_active', true)
+            // REMOVED: .eq('is_active', true)  ← This was causing the 500 error
             .order('created_at', { ascending: false });
         
         if (error) throw error;
@@ -2397,7 +2398,7 @@ async function loadProductsFromSupabase() {
             <div class="empty-products" style="text-align:center; padding:40px;">
                 <i class="fas fa-exclamation-circle" style="font-size:3rem; color:#dc3545; margin-bottom:16px;"></i>
                 <p>Failed to load products. Please check your connection and try again.</p>
-                <button onclick="loadProductsFromSupabase()" style="margin-top:16px; padding:10px 20px;">Retry</button>
+                <button onclick="loadProductsFromSupabase()" style="margin-top:16px; padding:10px 20px; background:#6F4D38; color:white; border:none; border-radius:8px; cursor:pointer;">Retry</button>
             </div>
         `;
     }

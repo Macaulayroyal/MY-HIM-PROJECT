@@ -1468,7 +1468,6 @@
 </nav>
 
 <script>
-
     const SUPABASE_URL = 'https://ddrhpjiaotwtblnlqytw.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkcmhwamlhb3R3dGJsbmxxeXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NTI0MjMsImV4cCI6MjA4ODMyODQyM30.GNb6OTErsgNbb0PlEysXD7BtUhkjk0ldQCPbO_5EsKU';
     
@@ -1504,12 +1503,19 @@
     }
 
     window.addEventListener('load', async () => {
-    await loadProductsFromSupabase();
-    
-    setTimeout(() => {
-        document.getElementById('loaderOverlay').classList.add('hidden');
-    }, 500);
-});
+        loadFromLocalStorage();
+        updateAllBadges();
+        
+        await syncWithSupabase();
+        await initializeBadges();
+        setupRealtimeSubscriptions();
+        updateGuestStateUI();
+        
+        setTimeout(() => {
+            const loader = document.getElementById('loaderOverlay');
+            if (loader) loader.classList.add('hidden');
+        }, 500);
+    });
 
     document.addEventListener('visibilitychange', async () => {
         if (document.visibilityState === 'visible') {
