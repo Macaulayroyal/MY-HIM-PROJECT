@@ -1546,7 +1546,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================
-// LOAD ORDERS - RLS AUTO-FILTERS, NO MANUAL FILTER NEEDED
+// LOAD ORDERS
 // ============================================
 async function loadOrders() {
     console.log("Loading orders for:", userEmail);
@@ -1557,25 +1557,13 @@ async function loadOrders() {
     }
 
     try {
-        // RLS automatically returns only:
-        // 1. Orders where customer_email = current user's email, OR
-        // 2. All orders if user is in admins table
-        
-        // For guests: we use magic link auth or just rely on RLS with email
-        // Actually for proper RLS, we need to sign in anonymously or with magic link
-        
-        // TEMPORARY WORKAROUND for guests until you implement magic link:
-        // Fetch with email filter as backup (RLS will still enforce)
         const { data, error } = await supabaseClient
             .from('orders')
             .select('*')
-            .eq('customer_email', userEmail)  // This helps RLS, not bypasses it
+            .eq('customer_email', userEmail)
             .order('created_at', { ascending: false });
 
-        if (error) {
-            console.error("Supabase error:", error);
-            throw error;
-        }
+        if (error) throw error;
 
         console.log("Orders loaded:", data?.length || 0);
         orders = data || [];
@@ -1858,7 +1846,7 @@ function showEmptyState() {
         <div class="empty-state">
             <div class="empty-illustration"></div>
             <h3>No orders found</h3>
-            <p>No orders found for ${userEmail}.</p>
+            <p>No orders found for ${userEmail || 'this account'}.</p>
             <button class="empty-action" onclick="window.location.href='HIM-coursepage.html'">Start Shopping</button>
         </div>
     `;
@@ -1986,48 +1974,49 @@ function closeModal() {
 }
 
 // ============================================
-// REALTIME - FIXED
+// REALTIME - FIXED WITH PROPER FILTER
 // ============================================
 function setupRealtimeSubscriptions() {
     if (!userEmail) return;
     
+    console.log('Setting up realtime for orders of:', userEmail);
+    
     ordersSubscription = supabaseClient
-        .channel('user-orders-channel')
-        .on('postgres_changes', {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'orders'
-            // RLS handles filtering - no filter needed here
-        }, (payload) => {
-            console.log('Order updated:', payload);
-            // Only update if it's our order
-            if (payload.new.customer_email === userEmail) {
-                const index = orders.findIndex(o => o.id === payload.new.id);
-                if (index !== -1) {
-                    orders[index] = payload.new;
-                } else {
-                    orders.unshift(payload.new);
-                }
-                updateStats();
-                applyFilter();
-            }
-        })
+        .channel('user-orders-channel-' + userEmail.replace(/[@.]/g, '_'))
         .on('postgres_changes', {
             event: 'INSERT',
             schema: 'public',
-            table: 'orders'
+            table: 'orders',
+            filter: `customer_email=eq.${userEmail}`
         }, (payload) => {
-            console.log('New order:', payload);
-            if (payload.new.customer_email === userEmail) {
+            console.log('New order received:', payload);
+            orders.unshift(payload.new);
+            updateStats();
+            applyFilter();
+            renderOrders();
+        })
+        .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'orders',
+            filter: `customer_email=eq.${userEmail}`
+        }, (payload) => {
+            console.log('Order updated:', payload);
+            const index = orders.findIndex(o => o.id === payload.new.id);
+            if (index !== -1) {
+                orders[index] = payload.new;
+            } else {
                 orders.unshift(payload.new);
-                updateStats();
-                applyFilter();
             }
+            updateStats();
+            applyFilter();
+            renderOrders();
         })
         .subscribe((status) => {
             console.log('Orders realtime status:', status);
         });
 }
+
 
 // ============================================
 // HELPERS

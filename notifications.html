@@ -828,6 +828,10 @@
                 background: rgba(26, 26, 26, 0.8);
             }
         }
+        @keyframes toastSlideOut {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(100%); }
+}
     </style>
 </head>
 <body>
@@ -1045,21 +1049,16 @@ async function loadNotifications() {
             return;
         }
         
-        // RLS automatically filters - we just fetch all
+        // ←←← THIS WAS THE PRIVACY BUG
         const { data, error } = await supabaseClient
             .from('notifications')
             .select('*')
-            .eq('customer_email', userEmail)  // Helps RLS, doesn't bypass
+            .eq('customer_email', userEmail)   // ←←← ADD THIS LINE
             .order('created_at', { ascending: false });
         
-        if (error) {
-            console.error('Supabase error:', error);
-            throw error;
-        }
+        if (error) throw error;
         
-        console.log('Notifications loaded:', data?.length || 0);
         notifications = data || [];
-        
         updateCounts();
         applyFilter();
         
@@ -1067,8 +1066,7 @@ async function loadNotifications() {
         console.error('Error loading notifications:', error);
         showEmptyState();
     }
-}
-// ============================================
+}// ============================================
 // COUNTS & FILTERING
 // ============================================
 function updateCounts() {
@@ -1139,8 +1137,11 @@ function renderNotifications() {
                 const isUnread = !notif.is_read;
                 const type = notif.type || 'general';
                 
-                let icon, title, message, cardClass;
-                
+                let icon = '•';
+                let title = notif.title || 'Update';
+                let message = notif.message || 'You have a new notification.';
+                let cardClass = 'pending';
+
                 if (type === 'accepted' || notif.title?.includes('Confirmed')) {
                     icon = '✓';
                     title = notif.title || 'Payment Confirmed';
@@ -1155,11 +1156,6 @@ function renderNotifications() {
                     icon = '📦';
                     title = notif.title || 'Order Update';
                     message = notif.message || 'Your order status has been updated.';
-                    cardClass = 'pending';
-                } else {
-                    icon = '•';
-                    title = notif.title || 'Update';
-                    message = notif.message || 'You have a new notification.';
                     cardClass = 'pending';
                 }
                 
@@ -1282,7 +1278,7 @@ async function markAllAsRead() {
 }
 
 function toggleSelectionMode() {
-    console.log('Selection mode toggled');
+    alert('Multi-select mode is not implemented yet. Coming soon!');
 }
 
 // ============================================

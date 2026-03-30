@@ -1468,8 +1468,7 @@
 </nav>
 
 <script>
-
-
+    
     const SUPABASE_URL = 'https://ddrhpjiaotwtblnlqytw.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkcmhwamlhb3R3dGJsbmxxeXR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NTI0MjMsImV4cCI6MjA4ODMyODQyM30.GNb6OTErsgNbb0PlEysXD7BtUhkjk0ldQCPbO_5EsKU';
     
@@ -1561,7 +1560,7 @@
             const { count, error } = await supabaseClient
                 .from('notifications')
                 .select('*', { count: 'exact', head: true })
-                .eq('user_email', userEmail)
+                .eq('customer_email', userEmail)
                 .eq('is_read', false);
 
             if (error) throw error;
@@ -1571,7 +1570,7 @@
                 const { data } = await supabaseClient
                     .from('notifications')
                     .select('id')
-                    .eq('user_email', userEmail)
+                    .eq('customer_email', userEmail)
                     .eq('is_read', false);
 
                 if (data) {
@@ -1905,7 +1904,7 @@ async function submitGuestEmail() {
             supabaseClient
                 .from('notifications')
                 .update({ is_read: true })
-                .eq('user_email', userEmail)
+                .eq('customer_email', userEmail)
                 .eq('is_read', false)
                 .then(() => console.log('Notifications marked as read'))
                 .catch(err => console.error('Error:', err));
@@ -2195,28 +2194,7 @@ async function submitGuestEmail() {
         if (ordersSubscription) supabaseClient.removeChannel(ordersSubscription);
     });
 
-// Guest enters email in modal → fetch their orders
-async function loadGuestOrders(email) {
-    const { data, error } = await supabaseClient
-        .from('orders')
-        .select(`
-            id,
-            status,
-            customer_email,
-            customer_address,
-            total_amount,
-            created_at,
-            items
-        `)
-        .eq('customer_email', email)  // ✅ Uses checkout email
-        .order('created_at', { ascending: false });
-    
-    if (data) {
-        displayOrders(data);
-    }
-}
 
-    
 </script>
 
 <style>

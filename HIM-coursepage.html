@@ -2002,6 +2002,22 @@
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
+
+/* Add this inside your <style> tag */
+.toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    z-index: 10000;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    animation: toastIn 0.3s ease;
+}
     </style>
 </head>
 <body>
@@ -2366,9 +2382,10 @@ async function loadProductsFromSupabase() {
         showSyncStatus('error');
         
         document.getElementById('productsGrid').innerHTML = `
-            <div class="empty-products">
-                <i class="fas fa-exclamation-circle"></i>
-                <p>Failed to load products. Please try again later.</p>
+            <div class="empty-products" style="text-align:center; padding:40px;">
+                <i class="fas fa-exclamation-circle" style="font-size:3rem; color:#dc3545; margin-bottom:16px;"></i>
+                <p>Failed to load products. Please check your connection and try again.</p>
+                <button onclick="loadProductsFromSupabase()" style="margin-top:16px; padding:10px 20px;">Retry</button>
             </div>
         `;
     }
@@ -2758,7 +2775,7 @@ function updateCartTotals() {
     document.getElementById('cartTotalAmount').textContent = `₦${subtotal.toLocaleString()}`;
 }
 
-// FIXED: Proper checkout flow that creates order before redirecting
+// FIXED: Proper checkout flow - just prepare cart and redirect
 async function checkoutAll() {
     if (cart.length === 0) {
         showToast('Your cart is empty!');
@@ -2767,69 +2784,22 @@ async function checkoutAll() {
     
     const total = cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
     
-    // Get user info
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    const userId = session?.user?.id || currentUserId || localStorage.getItem('tempUserId') || 'guest_' + Date.now();
+    // Simply save the current cart and total, then redirect to checkout page
+    localStorage.setItem('checkoutCart', JSON.stringify(cart));
+    localStorage.setItem('checkoutTotal', total.toString());
     
-    const userName = localStorage.getItem('userName') || 'Guest';
-    const userEmail = session?.user?.email || localStorage.getItem('userEmail') || '';
+    // Optional: save a pending order ID if you want
+    const pendingOrderId = 'pending_' + Date.now();
+    localStorage.setItem('pendingOrderId', pendingOrderId);
     
-    // Create order data - ensure proper types
-    const orderData = {
-        user_id: userId.startsWith('temp_') || userId.startsWith('guest_') ? null : userId,
-        customer_name: String(userName),
-        customer_email: String(userEmail),
-        customer_phone: '',
-        items: cart.map(item => ({
-            product_id: parseInt(item.id) || 0,
-            name: String(item.name || ''),
-            price: parseFloat(item.price) || 0,
-            quantity: parseInt(item.quantity) || 1,
-            size: item.size || null,
-            color: item.color || null,
-            image: item.image || null
-        })),
-        total_amount: parseFloat(total),
-        status: 'pending',
-        payment_method: 'Bank Transfer',
-        bank_details: {
-            bank: 'Moniepoint',
-            account: '9012949580',
-            name: 'Isah David Olearekhai'
-        }
-    };
+    showToast('Redirecting to checkout...');
     
-    showSyncStatus('syncing');
-    
-    try {
-        // Save order to Supabase
-        const { data, error } = await supabaseClient
-            .from('orders')
-            .insert(orderData)
-            .select()
-            .single();
-        
-        if (error) {
-            console.error('Supabase error:', error);
-            throw error;
-        }
-        
-        // Store order ID for checkout page
-        localStorage.setItem('pendingOrderId', data.id);
-        localStorage.setItem('checkoutCart', JSON.stringify(cart));
-        localStorage.setItem('checkoutTotal', total);
-        
-        showSyncStatus('synced');
-        
-        // Redirect to checkout
-        window.location.href = `checkout.html?order_id=${data.id}&total=${total}`;
-        
-    } catch (error) {
-        console.error('Error creating order:', error);
-        showSyncStatus('error');
-        showToast('Failed to create order: ' + (error.message || 'Unknown error'));
-    }
+    // Redirect to checkout page
+    setTimeout(() => {
+        window.location.href = `checkout.html?total=${total}`;
+    }, 800);
 }
+
 // Favorites Functions
 function openFavoritesModal() {
     renderFavoritesItems();

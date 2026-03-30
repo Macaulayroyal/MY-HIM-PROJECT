@@ -1214,120 +1214,116 @@
   }
 
   // ---------- MAIN: CONFIRM TRANSFER ----------
-  async function confirmTransfer() {
-  // Prevent double-click
-  if (window.orderProcessing) {
-    console.log('Order already processing...');
-    return;
-  }
-  
-  const customer = getFieldValues();
-  const total = getCheckoutTotal();
-  const cart = JSON.parse(localStorage.getItem("checkoutCart")) || 
-               JSON.parse(localStorage.getItem("cart")) || [];
-  
-  // Validate BEFORE any processing
-  if (!validateCheckoutFields()) return;
-  if (!cart || cart.length === 0 || total <= 0) {
-    showToast("Your cart is empty. Please add items first.", true);
-    return;
-  }
-  
-  // NOW set flag after validation
-  window.orderProcessing = true;
-  
-  const btn = document.querySelector(".confirm-btn") || 
-              document.querySelector(".modern-confirm-btn");
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-  }
-  
-  showLoading(true);
-  
-  try {
-   const orderData = {
-    customer_email: customer.email || getUserEmail(),  // This email MUST be set
-    customer_name: customer.accountName || "Guest",
-    customer_address: customer.address,
-    customer_state: customer.state,
-    customer_phone: customer.phone || null,
-    customer_bank_name: customer.bankName,
-    items: cart,
-    total_amount: total,
-    status: "submitted",  // NOT "payment_submitted"
-    payment_method: "Bank Transfer",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    source: "checkout_direct"
-};
-    const { data: newOrder, error } = await supabaseClient
-      .from("orders")
-      .insert(orderData)
-      .select();
-
-    if (error) throw new Error(error.message || "Database error");
-    if (!newOrder || newOrder.length === 0) throw new Error("Order creation failed");
-
-    const createdOrder = newOrder[0];
-    const orderId = createdOrder.id;
-    
-    // Track email for guest/signed-in
-    const finalEmail = customer.email || getUserEmail();
-    if (finalEmail) {
-      localStorage.setItem("guestTrackEmail", finalEmail);
-      localStorage.setItem("userEmail", finalEmail);
+async function confirmTransfer() {
+    if (window.orderProcessing) {
+        console.log('Order already processing...');
+        return;
     }
-
-    // WhatsApp message
-    const message = buildWhatsAppMessage(orderId, customer, cart, total);
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/2349129629049?text=${encodedMessage}`;
-
-    // Clear cart
-    localStorage.removeItem("cart");
-    localStorage.removeItem("checkoutCart");
-    localStorage.removeItem("pendingOrderId");
-
-    showToast("Order submitted! Opening WhatsApp...");
-
-    // WhatsApp - Multiple fallbacks
-    let whatsappOpened = false;
-    try {
-      const newWindow = window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-      if (newWindow) whatsappOpened = true;
-    } catch (e) {
-      console.log("window.open blocked:", e);
+  
+    const customer = getFieldValues();
+    const total = getCheckoutTotal();
+    const cart = JSON.parse(localStorage.getItem("checkoutCart")) || 
+                 JSON.parse(localStorage.getItem("cart")) || [];
+  
+    if (!validateCheckoutFields()) return;
+    if (!cart || cart.length === 0 || total <= 0) {
+        showToast("Your cart is empty. Please add items first.", true);
+        return;
     }
-
-    if (!whatsappOpened) {
-      // Fallback: direct redirect
-      setTimeout(() => {
-        window.location.href = whatsappUrl;
-      }, 1000);
-      return;
-    }
-
-    // Success: redirect to orders page
-    setTimeout(() => {
-      hideLoading();
-      window.location.href = finalEmail 
-        ? `orders.html?email=${encodeURIComponent(finalEmail)}`
-        : "orders.html";
-    }, 2000);
-    
-  } catch (error) {
-    console.error("Order error:", error);
-    showToast("Failed to create order: " + error.message, true);
-    hideLoading();
+  
+    window.orderProcessing = true;
+  
+    const btn = document.querySelector(".confirm-btn") || 
+                document.querySelector(".modern-confirm-btn");
     if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fab fa-whatsapp"></i> I Have Made This Transfer';
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
     }
-  } finally {
-    window.orderProcessing = false;
-  }
-}  function buildWhatsAppMessage(orderId, customer, cart, total) {
+  
+    showLoading(true);
+  
+    try {
+        const finalEmail = customer.email || getUserEmail();
+
+        const orderData = {
+            customer_email: finalEmail,
+            customer_name: customer.accountName || "Guest",
+            customer_address: customer.address,
+            customer_state: customer.state,
+            customer_phone: customer.phone || null,
+            customer_bank_name: customer.bankName,
+            items: cart,
+            total_amount: total,
+            status: "submitted",
+            payment_method: "Bank Transfer",
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            source: "checkout_direct"
+        };
+
+        const { data: newOrder, error } = await supabaseClient
+            .from("orders")
+            .insert(orderData)
+            .select();
+
+        if (error) throw new Error(error.message || "Database error");
+        if (!newOrder || newOrder.length === 0) throw new Error("Order creation failed");
+
+        const orderId = newOrder[0].id;
+        
+        // Save email for tracking
+        if (finalEmail) {
+            localStorage.setItem("guestTrackEmail", finalEmail);
+            localStorage.setItem("userEmail", finalEmail);
+        }
+
+        // WhatsApp message
+        const message = buildWhatsAppMessage(orderId, customer, cart, total);
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/2349129629049?text=${encodedMessage}`;
+
+        // Clear cart
+        localStorage.removeItem("cart");
+        localStorage.removeItem("checkoutCart");
+        localStorage.removeItem("pendingOrderId");
+
+        showToast("Order submitted! Opening WhatsApp...");
+
+        let whatsappOpened = false;
+        try {
+            const newWindow = window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+            if (newWindow) whatsappOpened = true;
+        } catch (e) {
+            console.log("window.open blocked:", e);
+        }
+
+        if (!whatsappOpened) {
+            setTimeout(() => {
+                window.location.href = whatsappUrl;
+            }, 1000);
+            return;
+        }
+
+        setTimeout(() => {
+            hideLoading();
+            window.location.href = finalEmail 
+                ? `orders.html?email=${encodeURIComponent(finalEmail)}`
+                : "orders.html";
+        }, 2000);
+        
+    } catch (error) {
+        console.error("Order error:", error);
+        showToast("Failed to create order: " + error.message, true);
+        hideLoading();
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fab fa-whatsapp"></i> I Have Made This Transfer';
+        }
+    } finally {
+        window.orderProcessing = false;
+    }
+}
+function buildWhatsAppMessage(orderId, customer, cart, total) {
     let message = "HIM.CLOTHIERS ORDER\n\n";
 
     message += "ORDER DETAILS\n";
